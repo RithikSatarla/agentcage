@@ -3,7 +3,7 @@
 ## Local development
 
 ```bash
-git clone https://github.com/rithi/agentcage.git
+git clone https://github.com/RithikSatarla/agentcage.git
 cd agentcage
 python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -22,7 +22,7 @@ The repository is initialised locally with an `initial` commit. To publish:
 #    (no README, no .gitignore, no license — this repo already has them)
 
 # 2. point the local repo at it and push
-git remote add origin https://github.com/<YOUR_ORG>/agentcage.git
+git remote add origin https://github.com/RithikSatarla/agentcage.git
 git branch -M main
 git push -u origin main
 ```
@@ -34,7 +34,7 @@ Then, in the repository settings:
 - **Pages** — leave disabled. Vercel serves the site.
 
 Update the `[project.urls]` entries in `pyproject.toml` and the badge URL in `README.md` if
-you push under an organisation other than `rithi`.
+you push under an organisation other than `RithikSatarla`.
 
 ## Vercel (the website is not built yet)
 

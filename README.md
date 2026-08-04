@@ -2,7 +2,7 @@
 
 **Stateful mocking for AI agents that write.**
 
-[![tests](https://github.com/rithi/agentcage/actions/workflows/test.yml/badge.svg)](https://github.com/rithi/agentcage/actions/workflows/test.yml)
+[![tests](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml/badge.svg)](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -81,7 +81,7 @@ Part A is exploratory. Part B's evaluation is pre-registered and has not been ru
 ## Quickstart
 
 ```bash
-git clone https://github.com/rithi/agentcage.git
+git clone https://github.com/RithikSatarla/agentcage.git
 cd agentcage
 pip install -e ".[dev]"
 

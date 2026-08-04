@@ -27,8 +27,8 @@ dependencies = [
 dev = ["pytest>=7.0", "black>=23.0", "ruff>=0.1"]
 
 [project.urls]
-Homepage = "https://github.com/rithi/agentcage"
-Protocol = "https://github.com/rithi/agentcage/blob/main/PROTOCOL.md"
+Homepage = "https://github.com/RithikSatarla/agentcage"
+Protocol = "https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md"
 
 [project.scripts]
 agentcage-part-a = "part_a.run:main"

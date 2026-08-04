@@ -13,6 +13,11 @@
 
 \input{generated_macros}
 
+% Long \texttt{} paths (part_b/demo_double_refund.py) cannot be hyphenated, so TeX
+% would rather overrun the margin than stretch a line. Let it stretch instead.
+\emergencystretch=3em
+\hbadness=2000
+
 \lstset{
   basicstyle=\ttfamily\footnotesize,
   breaklines=true,
@@ -309,28 +314,99 @@ double-refund, over-refund, refund-after-refund, and read-after-write, and no mo
 Stating this boundary matters: a mock's silent divergence from the real API is itself a
 source of false confidence.
 
+\subsection{Worked example}
+
+The smallest complete demonstration, produced by \texttt{part\_b/demo\_double\_refund.py}
+and committed as \texttt{traces/example\_double\_refund.json}:
+
+\begin{lstlisting}
+POST /v1/charges         -> 200   ch_00000001 created, 5000 usd
+POST /v1/refunds         -> 200   amount_refunded 0 -> 5000
+POST /v1/refunds         -> 400   charge_already_refunded    <- the retry
+GET  /v1/charges/ch_...  -> 200   amount_refunded == 5000
+\end{lstlisting}
+
+Both \texttt{POST /v1/refunds} requests are byte-identical. A replay fixture answers the
+second with 200 and the customer is refunded twice; the stateful model refuses it. The
+captured trace carries \texttt{authorization: <redacted>}, which is what makes traces
+publishable artefacts.
+
 \subsection{Pre-registered evaluation}
+\label{sec:prereg}
 
-\textbf{H1.} Agents that pass their existing replay-based suites exhibit write-path
-defects when run against a stateful model.
+\textbf{Status: not run. No results exist for this section.} It is stated before the
+experiment precisely so that it cannot change afterwards.
 
-\textbf{Procedure.} Sample agents from the Part A analysed set that perform
-payment-like writes. For each: run its own suite unmodified (expected: passes); re-run
-against the stateful model through the interceptor; classify every divergence.
+\paragraph{H1.} Agents that pass their existing replay-based suites exhibit write-path
+defects when the same paths are exercised against a stateful model.
 
-\textbf{Primary outcome.} The proportion of sampled agents exhibiting at least one
-defect in these pre-specified classes: (1) \emph{duplicate write}---the same logical
-mutation applied twice; (2) \emph{unchecked error}---a 4xx treated as success;
-(3) \emph{stale read}---a decision taken on state cached from before a write;
-(4) \emph{over-refund}---a refund exceeding the unrefunded amount.
+\paragraph{Sample and exclusions.} Drawn from the Part A analysed set, restricted to
+repositories whose tools perform payment-like writes. Pre-specified exclusions: no
+runnable suite; write tools requiring credentials we cannot substitute; tools that mutate
+only local filesystem state, giving the interceptor no HTTP surface to observe. Any agent
+added or dropped after its result is known will be reported as such.
 
-\textbf{Falsification.} H1 is not supported if fewer than 20\% of sampled agents
-exhibit any class-1--4 defect.
+\paragraph{Procedure.} For each agent: run its own suite unmodified (expected: passes;
+an agent whose suite already fails is excluded and reported); re-run its write paths
+through the interceptor against the stateful model; grade every request by the resolution
+tiers; classify every divergence by the defect classes.
 
-\textbf{Commitments.} The defect classes above are fixed and will not be extended after
-results are seen. Every trace is written to disk and published, so classification can be
-audited. Any agent added to or dropped from the sample after its result is known will be
-reported as such.
+\paragraph{Resolution tiers.} Each captured request receives exactly one tier, with
+precedence \textbf{T1 $>$ T2 $>$ T3 $>$ MISS}; the grader records which rule fired.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{0.13\textwidth}p{0.78\textwidth}}
+\toprule
+Tier & Definition \\
+\midrule
+\textbf{T1} & \emph{Exact.} Same status code and same decision-relevant fields as the
+real API, and the agent's control flow is identical. \\
+\textbf{T2} & \emph{Behaviourally equivalent.} Status class and decision-relevant
+semantics match; only incidental fields differ (identifier format, timestamps, unmodelled
+fields). Control flow unchanged. \\
+\textbf{T3} & \emph{Divergent but exercising.} The response differs from the real API's
+in a way that still drives the agent down its write path---typically the model is
+stricter. Recorded as a fidelity gap. \\
+\textbf{MISS} & The model cannot answer (unmodelled endpoint, parameter, or state), or
+answers such that the scenario cannot be evaluated. \\
+\bottomrule
+\end{tabular}
+\caption{Resolution tiers. T1 and T2 require a documented expectation of the real API's
+behaviour; absent such a reference a request is graded T3 or MISS, never T1.}
+\label{tab:tiers}
+\end{table}
+
+\paragraph{Miss classification.} Every MISS is assigned exactly one class, and this is
+the measurement that decides whether the approach is viable at all.
+\textbf{MODELABLE}---the gap closes by writing more model (an unmodelled endpoint, field,
+or error path), so the cost is engineering effort. \textbf{PRODUCTION-STATE-DEPENDENT}---%
+the miss requires state that exists only in a real account: a specific pre-existing
+entity, a live dispute, a provider-side asynchronous event, an inbound webhook. No amount
+of modelling closes it without real credentials.
+
+\paragraph{Defect classes.} Fixed in advance and not extendable after results are seen:
+(1) \emph{duplicate write}---the same logical mutation applied twice; (2) \emph{unchecked
+error}---a 4xx treated as success; (3) \emph{stale read}---a decision taken on state
+cached from before a write; (4) \emph{over-refund}---a refund exceeding the unrefunded
+amount. A genuine defect fitting none of these is recorded as \emph{unclassified},
+reported separately, and does not count toward the primary outcome.
+
+\paragraph{Outcomes.} \emph{Primary:} proportion of sampled agents exhibiting at least
+one class-1--4 defect. \emph{Secondary:} distribution of resolution tiers across all
+captured requests; MISS rate; the MODELABLE / PRODUCTION-STATE-DEPENDENT split; defects
+per agent by class. Analysis is descriptive proportions with the denominator stated, and
+no subgroup analysis beyond these breakdowns.
+
+\paragraph{Falsification.} H1 is not supported if fewer than \textbf{20\%} of sampled
+agents exhibit any class-1--4 defect. That is reported as a negative result, not
+reframed.
+
+\paragraph{Kill criterion.} If more than \textbf{50\%} of MISSes are
+PRODUCTION-STATE-DEPENDENT, the stateful-mock approach cannot be made general by further
+engineering, and the project pivots rather than continuing to build API models. Both
+thresholds are fixed now, before any data exists, so that they cannot be moved later.
 
 \section{Discussion}
 
@@ -355,6 +431,81 @@ history are at \url{https://github.com/RithikSatarla/agentcage}. The study repro
 with \texttt{python -m part\_a.run}, requires no credentials, and is re-run weekly in
 continuous integration. Every statistic in this paper is generated from
 \texttt{part\_a/results.json} rather than transcribed.
+
+\appendix
+
+\section{Pre-registration checklist}
+\label{app:checklist}
+
+Applies to the Part B evaluation of Section~\ref{sec:prereg}. Part A is exploratory and
+makes no pre-registration claim.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{0.62\textwidth}p{0.30\textwidth}}
+\toprule
+Item & Committed \\
+\midrule
+Hypothesis stated before data collection & Yes \\
+Sampling frame and exclusions fixed in advance & Yes \\
+Primary outcome specified, and single & Yes \\
+Secondary outcomes enumerated & Yes \\
+Grading rubric with explicit precedence rules & Yes (T1 $>$ T2 $>$ T3 $>$ MISS) \\
+Defect classes closed to extension & Yes (four classes) \\
+Falsification threshold numeric & Yes (20\%) \\
+Kill criterion numeric & Yes (50\% of MISSes) \\
+Analysis plan fixed & Yes \\
+Raw evidence published & Yes (all traces committed) \\
+Deviations to be logged with date and reason & Yes \\
+\textbf{Results known at time of writing} & \textbf{No --- none exist} \\
+\bottomrule
+\end{tabular}
+\caption{Pre-registration checklist for Part B.}
+\end{table}
+
+\section{Example captured trace}
+\label{app:trace}
+
+Abridged from the committed trace file, produced by running
+
+\begin{center}
+\texttt{python -m part\_b.demo\_double\_refund}
+\end{center}
+
+\noindent Four requests were captured, three of them writes. Credential headers are
+replaced at capture time, which is what makes traces committable.
+
+\begin{lstlisting}
+{
+  "count": 4,
+  "traces": [
+    { "method": "POST", "path": "/v1/charges",
+      "headers": { "authorization": "<redacted>",
+                   "content-type": "application/json" },
+      "body": "{\"amount\": 5000, \"currency\": \"usd\"}",
+      "status_code": 200 },
+
+    { "method": "POST", "path": "/v1/refunds",
+      "body": "{\"charge\": \"ch_00000001\", \"amount\": 5000}",
+      "status_code": 200 },
+
+    { "method": "POST", "path": "/v1/refunds",
+      "body": "{\"charge\": \"ch_00000001\", \"amount\": 5000}",
+      "status_code": 400,
+      "response_body": "{\"error\": {\"type\": \"invalid_request_error\",
+                         \"code\": \"charge_already_refunded\"}}" },
+
+    { "method": "GET", "path": "/v1/charges/ch_00000001",
+      "status_code": 200,
+      "response_body": "{... \"amount_refunded\": 5000 ...}" }
+  ]
+}
+\end{lstlisting}
+
+The two refund requests are byte-identical in method, path, and body. Only a mock that
+holds state can answer them differently, and answering them differently is what
+correctness requires.
 
 \begin{thebibliography}{99}
 

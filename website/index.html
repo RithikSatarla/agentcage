@@ -273,7 +273,7 @@ for trace in cage.writes:          # POST / PUT / PATCH / DELETE
 cd agentcage
 pip install -e ".[dev]"
 
-pytest tests/            # 52 tests, no network
+pytest tests/            # full suite, no network
 python -m part_a.run     # the full study — no credentials needed</code></pre>
   <p>The study costs 45 GitHub API calls, which fits inside the unauthenticated hourly
   limit. It re-runs weekly in CI, and every push re-runs the pipeline against the live API
@@ -310,7 +310,7 @@ python -m part_a.run     # the full study — no credentials needed</code></pre>
     <tr><td>Part A measurement</td><td><span class="pill live">working</span> reproducible, weekly in CI</td></tr>
     <tr><td>Interceptor — httpx + requests</td><td><span class="pill live">working</span></td></tr>
     <tr><td>Stateful Stripe model</td><td><span class="pill live">working</span> charges, refunds, idempotency</td></tr>
-    <tr><td>Test suite</td><td><span class="pill live">working</span> 52 tests, Python 3.9–3.12</td></tr>
+    <tr><td>Test suite</td><td><span class="pill live">working</span> green on Python 3.9–3.12</td></tr>
     <tr><td>Paper</td><td><span class="pill pending">compiles</span> not submitted</td></tr>
     <tr><td>Part B evaluation</td><td><span class="pill none">not run</span> pre-registered only</td></tr>
     <tr><td>GitHub / S3 / Postgres models</td><td><span class="pill none">not built</span></td></tr>

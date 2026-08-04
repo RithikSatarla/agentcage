@@ -1,173 +1,205 @@
-# AgentCage: positioning and fundraising notes
+# AgentCage: fundraising playbook
 
-Internal document. The point of this file is to keep the pitch tied to what the work
-actually shows, because the fastest way to lose a technical investor is to state a
-number you cannot reproduce in front of them.
+Internal document.
 
----
-
-## The one rule
-
-**Every number you say out loud must be in `part_a/results.json`.**
-
-Anyone can clone the repo and run `python -m part_a.run`. That is the whole advantage —
-do not trade it away for a rounder number.
-
-### Say this
-
-> Of the write-capable agent tools we could mechanically identify across 13 open-source
-> agent repositories, **20.3% — 32 of 158 — are never referenced by any test.** We
-> screened 45 repositories to find them. The methodology is public and the study re-runs
-> in CI every week.
-
-### Do not say this
+**The one rule: every number you say out loud must be in `part_a/results.json`.** Anyone
+can clone the repo and run `python -m part_a.run`. That reproducibility is the entire
+advantage — do not trade it for a rounder number.
 
 | Don't say | Why |
 |---|---|
 | "23.5% of agent repos have zero test coverage" | Not our finding. No data behind it. |
 | "We found 4 untested repos including crewAI-examples" | Not in our results. Our data has 1 repo with no write-tool tests: `aiwaves-cn/agents`. |
 | "Agents are causing production incidents" | We measured test coverage. We have no incident data. |
-| "Our framework prevents agent failures" | Part B has not been run. We have not demonstrated it catches anything in the wild yet. |
-| "Pre-registered study" (about Part A) | Part A is exploratory. Only Part B's evaluation is pre-registered. |
+| "Our framework prevents agent failures" | Part B has not run. We have not shown it catches anything in the wild. |
+| "Pre-registered study" (about Part A) | Part A is exploratory. Only Part B's evaluation is pre-registered, and the paper says so. |
 
-That last row matters more than it looks. The paper itself discloses that Part A is
-exploratory and lists all seven detector revisions. If you call it pre-registered and an
-investor reads the paper, you have contradicted your own document.
+That last row matters most. The paper itself discloses Part A as exploratory and lists all
+seven detector revisions. Call it pre-registered and you contradict your own document in
+front of someone who just read it.
 
 ---
 
-## Section 1: the problem, precisely stated
+## Section 1: The problem (quantified)
 
-Agents hold credentials for systems that change state — payments, infrastructure,
-repositories, email. The standard way to test them is to record an HTTP response and
-replay it. A replay fixture holds no state, so it cannot express the failure mode
-specific to writes: an operation applied twice, or applied when it should have been
-refused.
+Of the write-capable agent tools we can mechanically identify across **13** open-source
+agent repositories, **20.3% — 32 of 158 — are never referenced by any test.** We screened
+**45** candidate repositories to find them.
+
+**The bar was set as low as it goes.** A tool counts as tested if its identifier appears
+*anywhere* in the project's test sources — no assertion, no destructive path exercised,
+not even executed. One in five fails that, so 20.3% is a floor, not a ceiling.
+
+**Robustness:** restricted to the 7 repositories whose *entire* test suite was read, the
+figure is 20.7%. Not a sampling artefact.
+
+**Repository with no test touching any write tool:** `aiwaves-cn/agents` — it ships no
+test files at all. That is one repository, and you should present it as one repository.
+
+**APIs these tools reach**, from the detector categories: HTTP writes, filesystem
+mutation, shell execution, SQL and ORM writes, cloud SDK writes (S3, EC2, DynamoDB),
+version-control writes (GitHub pulls, issues, comments, refs), outbound messaging (email,
+Slack), and payment operations. Per-repository detail is in `results.json` under `apis`.
+
+**The caveat you lead with, not bury:** 32 of the 45 candidates screened out. Our
+detectors find framework-idiomatic tool definitions — `@tool`, `BaseTool`, JSON tool
+schemas. Agents with bespoke architectures (`aider`, `OpenHands`, `SWE-agent`) write to
+disk and shell out constantly but expose no such surface. The denominator of 13 reflects
+detector coverage as much as it reflects the ecosystem.
+
+Saying it first converts your weakest point into a credibility signal. A sharp investor
+finds it in four minutes of reading PROTOCOL.md regardless.
+
+---
+
+## Section 2: Why this matters
+
+An agent holding credentials is a program that changes state it cannot undo. The standard
+test — record a response, replay it — holds no state, so it cannot express the failure
+mode that only writes have:
 
 ```
 refund(charge_id, 5000)   # fixture: 200 OK
 refund(charge_id, 5000)   # fixture: 200 OK   <- suite passes
                           # Stripe:  400 charge_already_refunded
-                          # reality: customer paid twice
+                          # reality: the customer was paid twice
 ```
 
-The test suite is not merely incomplete. It is structurally incapable of catching this.
+The defect lives in the state transition. No assertion over a fixture's responses reaches
+it. The suite is not incomplete — it is structurally incapable.
 
-**What we measured:** 45 candidate repositories screened; 13 had mechanically
-identifiable write-capable tool definitions; those 13 ship 158 such tools; 32 of them
-(20.3%) are never referenced by any test.
+The same shape recurs wherever an agent writes: a retried refund, a delete applied twice,
+a branch force-pushed on a stale read, a message sent again because the first response
+was not parsed.
 
-**The bar was deliberately low.** A tool counts as tested if its name appears *anywhere*
-in the test sources — no assertion, no destructive path exercised, not even executed.
-One in five fails that. So 20.3% is a floor, not a ceiling.
-
-**Robustness:** restricted to the 7 repositories whose entire test suite was read,
-the figure is 20.7%. It is not a sampling artefact.
+**State what you know and what you don't.** We have measured that these paths are largely
+untested. We have *not* measured how often they fail in production — nobody has published
+that, and claiming it invites a question you cannot answer.
 
 ---
 
-## Section 2: the honest caveat, and why you lead with it
+## Section 3: The solution
 
-**32 of 45 candidates screened out.** Our detectors find framework-idiomatic tool
-definitions — `@tool`, `BaseTool`, JSON tool schemas. Agents with bespoke architectures
-(`aider`, `OpenHands`, `SWE-agent`) write to disk and shell out constantly but expose no
-such surface, so they are not in the denominator.
+**Passive interceptor.** Attaches through each HTTP library's own documented hook points
+(`httpx` event hooks, `requests` response hooks). Never rewrites a request, injects a
+response, or short-circuits the transport — a test asserts the caller receives exactly
+what the transport returned. Credential headers are redacted at capture, so traces are
+committable.
 
-A sharp investor will find this in about four minutes of reading PROTOCOL.md. You have
-two options: they discover it, or you tell them. Telling them converts a weakness into a
-credibility signal — and it is genuinely the honest framing, because n=13 says as much
-about detector coverage as about the ecosystem.
+**Stateful API model.** Not a fixture. Writes mutate state and later reads observe the
+mutation: a refund increases `charge.amount_refunded`, and `GET /v1/charges/{id}` reflects
+it immediately. Over-refunds are rejected with Stripe's real message and error code, fully
+refunded charges reject further refunds, and idempotency keys replay rather than
+re-execute.
 
-Framing that works:
+**Deterministic.** Counter-derived identifiers and an injectable clock, so a run is
+byte-for-byte reproducible and a failure is a failure every time.
 
-> The denominator is 13 because we only count tools we can identify mechanically. That's
-> the conservative read — the agents we *can't* parse are shelling out and writing files
-> constantly, and nothing suggests they're better tested. Widening detector coverage is
-> the next piece of work.
+**The demo that lands** — under a second, in front of them:
+
+```bash
+python -m part_b.demo_double_refund
+```
+
+A real `httpx` client, an agent that retries a refund, a `400 charge_already_refunded` on
+the second attempt, and a customer refunded exactly once. The captured trace is committed
+at `traces/example_double_refund.json`.
 
 ---
 
-## Section 3: what exists today
+## Section 4: Validation
 
-| Component | State |
+**What is proven today:**
+
+- Part A is complete, reproducible, and re-runs weekly in CI. Every push also re-runs the
+  study pipeline against the live GitHub API.
+- The full test suite passes on Python 3.9–3.12, with no network required.
+- Every figure in the README, paper, and website is generated from `results.json`; a test
+  fails the build if any drifts.
+- The paper compiles clean — 9 pages, zero undefined references or citations.
+
+**What is not proven:** Part B has not run. There are no results for it. What exists is a
+pre-registered protocol with:
+
+- a hypothesis fixed before data collection,
+- resolution tiers (T1 / T2 / T3 / MISS) with explicit precedence,
+- miss classification (MODELABLE vs PRODUCTION-STATE-DEPENDENT),
+- four closed defect classes that cannot be extended after results are seen,
+- a numeric falsification threshold (20%),
+- a numeric kill criterion (>50% of misses production-state-dependent → pivot).
+
+**The kill criterion is a selling point, not a risk.** It says: if the misses turn out to
+need real production state, more engineering will not save the approach and we stop. An
+investor who has watched founders move goalposts will recognise what a fixed threshold
+written before the data is worth.
+
+**If Part B fails its threshold, publish that.** A negative result on a pre-registered
+hypothesis makes the Part A measurement more trustworthy, and it tells you something true
+about the thesis while it is still cheap to learn.
+
+---
+
+## Section 5: Business model
+
+Label this a hypothesis, because it is. No users, no revenue, no pricing conversations.
+
+| Tier | Scope |
 |---|---|
-| Part A measurement | Complete, reproducible, re-runs weekly in CI |
-| Interceptor (`httpx` + `requests`) | Working. Passive by construction; a test asserts responses are unmodified |
-| Stateful Stripe model | Working. Refunds mutate charges, reads observe mutations, over-refund and double-refund rejected with real error codes, idempotency keys honoured |
-| Test suite | 31 tests, no network, green on Python 3.9–3.12 |
-| Paper | Compiles clean, 7 pages, not yet submitted |
-| Part B evaluation | **Pre-registered, not run.** No results exist |
-| Other API models (GitHub, S3, Postgres) | Not built |
-| Website | Static page only |
+| **Open source (MIT)** | Interceptor + common API models. Drives adoption and contribution. |
+| **Pro** | State models expensive to build and keep correct — AWS, multi-step payment flows, provider-specific error semantics — plus CI integration and trace diffing. |
+| **Enterprise** | Models of internal APIs; compliance evidence that destructive agent paths were exercised before deploy. |
 
-The demo that lands: the end-to-end test in `tests/test_interceptor.py`. A real `httpx`
-client, a stateful backend, an agent that retries a refund — second attempt returns
-`400 charge_already_refunded`, and the customer is refunded once. It runs in under a
-second in front of them.
+**The question a good investor will actually ask:** why doesn't the agent framework ship
+this themselves? Have the answer ready. Fidelity to a third-party API's state machine is
+ongoing specialist work that framework maintainers have no incentive to own — the same
+reason VCR-style libraries exist independently of HTTP clients, and why nobody expects
+`requests` to model Stripe.
 
 ---
 
-## Section 4: why the research posture is the moat
+## Section 6: Timeline
 
-Anyone can write an HTTP mock. Not everyone will:
+| Stage | State |
+|---|---|
+| Repo public, CI green, Part A reproducible | **Done** |
+| Verify all 10 citations; obtain arXiv endorsement; submit | Next — endorsement is the long pole, start it now |
+| Run Part B against the pre-registered protocol | The real milestone: validates or kills the thesis |
+| Second API model (GitHub — destructive, widely used, easy to reason about) | After Part B |
+| Outreach at volume | Only after Part B |
 
-- publish the sampling frame and inclusion criteria before the result,
-- publish a detector revision history including revisions that made their own headline
-  weaker,
-- pre-register the validation hypothesis with an explicit falsification threshold,
-- wire the whole study into CI so it re-runs weekly against a moving ecosystem.
-
-That combination is what makes the number quotable by other people. A statistic that
-others cite is worth more than a product demo, because it travels without you.
-
-**Corollary:** if Part B fails its falsification threshold — fewer than 20% of sampled
-agents showing a defect — publish that. A negative result on a pre-registered hypothesis
-makes the Part A measurement *more* trustworthy. It also tells you something real about
-the product thesis, early, while it is cheap to learn.
+**Do not skip to the last row.** Going out before Part B means pitching a thesis you have
+not tested, which is precisely the posture this whole project is a critique of. That
+inconsistency is the kind of thing a technical investor notices and remembers.
 
 ---
 
-## Section 5: business model (unvalidated)
+## Section 7: Investor talking points
 
-Label this as hypothesis, because it is. There are no users and no revenue.
+Each of these is checkable, which is the point:
 
-- **Open source core** — interceptor plus common API models. Drives adoption and
-  contributions.
-- **Paid** — state models that are expensive to build and maintain correctly (AWS,
-  multi-step payment flows, provider-specific error semantics), CI integration,
-  trace storage and diffing.
-- **Enterprise** — custom models for internal APIs, compliance evidence that destructive
-  agent paths were exercised before deploy.
+- *"20.3% of the write-capable agent tools we can identify — 32 of 158 across 13 repos —
+  are never referenced by a test. Clone it and run it; it takes four minutes and no
+  credentials."*
+- *"We screened 45 repos and 32 screened out, so the denominator says as much about our
+  detector coverage as about the ecosystem. That's the honest read."*
+- *"The detectors went through seven revisions. Two of them removed false positives that
+  would have made our number look worse. They're all in the paper."*
+- *"Part A is exploratory. Part B is pre-registered with a numeric kill criterion we wrote
+  before collecting any data."*
+- *"The measurement re-runs in CI every week, so it stays true as the ecosystem moves."*
+- *"MIT licensed. If we disappear, it keeps working — which is why a design partner can
+  say yes without a procurement conversation."*
 
-The real question a good investor will ask: *why doesn't the agent framework ship this
-themselves?* Have an answer. The honest one is that fidelity to a third-party API's state
-machine is ongoing specialist work that framework maintainers have no incentive to own —
-same reason VCR-style libraries exist independently of HTTP clients.
-
----
-
-## Section 6: sequence
-
-1. **Done** — repo public, CI green, Part A reproducible.
-2. **Next** — verify the 10 citations, get arXiv endorsement (this is the long pole,
-   start it now), submit.
-3. **Then** — run Part B against the pre-registered protocol. This is the real milestone:
-   it either validates the thesis or kills it, and either outcome is worth knowing before
-   raising.
-4. **Then** — second API model (GitHub is the natural one: destructive, widely used, easy
-   to reason about).
-5. **Only then** — outreach at volume.
-
-Going out before step 3 means pitching a thesis you have not tested. That is exactly the
-posture the whole project is a critique of.
+**Do not claim** the framework prevents production incidents, that agents are known to be
+failing in the wild at some rate, or that anyone is using this yet.
 
 ---
 
-## Section 7: what to send
+## Section 8: What to share
 
 ```
 GitHub:  https://github.com/RithikSatarla/agentcage
-Paper:   [after submission]
+Paper:   [after arXiv submission]
 
 Of the write-capable agent tools we can mechanically identify across 13 open-source
 agent repos, 20.3% (32 of 158) are never referenced by any test. We screened 45 repos
@@ -175,7 +207,16 @@ to find them; the methodology, the full results, and the detector revision histo
 public, and the study re-runs in CI weekly.
 
 We're building the stateful alternative to replay fixtures. The validation study is
-pre-registered and running now.
+pre-registered, with a kill criterion, and runs next.
 ```
 
 Short. Every claim checkable. No adjectives doing work the data should do.
+
+**Send the repo, not just the number.** The reproducibility is the strongest thing here —
+CI already proves it, since the smoke job reproduces the langchain-community figures on a
+clean runner on every push.
+
+**For design partners**, lead with the question rather than the pitch: which API their
+agent writes to, and which operations actually scare them. That is genuinely the input
+needed to choose the second model, and it is a much better opening than a feature list
+when Part B has not run yet.

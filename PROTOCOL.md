@@ -259,30 +259,140 @@ cursors, rate limits, and Stripe's real ID format. `capture=False` refunds are r
 rather than releasing the authorisation as Stripe does. The model is sufficient to exercise
 double-refund, over-refund, refund-after-refund and read-after-write, and nothing more.
 
-### 3.4 Pre-registered evaluation (not yet run)
+### 3.4 Worked example
 
-**H1.** Agents that pass their existing replay-based suites exhibit write-path defects
-against a stateful model.
+`part_b/demo_double_refund.py` runs the whole loop and writes
+`traces/example_double_refund.json`, which is committed. A real `httpx` client, the
+passive interceptor, and the stateful model behind the transport:
 
-**Procedure.** Sample agents from the Part A analysed set that perform payment-like writes.
-For each: run its own suite unmodified (expect: passes); re-run against the stateful model
-via the interceptor; classify every divergence.
+```
+POST /v1/charges           -> 200   ch_00000001 created, 5000 usd
+POST /v1/refunds           -> 200   amount_refunded 0 -> 5000
+POST /v1/refunds           -> 400   charge_already_refunded     <- the retry
+GET  /v1/charges/ch_...    -> 200   amount_refunded == 5000
+```
 
-**Primary outcome.** Proportion of sampled agents exhibiting ≥1 defect in these
-pre-specified classes:
+Against a replay fixture the second POST also returns 200 and the customer is refunded
+twice. The captured trace has `authorization` replaced with `<redacted>`, which is why
+traces are safe to commit.
 
-1. **Duplicate write** — the same logical mutation applied twice (retry without an
+---
+
+## 3A. Part B: pre-registered evaluation
+
+**Status: not run. No results exist.** This section is written before the experiment and
+is the thing that must not change afterwards.
+
+### 3A.1 Hypothesis
+
+**H1.** Agents that pass their existing replay-based test suites exhibit write-path
+defects when the same paths are exercised against a stateful model.
+
+### 3A.2 Sample and exclusions
+
+Sampling frame: the Part A analysed set, restricted to repositories with tools performing
+payment-like or otherwise reversible-in-model writes. Pre-specified exclusions: agents
+with no runnable test suite; agents whose write tools require credentials we cannot
+substitute; agents whose tools only mutate local filesystem state (no HTTP surface for
+the interceptor to observe).
+
+Any agent added or dropped **after** its result is known will be reported as such, with
+the reason.
+
+### 3A.3 Procedure
+
+For each sampled agent:
+
+1. Run its own suite unmodified. *Expected: passes.* An agent whose suite already fails
+   is excluded and reported.
+2. Re-run the write paths through the interceptor against the stateful model.
+3. Grade every captured request by the resolution tiers below.
+4. Classify every divergence by the defect classes below.
+
+### 3A.4 Resolution tiers
+
+Each captured request receives exactly one tier. Where more than one could apply,
+precedence is **T1 > T2 > T3 > MISS**, and the grader records which rule fired.
+
+| Tier | Definition |
+|---|---|
+| **T1 — exact** | The model returns the same status code and the same decision-relevant fields the real API would, and the agent's control flow is identical. |
+| **T2 — behaviourally equivalent** | Status class and decision-relevant semantics match; only incidental fields differ (identifier format, timestamps, fields we do not model). The agent's control flow is unchanged. |
+| **T3 — divergent but exercising** | The model's response differs from the real API's in a way that still drives the agent down its write path — typically the model is stricter. The interaction remains informative; the divergence is recorded as a fidelity gap. |
+| **MISS** | The model cannot answer at all (unmodelled endpoint, parameter, or state), or answers such that the scenario cannot be evaluated. |
+
+Tier assignment for T1/T2 requires a documented expectation of the real API's behaviour
+(official documentation or a recorded real response). Where no such reference exists, the
+request is graded T3 or MISS, never T1.
+
+### 3A.5 Miss classification
+
+Every MISS is assigned exactly one class. This is the measurement that decides whether
+the approach is viable at all.
+
+| Class | Definition | Implication |
+|---|---|---|
+| **MODELABLE** | The miss is a gap we could close by writing more model: an unmodelled endpoint, field, or error path. | Cost is engineering effort. The approach holds. |
+| **PRODUCTION-STATE-DEPENDENT** | The miss requires state that exists only in a real account — a specific pre-existing entity, a live dispute, a provider-side asynchronous event, an inbound webhook. | No amount of modelling closes it without real credentials. The approach has a ceiling. |
+
+### 3A.6 Defect classes
+
+Fixed in advance and **not extendable** after results are seen:
+
+1. **Duplicate write** — the same logical mutation applied twice (a retry with no
    idempotency key).
-2. **Unchecked error** — a 4xx treated as success.
-3. **Stale read** — a decision made on state cached from before a write.
+2. **Unchecked error** — a 4xx response treated as success.
+3. **Stale read** — a decision taken on state cached from before a write.
 4. **Over-refund** — a refund exceeding the unrefunded amount.
 
-**Falsification.** H1 is not supported if fewer than 20% of sampled agents exhibit any
-class-1–4 defect.
+A divergence that is a genuine defect but fits none of these is recorded as
+**unclassified** and reported separately. It does not count toward the primary outcome.
 
-**Committed in advance.** Defect classes are fixed above and will not be extended after
-seeing results. Every trace is written to `traces/` and committed, so classification can be
-audited. Any agent added or dropped after seeing its result will be reported as such.
+### 3A.7 Outcomes
+
+**Primary outcome.** Proportion of sampled agents exhibiting at least one class-1–4
+defect.
+
+**Secondary outcomes.** Distribution of resolution tiers across all captured requests;
+MISS rate; the MODELABLE / PRODUCTION-STATE-DEPENDENT split; defects per agent by class.
+
+**Analysis.** Descriptive proportions with the denominator stated. No subgroup analysis
+beyond the tier and class breakdowns specified here.
+
+### 3A.8 Falsification and kill criterion
+
+**H1 is not supported** if fewer than **20%** of sampled agents exhibit any class-1–4
+defect. This is reported as a negative result, not reframed.
+
+**Kill criterion.** If **more than 50% of MISSes are PRODUCTION-STATE-DEPENDENT**, the
+stateful-mock approach cannot be made general by further engineering, and the project
+pivots rather than continuing to build API models. This threshold is fixed now,
+before any data exists, precisely so it cannot be moved later.
+
+### 3A.9 Pre-registration checklist
+
+| Item | Committed |
+|---|---|
+| Hypothesis stated before data collection | Yes — §3A.1 |
+| Sampling frame and exclusions fixed in advance | Yes — §3A.2 |
+| Primary outcome specified and single | Yes — §3A.7 |
+| Secondary outcomes enumerated | Yes — §3A.7 |
+| Grading rubric with precedence rules | Yes — §3A.4 |
+| Defect classes closed to extension | Yes — §3A.6 |
+| Falsification threshold numeric | Yes — 20%, §3A.8 |
+| Kill criterion numeric | Yes — 50%, §3A.8 |
+| Analysis plan fixed | Yes — §3A.7 |
+| Raw evidence published | Yes — every trace committed to `traces/` |
+| Deviations to be logged | Yes — §3A.10 |
+| Results known at time of writing | **No — none exist** |
+
+### 3A.10 Deviations log
+
+Any departure from §3A.1–§3A.9 once the experiment starts is recorded here, with the
+date, what changed, and why. An empty log at publication means the protocol was followed
+exactly.
+
+*Currently empty — the experiment has not been run.*
 
 ---
 
@@ -290,7 +400,7 @@ audited. Any agent added or dropped after seeing its result will be reported as 
 
 ```bash
 pip install -e ".[dev]"
-pytest tests/                # Part B: 31 tests, no network
+pytest tests/                # Part B + doc consistency, no network
 python -m part_a.run         # Part A: regenerates part_a/results.json
 ```
 

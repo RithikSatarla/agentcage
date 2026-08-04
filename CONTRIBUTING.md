@@ -36,7 +36,30 @@ Then, in the repository settings:
 Update the `[project.urls]` entries in `pyproject.toml` and the badge URL in `README.md` if
 you push under an organisation other than `RithikSatarla`.
 
-## Vercel (the website is not built yet)
+## Deliberate deviations from the original build spec
+
+Two places where following the spec literally would have shipped something broken. Both
+are intentional; change them back only with a reason.
+
+**1. CI does not run the full Part A study on every push.** The spec's workflow ends with
+`python -m part_a.run` in the test matrix. That is thousands of network reads per job,
+times four Python versions, on every push — slow, and red whenever GitHub rate-limits or
+a sampled repository is briefly unavailable. Instead:
+
+- every push runs `python -m part_a.run --limit 3`, which exercises the real pipeline
+  (network, parsing, detection, aggregation) against the live API and asserts the run
+  produced a real analysis;
+- the complete study runs weekly on a schedule, and on demand via `workflow_dispatch`.
+
+The study still runs in CI. It just doesn't gate every commit on the GitHub API being
+healthy.
+
+**2. `vercel.json` does not run `npm run build`.** The spec sets `buildCommand` to
+`npm run build` and `outputDirectory` to `out`. There is no `package.json` in this
+repository and nothing to build — that configuration fails the deployment. The site is
+static HTML, so the config serves `website/` directly with no build step.
+
+## Vercel
 
 `vercel.json` is committed and configured, but there is no `website/` directory yet, so a
 deployment will 404 until one exists. That is expected.

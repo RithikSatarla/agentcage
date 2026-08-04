@@ -112,6 +112,45 @@ def test_paper_source_carries_no_unreproducible_figures():
         assert bad not in tex, f"paper contains unreproducible claim {bad!r}"
 
 
+def test_quoted_test_counts_agree_across_documents():
+    """Three documents once quoted three different suite sizes. Keep them in step."""
+    quoted = {}
+    for name in ["README.md", "STARTUP_GUIDE.md", "PROTOCOL.md", "website/index.html"]:
+        text = (ROOT / name).read_text(encoding="utf-8")
+        for count in re.findall(r"\b(\d+) tests\b", text):
+            quoted.setdefault(count, []).append(name)
+    assert len(quoted) <= 1, f"documents disagree on the suite size: {quoted}"
+
+
+def test_committed_trace_is_the_real_double_refund():
+    """The committed trace is cited by the paper; it must not go stale.
+
+    Regenerate with: python -m part_b.demo_double_refund
+    """
+    trace = json.loads(
+        (ROOT / "traces" / "example_double_refund.json").read_text(encoding="utf-8")
+    )
+    entries = trace["traces"]
+    assert trace["count"] == len(entries) == 4
+
+    calls = [(t["method"], t["path"], t["status_code"]) for t in entries]
+    assert calls == [
+        ("POST", "/v1/charges", 200),
+        ("POST", "/v1/refunds", 200),
+        ("POST", "/v1/refunds", 400),
+        ("GET", "/v1/charges/ch_00000001", 200),
+    ]
+
+    # the two refund attempts are byte-identical; only the responses differ
+    assert entries[1]["body"] == entries[2]["body"]
+    assert "charge_already_refunded" in entries[2]["response_body"]
+
+    # no credential may ever reach a committed trace
+    for entry in entries:
+        assert entry["headers"].get("authorization") == "<redacted>"
+        assert "sk_live" not in json.dumps(entry)
+
+
 def test_untested_repo_list_is_consistent():
     """The repos named as untested must be exactly those the data says are untested."""
     from_data = {r["repo"] for r in RESULTS["repos"]

@@ -1,20 +1,20 @@
 # AgentCage: Stateful Mocking for AI Agents with Untested Write Operations
 
-**The problem:** across 13 open-source agent repositories, **20.3% of the 158
-write-capable tool definitions they ship are never referenced by any test.**
+**The Problem:** Of 13 open-source agent repositories with write-capable tools,
+**20.3% of the 158 write-capable tools they ship have zero test coverage.**
 
 [![tests](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml/badge.svg)](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **Part A results** — [the measurement, machine-generated](part_a/results.json)
-- **Paper** — [LaTeX source](paper/agentcage_arxiv.tex), compiles to 7 pages. *Not yet
-  submitted to arXiv;* this line gets a real link when it is
-- **Code** — [interceptor + stateful Stripe model](part_b/)
-- **Methodology** — [full protocol, detector definitions, threats to validity](PROTOCOL.md)
-- **Website** — [`website/`](website/), static; deploys to Vercel from `main`
+- 📊 **Part A Results:** [Quantified the problem](part_a/results.json) — machine-generated, reproducible
+- 📄 **Paper:** [Full LaTeX source](paper/agentcage_arxiv.tex) — compiles to 9 pages. *Not yet submitted to arXiv;* this line gets the listing link when it is
+- 💻 **Code:** [Interceptor + State Models](part_b/) — plus a [runnable demo](part_b/demo_double_refund.py) and its [captured trace](traces/example_double_refund.json)
+- 🚀 **Vercel:** [`website/`](website/) is built and configured — *not yet deployed;* this line gets the live URL when it is
+- 📖 **Methodology:** [Full protocol + Part B pre-registration](PROTOCOL.md)
 
-Every statistic in this README, the paper, and the site is generated from
-`part_a/results.json`. None is typed by hand.
+Every statistic in this README, the paper, and the website is generated from
+`part_a/results.json`. None is typed by hand, and
+[a test fails the build](tests/test_docs_match_results.py) if any of them drift.
 
 ---
 
@@ -96,7 +96,7 @@ git clone https://github.com/RithikSatarla/agentcage.git
 cd agentcage
 pip install -e ".[dev]"
 
-pytest tests/            # 31 tests, no network
+pytest tests/            # full suite, no network
 python -m part_a.run     # reproduce the study (~45 API calls, no credentials needed)
 ```
 
@@ -145,17 +145,19 @@ twice, is refused the second time, and the customer is paid once.
 | [part_a/results.json](part_a/results.json) | Full results, per repository and per tool |
 | [part_b/interceptor.py](part_b/interceptor.py) | Passive HTTP capture for httpx and requests |
 | [part_b/stripe_mock.py](part_b/stripe_mock.py) | Stateful Stripe model — charges, refunds, idempotency |
-| [tests/](tests/) | 31 tests, no network |
+| [tests/](tests/) | Unit, integration and doc-consistency tests; no network |
 | [PROTOCOL.md](PROTOCOL.md) | Methodology, detector definitions, threats to validity |
 
 ## Status
 
 Part A is complete and reproducible. Part B is a working foundation, not a finished
 framework: the interceptor and the Stripe model do what this README shows, and the
-[evaluation in PROTOCOL.md §3.4](PROTOCOL.md) has not been run yet.
+[pre-registered evaluation in PROTOCOL.md §3A](PROTOCOL.md) has **not been run** — it
+fixes the hypothesis, resolution tiers, miss classification, defect classes, a 20%
+falsification threshold and a 50% kill criterion, all before any data exists.
 
-Not built yet: other API models (GitHub, S3, Postgres), trace-driven replay, a
-pytest plugin, the website.
+Not built yet: other API models (GitHub, S3, Postgres), trace-driven replay, a pytest
+plugin, and a live deployment of [`website/`](website/).
 
 ## License
 

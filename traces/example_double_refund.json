@@ -1,0 +1,92 @@
+{
+  "captured_at": "2026-08-04T21:09:15.064868+00:00",
+  "count": 4,
+  "traces": [
+    {
+      "timestamp": "2026-08-04T21:09:15.063595+00:00",
+      "method": "POST",
+      "url": "https://api.stripe.com/v1/charges",
+      "host": "api.stripe.com",
+      "path": "/v1/charges",
+      "query": "",
+      "headers": {
+        "host": "api.stripe.com",
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate",
+        "connection": "keep-alive",
+        "user-agent": "python-httpx/0.28.1",
+        "authorization": "<redacted>",
+        "content-length": "32",
+        "content-type": "application/json"
+      },
+      "body": "{\"amount\":5000,\"currency\":\"usd\"}",
+      "status_code": 200,
+      "response_body": "{\"id\":\"ch_00000001\",\"object\":\"charge\",\"created\":1750000000,\"amount\":5000,\"amount_captured\":5000,\"amount_refunded\":0,\"currency\":\"usd\",\"customer\":null,\"description\":null,\"captured\":true,\"paid\":true,\"refunded\":false,\"status\":\"succeeded\",\"livemode\":false,\"metadata\":{}}",
+      "seq": 0
+    },
+    {
+      "timestamp": "2026-08-04T21:09:15.064163+00:00",
+      "method": "POST",
+      "url": "https://api.stripe.com/v1/refunds",
+      "host": "api.stripe.com",
+      "path": "/v1/refunds",
+      "query": "",
+      "headers": {
+        "host": "api.stripe.com",
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate",
+        "connection": "keep-alive",
+        "user-agent": "python-httpx/0.28.1",
+        "authorization": "<redacted>",
+        "content-length": "38",
+        "content-type": "application/json"
+      },
+      "body": "{\"charge\":\"ch_00000001\",\"amount\":5000}",
+      "status_code": 200,
+      "response_body": "{\"id\":\"re_00000001\",\"object\":\"refund\",\"created\":1750000000,\"amount\":5000,\"charge\":\"ch_00000001\",\"currency\":\"usd\",\"reason\":null,\"status\":\"succeeded\",\"metadata\":{}}",
+      "seq": 1
+    },
+    {
+      "timestamp": "2026-08-04T21:09:15.064431+00:00",
+      "method": "POST",
+      "url": "https://api.stripe.com/v1/refunds",
+      "host": "api.stripe.com",
+      "path": "/v1/refunds",
+      "query": "",
+      "headers": {
+        "host": "api.stripe.com",
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate",
+        "connection": "keep-alive",
+        "user-agent": "python-httpx/0.28.1",
+        "authorization": "<redacted>",
+        "content-length": "38",
+        "content-type": "application/json"
+      },
+      "body": "{\"charge\":\"ch_00000001\",\"amount\":5000}",
+      "status_code": 400,
+      "response_body": "{\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Charge ch_00000001 has already been refunded.\",\"code\":\"charge_already_refunded\",\"param\":\"charge\"}}",
+      "seq": 2
+    },
+    {
+      "timestamp": "2026-08-04T21:09:15.064626+00:00",
+      "method": "GET",
+      "url": "https://api.stripe.com/v1/charges/ch_00000001",
+      "host": "api.stripe.com",
+      "path": "/v1/charges/ch_00000001",
+      "query": "",
+      "headers": {
+        "host": "api.stripe.com",
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate",
+        "connection": "keep-alive",
+        "user-agent": "python-httpx/0.28.1",
+        "authorization": "<redacted>"
+      },
+      "body": "",
+      "status_code": 200,
+      "response_body": "{\"id\":\"ch_00000001\",\"object\":\"charge\",\"created\":1750000000,\"amount\":5000,\"amount_captured\":5000,\"amount_refunded\":5000,\"currency\":\"usd\",\"customer\":null,\"description\":null,\"captured\":true,\"paid\":true,\"refunded\":true,\"status\":\"succeeded\",\"livemode\":false,\"metadata\":{}}",
+      "seq": 3
+    }
+  ]
+}

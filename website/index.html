@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentCage — stateful mocking for AI agents that write</title>
+<meta name="description" content="20.3% of write-capable tools in open-source LLM agents are never referenced by any test. AgentCage is the stateful alternative to replay fixtures.">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #16181d; --muted: #5c6370; --line: #e4e6eb;
+    --accent: #b3391b; --code-bg: #f6f7f9; --card: #fbfbfc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101216; --fg: #e8eaed; --muted: #9aa2ad; --line: #262a31;
+      --accent: #ff8964; --code-bg: #171a1f; --card: #14171c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 72px 0 40px; }
+  h1 { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .tag { color: var(--muted); font-size: 1.1rem; margin: 0 0 28px; }
+  a { color: var(--accent); }
+  .links a {
+    display: inline-block; margin: 0 14px 10px 0; padding: 9px 16px;
+    border: 1px solid var(--line); border-radius: 7px; text-decoration: none;
+    color: var(--fg); font-size: .93rem; transition: border-color .15s;
+  }
+  .links a:hover { border-color: var(--accent); }
+  .links a.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  h2 { font-size: 1.35rem; margin: 52px 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 30px 0 8px; }
+  p { margin: 0 0 16px; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px;
+    padding: 15px 17px; overflow-x: auto; font-size: .855rem; line-height: 1.55; margin: 0 0 18px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+  p code, li code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: .89em; }
+  .stat {
+    border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 7px; background: var(--card); padding: 22px 24px; margin: 0 0 22px;
+  }
+  .stat .big { font-size: 2.6rem; font-weight: 660; letter-spacing: -0.03em; line-height: 1; }
+  .stat .sub { color: var(--muted); font-size: .96rem; margin-top: 9px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 22px; }
+  .cell { border: 1px solid var(--line); border-radius: 7px; padding: 14px 16px; background: var(--card); }
+  .cell .n { font-size: 1.5rem; font-weight: 620; letter-spacing: -0.02em; }
+  .cell .l { color: var(--muted); font-size: .82rem; margin-top: 3px; }
+  .note {
+    border: 1px solid var(--line); border-radius: 7px; padding: 16px 18px;
+    background: var(--card); color: var(--muted); font-size: .93rem; margin: 0 0 18px;
+  }
+  .note strong { color: var(--fg); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; margin: 0 0 18px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 560; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; }
+  ul { padding-left: 20px; margin: 0 0 16px; }
+  li { margin-bottom: 7px; }
+  footer { margin: 64px 0 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: .87rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Agents write to production.<br>Their tests don't.</h1>
+  <p class="tag">AgentCage is a stateful mock for AI agents that perform write operations —
+  refunds, deletes, pushes, sends.</p>
+  <div class="links">
+    <a class="primary" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Methodology</a>
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/part_a/results.json">Raw results</a>
+  </div>
+</header>
+
+<h2>The measurement</h2>
+
+<div class="stat">
+  <div class="big">20.3%</div>
+  <div class="sub">of write-capable tool definitions in open-source LLM agents are never
+  referenced by any test — 32 of 158, across 13 repositories.</div>
+</div>
+
+<div class="grid">
+  <div class="cell"><div class="n">45</div><div class="l">repos screened</div></div>
+  <div class="cell"><div class="n">158</div><div class="l">write tools found</div></div>
+  <div class="cell"><div class="n">32</div><div class="l">never tested</div></div>
+  <div class="cell"><div class="n">20.7%</div><div class="l">sensitivity check</div></div>
+</div>
+
+<p>The bar was set as low as it goes. A tool counts as <em>tested</em> if its name appears
+anywhere in the project's test sources — no assertion required, no destructive path
+exercised, not even executed. One in five fails that. So 20.3% is a floor, not a ceiling.</p>
+
+<p>Restricted to the 7 repositories whose entire test suite was read, the figure is
+20.7%. The result doesn't depend on sampling.</p>
+
+<div class="note">
+  <strong>What this does not say.</strong> The study detects framework-idiomatic tool
+  definitions — <code>@tool</code>, <code>BaseTool</code>, JSON tool schemas. 32 of the 45
+  candidates screened out, including agents like <code>aider</code> and
+  <code>OpenHands</code> that write to disk constantly but expose no such surface. The
+  denominator of 13 reflects detector coverage as much as it reflects the ecosystem, and
+  the <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">protocol</a>
+  says so at length. Part A is exploratory, not pre-registered.
+</div>
+
+<h2>Why fixtures can't catch this</h2>
+
+<p>The standard way to test an agent is to record an HTTP response and replay it. A replay
+fixture holds no state, so it cannot express the failure mode specific to writes — an
+operation applied twice, or applied when it should have been refused.</p>
+
+<pre><code>refund(charge_id, 5000)   # fixture: 200 OK
+refund(charge_id, 5000)   # fixture: 200 OK   &lt;- suite passes
+                          # Stripe:  400 charge_already_refunded
+                          # reality: the customer was paid twice</code></pre>
+
+<p>The defect lives entirely in the state transition. No assertion over the fixture's
+responses can detect it. The suite isn't incomplete — it's structurally incapable.</p>
+
+<h2>The alternative</h2>
+
+<p>A model where writes mutate state and later reads observe the mutation.</p>
+
+<pre><code>from part_b.stripe_mock import StripeMock
+
+stripe = StripeMock()
+charge = stripe.post_charge(amount=5000, currency="usd")
+
+stripe.post_refund(charge=charge.id, amount=5000)
+stripe.get_charge(charge.id).amount_refunded   # 5000  &lt;- the read sees the write
+
+stripe.post_refund(charge=charge.id, amount=5000)
+# StripeError: Charge ch_00000001 has already been refunded.
+#              (400 charge_already_refunded)</code></pre>
+
+<p>Capture is passive — it attaches through each HTTP library's own hook points and never
+rewrites a request, injects a response, or short-circuits the transport. A test asserts
+that the caller receives exactly what the transport returned.</p>
+
+<pre><code>import httpx
+from part_b.interceptor import Interceptor
+
+cage = Interceptor()
+client = httpx.Client(event_hooks=cage.httpx_event_hooks())
+
+run_my_agent(client)
+
+for trace in cage.writes:          # POST / PUT / PATCH / DELETE
+    print(trace.method, trace.path, trace.status_code)</code></pre>
+
+<h2>Reproduce it</h2>
+
+<pre><code>git clone https://github.com/RithikSatarla/agentcage.git
+cd agentcage
+pip install -e ".[dev]"
+
+pytest tests/            # 31 tests, no network
+python -m part_a.run     # the full study, no credentials needed</code></pre>
+
+<p>The study makes 45 GitHub API calls, which fits inside the unauthenticated hourly
+limit. It re-runs weekly in CI, and every push re-runs the pipeline against the live
+API to prove it still works.</p>
+
+<h2>Status</h2>
+
+<div class="scroll">
+<table>
+  <tr><th>Component</th><th>State</th></tr>
+  <tr><td>Part A measurement</td><td>Complete, reproducible, weekly in CI</td></tr>
+  <tr><td>Interceptor (httpx + requests)</td><td>Working</td></tr>
+  <tr><td>Stateful Stripe model</td><td>Working — charges, refunds, idempotency</td></tr>
+  <tr><td>Test suite</td><td>31 tests, green on Python 3.9–3.12</td></tr>
+  <tr><td>Paper</td><td>Compiles clean; not yet submitted</td></tr>
+  <tr><td>Part B evaluation</td><td>Pre-registered, <strong>not run</strong></td></tr>
+  <tr><td>GitHub / S3 / Postgres models</td><td>Not built</td></tr>
+</table>
+</div>
+
+<p>Part B's hypothesis, falsification threshold, and defect classes were written down
+before the experiment. No results exist for it yet, and this page will say so until they
+do.</p>
+
+<footer>
+  MIT licensed ·
+  <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a><br>
+  Figures generated from <code>part_a/results.json</code>, run of 2026-08-04.
+</footer>
+
+</div>
+</body>
+</html>

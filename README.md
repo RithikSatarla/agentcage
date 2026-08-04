@@ -1,9 +1,20 @@
-# AgentCage
+# AgentCage: Stateful Mocking for AI Agents with Untested Write Operations
 
-**Stateful mocking for AI agents that write.**
+**The problem:** across 13 open-source agent repositories, **20.3% of the 158
+write-capable tool definitions they ship are never referenced by any test.**
 
 [![tests](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml/badge.svg)](https://github.com/RithikSatarla/agentcage/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+- **Part A results** — [the measurement, machine-generated](part_a/results.json)
+- **Paper** — [LaTeX source](paper/agentcage_arxiv.tex), compiles to 7 pages. *Not yet
+  submitted to arXiv;* this line gets a real link when it is
+- **Code** — [interceptor + stateful Stripe model](part_b/)
+- **Methodology** — [full protocol, detector definitions, threats to validity](PROTOCOL.md)
+- **Website** — [`website/`](website/), static; deploys to Vercel from `main`
+
+Every statistic in this README, the paper, and the site is generated from
+`part_a/results.json`. None is typed by hand.
 
 ---
 

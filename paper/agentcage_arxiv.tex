@@ -1,0 +1,396 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black,
+            urlcolor=blue!50!black}
+
+\input{generated_macros}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{black!30},
+  columns=fullflexible,
+}
+
+\title{\textbf{Untested by Construction: Test Coverage of Write-Capable Tools\\
+in Open-Source LLM Agents}}
+
+\author{Rithik Satarla\\
+\texttt{rithiksatarla@gmail.com}}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Large language model agents increasingly hold credentials for systems that change
+state: they issue refunds, delete records, push branches, and send mail. The dominant
+way to test such an agent is to record an HTTP response and replay it. A replay
+fixture, however, has no state, and so it cannot express the failure mode specific to
+write operations---an operation applied twice, or applied when it should have been
+refused. An agent that retries a refund it already completed passes a fixture-based
+suite and double-refunds in production.
+
+We ask how much of the open-source agent ecosystem tests its write paths at all. We
+screened \AcCandidates{} Python-primary agent repositories, mechanically extracted
+framework-idiomatic tool definitions, and retained the \AcTools{} definitions whose
+bodies perform a detectable state mutation across the \AcRepos{} repositories that had
+any. Using a deliberately generous coverage criterion---a tool is covered if its
+identifier appears anywhere in the repository's test sources, with no assertion or
+execution required---we find that \AcUncoveredPct{} of write-capable tool definitions
+(\AcUncovered{} of \AcTools{}) are never referenced by any test. Restricting to the
+\AcSensRepos{} repositories whose entire test suite was read gives \AcSensPct{},
+so the estimate does not depend on sampling. Because the criterion is an upper bound
+on real coverage, \AcUncoveredPct{} is a lower bound on what goes untested.
+
+We then describe AgentCage, a stateful alternative: a passive HTTP interceptor plus an
+in-memory API model in which writes mutate state and subsequent reads observe the
+mutation. We pre-register an evaluation of whether this surfaces defects that replay
+fixtures cannot. All code, data, and the detector revision history are public.
+\end{abstract}
+
+\section{Introduction}
+
+An LLM agent with tool access is, operationally, a program that issues requests against
+external systems. A growing fraction of those requests are writes. Agent frameworks ship
+tools that commit to git, delete cloud objects, run shell commands, execute SQL, send
+email, and move money.
+
+The testing practice these agents inherited comes from the world of read-mostly API
+clients: record a response, replay it. This works for a tool that fetches a document.
+It fails for a tool that moves money, and it fails in a specific, structural way.
+Consider an agent that issues a refund, fails to parse the response, and retries:
+
+\begin{lstlisting}
+refund(charge_id, 5000)   # fixture replies 200 OK
+refund(charge_id, 5000)   # fixture replies 200 OK  <- suite passes
+                          # Stripe would reply 400 charge_already_refunded
+\end{lstlisting}
+
+The fixture answers identically however many times it is asked, because it holds no
+state. The defect lives entirely in the state transition, so no assertion over the
+fixture's responses can detect it. The test suite is not merely incomplete; it is
+incapable of expressing the property.
+
+This paper makes two contributions.
+
+\textbf{A measurement (Section~\ref{sec:parta}).} We quantify how much of the
+open-source agent ecosystem tests its write-capable tools, using a mechanical,
+reproducible procedure over \AcCandidates{} repositories. The headline is
+\AcUncoveredPct{} of \AcTools{} write-capable tool definitions never referenced by any
+test. We report the result together with the seven revisions our detectors underwent,
+two of which removed false positives that would have made the finding look worse.
+
+\textbf{An artefact and a pre-registered evaluation (Section~\ref{sec:partb}).} We
+describe AgentCage: passive HTTP capture plus a stateful API model. We state in advance
+what would count as evidence that it surfaces defects fixtures cannot, and what would
+falsify that claim. The evaluation has not been run; no results are reported for it.
+
+\paragraph{Scope.} This is a study of \emph{test coverage}, not of agent safety in
+deployment. We do not claim the uncovered tools are buggy, nor that any agent has
+caused harm. We claim only that a fifth of the write-capable tools we could identify
+are not touched by their projects' tests, under the weakest definition of ``touched''
+we could construct.
+
+\section{Related work}
+
+Agent benchmarks evaluate whether agents \emph{accomplish} tasks. ReAct~\cite{react}
+established interleaved reasoning and acting; Toolformer~\cite{toolformer},
+Gorilla~\cite{gorilla}, and ToolLLM~\cite{toolllm} study tool invocation.
+SWE-bench~\cite{swebench}, WebArena~\cite{webarena}, AgentBench~\cite{agentbench}, and
+GAIA~\cite{gaia} measure task success in code, web, and general settings. These measure
+capability. We measure whether the tool implementations themselves are tested by the
+projects that ship them---a software-engineering property of the codebase, orthogonal to
+how well a model uses the tool.
+
+Closest to our artefact is ToolEmu~\cite{toolemu}, which uses a language model to
+emulate tool execution in order to surface agent risks without real side effects, and
+AgentDojo~\cite{agentdojo}, which evaluates agents against prompt-injection attacks in
+environments with stateful tools. Both establish that consequences of agent writes
+deserve dedicated infrastructure. AgentCage differs in mechanism and in aim: our model
+is deterministic code rather than an LM emulation, which trades breadth of coverage for
+exact, inspectable state transitions and reproducible failures; and our target is the
+developer's own test suite rather than a red-teaming evaluation.
+
+We are not aware of prior work quantifying test coverage of write-capable tools across
+open-source agent repositories, which is the gap Section~\ref{sec:parta} addresses.
+
+\section{Part A: how much is tested?}
+\label{sec:parta}
+
+\subsection{Sampling frame}
+
+We assembled \AcCandidates{} candidate repositories: recognisable Python agent
+projects spanning frameworks, autonomous agents, coding agents, and browser agents.
+The frame is a convenience sample, not a random sample of GitHub, and is restricted to
+Python-primary repositories because every detector is a Python source pattern that
+would silently under-detect on other languages.
+
+This biases the result toward well-maintained projects, which if anything biases
+measured coverage \emph{upward}: the long tail of small agent repositories is unlikely
+to be better tested than CrewAI or LlamaIndex.
+
+\subsection{Screening: what enters the denominator}
+
+A repository enters the analysed set only if the detectors find at least one
+\emph{write-capable tool definition}. Screening is mechanical: \AcScreenedOut{} of
+\AcCandidates{} candidates were excluded by code, leaving \AcRepos{}. Screening out is
+not a claim that a project performs no writes; it means the project exposes no
+framework-idiomatic tool definition whose body performs a detectable mutation.
+Section~\ref{sec:threats} treats this as the study's principal limitation.
+
+\subsection{Detectors}
+
+Tool definitions are recognised in three styles: \textbf{decorator}
+(\texttt{@tool}, \texttt{@agent.tool}, \texttt{@mcp.tool()}, \texttt{@registry.action},
+\texttt{@function\_tool}, \texttt{@kernel\_function}), \textbf{class} (a base named
+\texttt{*BaseTool}, \texttt{*Toolkit}, \texttt{*ToolSpec}, \texttt{*BaseAction}), and
+\textbf{schema} (a JSON tool schema pairing a \texttt{name} with \texttt{parameters} or
+\texttt{input\_schema}). CLI decorators such as \texttt{@click.command} are deliberately
+excluded, since matching them would classify ordinary command-line programs as agents.
+
+A definition is write-capable if its body matches at least one non-ambiguous mutation
+marker across ten categories: destructive HTTP verbs, filesystem mutation, file opens
+in write mode, shell execution, SQL and ORM writes, cloud SDK writes, version-control
+writes, outbound messaging, and payment operations. A bare HTTP \texttt{POST} is placed
+in a separate tier and \emph{excluded}, because many read-only search and inference
+endpoints are queried with \texttt{POST}.
+
+Two rules prevent a definition from serving as its own evidence. First, markers are
+matched only against the body \emph{after} the signature: without this,
+\texttt{def delete\_file(path)} satisfies a pattern intended to catch \emph{calls} to
+\texttt{delete\_file(}, and any tool whose name reads like a mutation is counted as one
+on the strength of its own name. Second, every occurrence of the tool's own identifier
+is neutralised before matching. Both rules were added after manual inspection revealed
+false positives that these exact mechanisms had produced.
+
+\subsection{Coverage criterion}
+
+For each analysed repository we read its test sources and count a write tool as
+\textbf{covered} if its identifier appears as a whole word anywhere in that corpus.
+
+This bar is intentionally generous. It requires no assertion, no exercise of the
+destructive path, and no execution: a single import or an incidental mention in an
+unrelated test satisfies it. Coverage measured this way is therefore an \emph{upper
+bound} on real coverage, and the uncovered fraction a \emph{lower bound}. A tool this
+study calls untested is untested under the weakest available definition.
+
+\paragraph{Unit of analysis.} We count \emph{tools}, not repositories. A repository-level
+criterion---``has at least one test touching at least one write tool''---is nearly
+vacuous: a project shipping 34 write tools with one of them referenced satisfies it.
+Counting tools places \AcTools{} items in the denominator rather than \AcRepos{}.
+
+\subsection{Results}
+
+Table~\ref{tab:parta} reports per-repository counts for the run of \AcRunDate{}.
+Across \AcRepos{} repositories, \AcUncovered{} of \AcTools{} write-capable tool
+definitions (\AcUncoveredPct{}) are never referenced by any test.
+
+\input{generated_table}
+
+\paragraph{Sensitivity.} Restricting to the \AcSensRepos{} repositories whose entire
+test suite was read---where a missed reference cannot be an artefact of sampling---gives
+\AcSensUncovered{} of \AcSensTools{} tools uncovered, or \AcSensPct{}. The agreement
+with the headline indicates the estimate is not driven by the read cap.
+
+\paragraph{Repository-level view.} \AcRepoUntested{} of \AcRepos{} repositories
+(\AcRepoUntestedPct{}) have no test touching any write tool: \AcUntestedRepoList{},
+which ships no test files at all. We report this figure for completeness while noting
+it rests on a single repository and is far less informative than the tool-level result.
+
+\subsection{Detector revision history}
+\label{sec:revisions}
+
+The detectors were developed against the corpus, and each revision moved the headline.
+We record them because the final number is not interpretable without them.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{p{0.44\textwidth}p{0.44\textwidth}}
+\toprule
+Problem identified & Change and effect \\
+\midrule
+Path filter matched substrings, so \texttt{openai.py} matched an ``op'' alternative &
+Match whole delimiter-separated path words; candidate files became genuine tool surfaces \\
+File cap applied lexicographically, representing large repositories by whichever
+directory sorted first & Rank by tool-likeness before applying the cap \\
+Reading only files whose \emph{path} contained a tool keyword missed tools defined in
+files such as \texttt{controller/service.py} & Make every non-test source file eligible;
+\AcRepos{}$\rightarrow$17 repositories analysed \\
+\texttt{@registry.action} and MCP-style decorators absent from the vocabulary & Added;
+included in the above \\
+\texttt{db\_write} matched bare \texttt{.save(}, catching a PIL image save & Removed bare
+\texttt{.save(}; removed a false positive from the untested set \\
+Patterns matched the definition line itself, classifying a tool as a write on the
+strength of \texttt{def delete\_file(} & Strip signatures, neutralise self-reference;
+17$\rightarrow$\AcRepos{} repositories \\
+Repository-level binary coverage too weak, and after the above rested on one repository
+& Switch unit of analysis to the tool; headline became \AcUncoveredPct{} of \AcTools{} \\
+\bottomrule
+\end{tabular}
+\caption{Detector revisions. The final two rows removed findings that would have
+\emph{raised} the reported figure.}
+\label{tab:revisions}
+\end{table}
+
+\paragraph{Status of this analysis.} Part A is \textbf{exploratory}, not
+pre-registered. The detectors were revised in response to inspecting their output, as
+Table~\ref{tab:revisions} records. It should be read as a measurement with a documented
+derivation rather than a confirmatory test of a hypothesis fixed in advance. The Part B
+evaluation in Section~\ref{sec:partb} \emph{is} pre-registered and has not been run.
+
+\subsection{Threats to validity}
+\label{sec:threats}
+
+\paragraph{Construct validity is the dominant limitation.} The study measures
+\emph{framework-idiomatic tool definitions}. Agents with bespoke architectures---%
+\texttt{aider}, \texttt{OpenHands}, \texttt{SWE-agent}, \texttt{gpt-engineer}---write to
+disk and execute shell commands continuously but expose no \texttt{@tool} or
+\texttt{BaseTool} surface, and therefore screen out. With \AcScreenedOut{} of
+\AcCandidates{} candidates excluded, the denominator of \AcRepos{} reflects detector
+coverage as much as it reflects the ecosystem. The correct reading of our headline is
+``among tools we can mechanically identify,'' not ``among all agent write paths.''
+
+\paragraph{Coverage inference.} Name reference in a test file is not execution. A
+referenced tool may carry no assertion on its destructive path (inflating measured
+coverage); an unreferenced tool may be exercised by an integration harness that never
+names it (deflating it). We argue the first error dominates because the criterion is so
+weak, which makes \AcUncoveredPct{} a floor.
+
+\paragraph{Browser and GUI writes.} Agents that mutate state by clicking and submitting
+forms are not detected, since no marker recognises a DOM interaction.
+
+\paragraph{Frameworks versus applications.} Several screened-out projects ship the
+\emph{mechanism} for defining tools rather than write tools themselves. Excluding them
+is correct, but it skews the analysed set toward tool catalogues.
+
+\paragraph{Temporal validity.} Files are read at \texttt{HEAD}. The measurement is of a
+moving target; results carry a timestamp and continuous integration re-runs the study
+weekly.
+
+\section{Part B: AgentCage}
+\label{sec:partb}
+
+\subsection{Design}
+
+\textbf{Interceptor.} Attaches through each HTTP library's own documented hook points
+(\texttt{httpx} event hooks, \texttt{requests} response hooks) and records method, URL,
+path, query, headers, body, and response status. It is strictly passive: it never
+rewrites a request, injects a response, or short-circuits the transport, and a test
+asserts that the caller receives exactly what the transport returned. Credential headers
+are redacted at capture time so traces are committable artefacts.
+
+\textbf{State model.} A deterministic in-memory model of the money-moving subset of the
+Stripe API. Refunds increase \texttt{charge.amount\_refunded} and set
+\texttt{charge.refunded} at parity with \texttt{amount\_captured}; a subsequent
+\texttt{GET} observes the change. Refunds beyond the unrefunded amount are rejected with
+the real error code and message; a fully refunded charge rejects further refunds;
+idempotency keys replay the original response and reject reuse with altered parameters.
+Identifiers are counter-derived and the clock is injectable, so runs are reproducible.
+
+\subsection{Fidelity boundary}
+
+Not modelled: payment-method validation, 3-D Secure, disputes, payouts, balance
+transactions, webhooks, connected accounts, field expansion, pagination cursors, rate
+limits, and Stripe's real identifier format. The model is sufficient to exercise
+double-refund, over-refund, refund-after-refund, and read-after-write, and no more.
+Stating this boundary matters: a mock's silent divergence from the real API is itself a
+source of false confidence.
+
+\subsection{Pre-registered evaluation}
+
+\textbf{H1.} Agents that pass their existing replay-based suites exhibit write-path
+defects when run against a stateful model.
+
+\textbf{Procedure.} Sample agents from the Part A analysed set that perform
+payment-like writes. For each: run its own suite unmodified (expected: passes); re-run
+against the stateful model through the interceptor; classify every divergence.
+
+\textbf{Primary outcome.} The proportion of sampled agents exhibiting at least one
+defect in these pre-specified classes: (1) \emph{duplicate write}---the same logical
+mutation applied twice; (2) \emph{unchecked error}---a 4xx treated as success;
+(3) \emph{stale read}---a decision taken on state cached from before a write;
+(4) \emph{over-refund}---a refund exceeding the unrefunded amount.
+
+\textbf{Falsification.} H1 is not supported if fewer than 20\% of sampled agents
+exhibit any class-1--4 defect.
+
+\textbf{Commitments.} The defect classes above are fixed and will not be extended after
+results are seen. Every trace is written to disk and published, so classification can be
+audited. Any agent added to or dropped from the sample after its result is known will be
+reported as such.
+
+\section{Discussion}
+
+The measurement and the artefact are related but independent. Even if AgentCage were
+never adopted, \AcUncoveredPct{} of identifiable write-capable agent tools going
+unreferenced by tests is a fact about how this software is currently built. And even a
+perfect coverage figure would not establish that fixture-based tests \emph{detect}
+write-path defects, which is why Part B is posed as a falsifiable claim rather than a
+demonstration.
+
+The honest summary of Part A is narrower than its headline: among tools we can
+mechanically identify in a convenience sample of well-known Python agent projects, about
+one in five is never named by a test. Whether that generalises to the long tail, to
+non-Python ecosystems, or to bespoke agent architectures is unresolved, and the
+screening rate of \AcScreenedOut{}/\AcCandidates{} is the clearest signal of how much
+remains unmeasured.
+
+\section{Availability}
+
+Code, the sampling frame, complete per-repository results, and the detector revision
+history are at \url{https://github.com/RithikSatarla/agentcage}. The study reproduces
+with \texttt{python -m part\_a.run}, requires no credentials, and is re-run weekly in
+continuous integration. Every statistic in this paper is generated from
+\texttt{part\_a/results.json} rather than transcribed.
+
+\begin{thebibliography}{99}
+
+\bibitem{react} S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, Y. Cao.
+ReAct: Synergizing Reasoning and Acting in Language Models.
+\emph{arXiv:2210.03629}, 2022.
+
+\bibitem{toolformer} T. Schick, J. Dwivedi-Yu, R. Dessì, R. Raileanu, M. Lomeli,
+L. Zettlemoyer, N. Cancedda, T. Scialom. Toolformer: Language Models Can Teach
+Themselves to Use Tools. \emph{arXiv:2302.04761}, 2023.
+
+\bibitem{gorilla} S. G. Patil, T. Zhang, X. Wang, J. E. Gonzalez. Gorilla: Large
+Language Model Connected with Massive APIs. \emph{arXiv:2305.15334}, 2023.
+
+\bibitem{toolllm} Y. Qin et al. ToolLLM: Facilitating Large Language Models to Master
+16000+ Real-world APIs. \emph{arXiv:2307.16789}, 2023.
+
+\bibitem{swebench} C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press,
+K. Narasimhan. SWE-bench: Can Language Models Resolve Real-World GitHub Issues?
+\emph{arXiv:2310.06770}, 2023.
+
+\bibitem{webarena} S. Zhou et al. WebArena: A Realistic Web Environment for Building
+Autonomous Agents. \emph{arXiv:2307.13854}, 2023.
+
+\bibitem{agentbench} X. Liu et al. AgentBench: Evaluating LLMs as Agents.
+\emph{arXiv:2308.03688}, 2023.
+
+\bibitem{gaia} G. Mialon et al. GAIA: A Benchmark for General AI Assistants.
+\emph{arXiv:2311.12983}, 2023.
+
+\bibitem{toolemu} Y. Ruan et al. Identifying the Risks of LM Agents with an
+LM-Emulated Sandbox. \emph{arXiv:2309.15817}, 2023.
+
+\bibitem{agentdojo} E. Debenedetti et al. AgentDojo: A Dynamic Environment to Evaluate
+Prompt Injection Attacks and Defenses for LLM Agents. \emph{arXiv:2406.13352}, 2024.
+
+\end{thebibliography}
+
+\end{document}

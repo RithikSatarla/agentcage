@@ -18,3 +18,14 @@ results/
 
 # Part A HTTP cache (regenerable; keeps re-runs off the GitHub rate limit)
 .cache/
+
+# LaTeX build artefacts. generated_macros.tex and generated_table.tex ARE tracked:
+# they are the paper's numbers, produced by paper/make_tables.py from results.json.
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.pdf
+paper/*.tar.gz

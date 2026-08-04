@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "sampling_frame": {
+    "description": "Python-primary open-source repositories that define or ship agent tools. This is the CANDIDATE universe, not the analyzed set. part_a/run.py screens each candidate for at least one write-capable tool definition; only candidates that pass screening enter the analyzed set and the headline denominator.",
+    "inclusion_criteria": [
+      "Public GitHub repository, Python-primary source tree.",
+      "Ships agent/tool-calling machinery or is itself an autonomous agent.",
+      "Selected for recognisability in the LLM-agent ecosystem (frameworks, autonomous agents, coding agents, browser/computer-use agents)."
+    ],
+    "exclusion_criteria": [
+      "JavaScript/TypeScript-primary repositories: the detectors in run.py are Python AST/regex heuristics and would systematically under-detect on non-Python sources.",
+      "Repositories with no agent-tool surface at all (pure model libraries, datasets, prompt collections)."
+    ],
+    "known_limitations": "This frame is a convenience sample of well-known projects, not a random sample of all agent repositories. It is biased toward large, well-maintained projects, which if anything biases the measured test-coverage rate UPWARD (i.e. the true untested rate across the long tail is likely higher, not lower)."
+  },
+  "candidates": [
+    { "repo": "langchain-ai/langchain", "framework": "LangChain", "notes": "Tool abstraction plus a large community tool catalogue." },
+    { "repo": "langchain-ai/langchain-community", "framework": "LangChain", "notes": "Where the LangChain community tool implementations now live after the monorepo split." },
+    { "repo": "langchain-ai/langgraph", "framework": "LangGraph", "notes": "Graph agent runtime." },
+    { "repo": "Significant-Gravitas/AutoGPT", "framework": "AutoGPT", "notes": "Autonomous agent with filesystem and web abilities." },
+    { "repo": "yoheinakajima/babyagi", "framework": "BabyAGI", "notes": "Task-loop agent." },
+    { "repo": "microsoft/autogen", "framework": "AutoGen", "notes": "Multi-agent conversation framework with code execution." },
+    { "repo": "crewAIInc/crewAI", "framework": "CrewAI", "notes": "Role-based multi-agent framework." },
+    { "repo": "run-llama/llama_index", "framework": "LlamaIndex", "notes": "Data framework with a large tool-spec catalogue." },
+    { "repo": "Aider-AI/aider", "framework": "Aider", "notes": "Coding agent that edits files and runs git commands." },
+    { "repo": "SWE-agent/SWE-agent", "framework": "SWE-agent", "notes": "Agent that edits repositories to resolve issues." },
+    { "repo": "OpenBMB/ChatDev", "framework": "ChatDev", "notes": "Multi-agent software company simulation." },
+    { "repo": "geekan/MetaGPT", "framework": "MetaGPT", "notes": "Multi-agent framework writing to the filesystem." },
+    { "repo": "TransformerOptimus/SuperAGI", "framework": "SuperAGI", "notes": "Agent infrastructure with a tool marketplace." },
+    { "repo": "AntonOsika/gpt-engineer", "framework": "gpt-engineer", "notes": "Generates and writes whole codebases." },
+    { "repo": "huggingface/smolagents", "framework": "smolagents", "notes": "Minimal code-executing agent library." },
+    { "repo": "All-Hands-AI/OpenHands", "framework": "OpenHands", "notes": "Autonomous software engineer with shell access." },
+    { "repo": "camel-ai/camel", "framework": "CAMEL", "notes": "Multi-agent framework with a toolkit catalogue." },
+    { "repo": "agno-agi/agno", "framework": "Agno", "notes": "Agent framework, formerly phidata." },
+    { "repo": "stanfordnlp/dspy", "framework": "DSPy", "notes": "Programming model for LM pipelines, includes ReAct tools." },
+    { "repo": "openai/openai-agents-python", "framework": "OpenAI Agents SDK", "notes": "Official OpenAI agents SDK." },
+    { "repo": "pydantic/pydantic-ai", "framework": "PydanticAI", "notes": "Typed agent framework." },
+    { "repo": "openai/swarm", "framework": "Swarm", "notes": "Educational multi-agent orchestration." },
+    { "repo": "OpenInterpreter/open-interpreter", "framework": "Open Interpreter", "notes": "Runs generated code locally." },
+    { "repo": "microsoft/TaskWeaver", "framework": "TaskWeaver", "notes": "Code-first agent framework with plugins." },
+    { "repo": "microsoft/JARVIS", "framework": "JARVIS/HuggingGPT", "notes": "Model-orchestrating agent." },
+    { "repo": "microsoft/UFO", "framework": "UFO", "notes": "Windows OS computer-use agent." },
+    { "repo": "modelcontextprotocol/python-sdk", "framework": "MCP", "notes": "Reference MCP server/client SDK; tools are the core abstraction." },
+    { "repo": "mem0ai/mem0", "framework": "Mem0", "notes": "Agent memory layer with write APIs." },
+    { "repo": "letta-ai/letta", "framework": "Letta/MemGPT", "notes": "Stateful agents server with tool execution." },
+    { "repo": "assafelovic/gpt-researcher", "framework": "GPT Researcher", "notes": "Research agent writing reports to disk." },
+    { "repo": "Skyvern-AI/skyvern", "framework": "Skyvern", "notes": "Browser automation agent that submits forms." },
+    { "repo": "browser-use/browser-use", "framework": "browser-use", "notes": "LLM browser control, clicks and submits." },
+    { "repo": "lavague-ai/LaVague", "framework": "LaVague", "notes": "Web-action agent." },
+    { "repo": "kyegomez/swarms", "framework": "Swarms", "notes": "Multi-agent framework with tool support." },
+    { "repo": "langroid/langroid", "framework": "Langroid", "notes": "Multi-agent programming framework." },
+    { "repo": "deepset-ai/haystack", "framework": "Haystack", "notes": "Pipeline framework with agent tools." },
+    { "repo": "griptape-ai/griptape", "framework": "Griptape", "notes": "Agent framework with off-prompt tools." },
+    { "repo": "Qodo-Ai/pr-agent", "framework": "PR-Agent", "notes": "Posts reviews and comments to git providers." },
+    { "repo": "sweepai/sweep", "framework": "Sweep", "notes": "Issue-to-PR agent." },
+    { "repo": "OpenBMB/AgentVerse", "framework": "AgentVerse", "notes": "Multi-agent simulation and task solving." },
+    { "repo": "aiwaves-cn/agents", "framework": "Agents", "notes": "Open framework for autonomous language agents." },
+    { "repo": "Upsonic/Upsonic", "framework": "Upsonic", "notes": "Agent framework with tool integrations." },
+    { "repo": "superagent-ai/superagent", "framework": "Superagent", "notes": "Agent runtime with integrations." },
+    { "repo": "entropy-research/Devon", "framework": "Devon", "notes": "Open-source pair programmer editing files." },
+    { "repo": "THUDM/AgentBench", "framework": "AgentBench", "notes": "Agent evaluation harness with OS/DB write tasks." }
+  ]
+}

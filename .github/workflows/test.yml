@@ -1,0 +1,74 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Re-run the full Part A study weekly; the ecosystem moves.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - name: Unit tests
+        run: pytest tests/ -v
+      - name: Lint
+        run: ruff check part_a part_b tests
+
+  part-a-smoke:
+    # Proves the study pipeline really executes (network, parsing, detection,
+    # aggregation) on every push, without spending ten minutes doing it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - name: Screen the first 3 candidates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m part_a.run --limit 3 --out /tmp/part_a_smoke.json
+      - name: Assert the run produced a real analysis
+        run: |
+          python - <<'PY'
+          import json, sys
+          d = json.load(open("/tmp/part_a_smoke.json"))
+          assert d["candidates_screened"] == 3, d["candidates_screened"]
+          assert not d["candidates_unresolved"], d["candidates_unresolved"]
+          assert d["config"]["ref"] == "HEAD"
+          print("smoke ok:", d["candidates_screened"], "screened")
+          PY
+
+  part-a-full:
+    # The complete study. Too slow (thousands of file reads) for every push.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - name: Run the full Part A study
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m part_a.run
+      - name: Show the diff against the committed results
+        run: git --no-pager diff --stat part_a/results.json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: part-a-results
+          path: part_a/results.json

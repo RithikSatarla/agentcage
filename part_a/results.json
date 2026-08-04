@@ -1,0 +1,2326 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-04T19:28:48.203219+00:00",
+  "tool_version": "0.1.0",
+  "elapsed_seconds": 18.2,
+  "config": {
+    "max_tool_files_per_repo": 250,
+    "max_test_files_per_repo": 400,
+    "max_file_bytes": 400000,
+    "ref": "HEAD",
+    "authenticated": false,
+    "coverage_detection": "symbol_reference_in_test_sources"
+  },
+  "candidates_screened": 45,
+  "candidates_unresolved": [],
+  "screened_out_no_write_tools": [
+    "langchain-ai/langchain",
+    "langchain-ai/langgraph",
+    "yoheinakajima/babyagi",
+    "Aider-AI/aider",
+    "SWE-agent/SWE-agent",
+    "OpenBMB/ChatDev",
+    "AntonOsika/gpt-engineer",
+    "huggingface/smolagents",
+    "All-Hands-AI/OpenHands",
+    "stanfordnlp/dspy",
+    "pydantic/pydantic-ai",
+    "openai/swarm",
+    "OpenInterpreter/open-interpreter",
+    "microsoft/TaskWeaver",
+    "microsoft/JARVIS",
+    "microsoft/UFO",
+    "modelcontextprotocol/python-sdk",
+    "mem0ai/mem0",
+    "letta-ai/letta",
+    "assafelovic/gpt-researcher",
+    "Skyvern-AI/skyvern",
+    "browser-use/browser-use",
+    "lavague-ai/LaVague",
+    "kyegomez/swarms",
+    "langroid/langroid",
+    "deepset-ai/haystack",
+    "Qodo-Ai/pr-agent",
+    "sweepai/sweep",
+    "OpenBMB/AgentVerse",
+    "superagent-ai/superagent",
+    "entropy-research/Devon",
+    "THUDM/AgentBench"
+  ],
+  "total_repos_analyzed": 13,
+  "tested": 12,
+  "untested": 1,
+  "untested_pct": 7.7,
+  "untested_repos": [
+    "aiwaves-cn/agents"
+  ],
+  "write_tools_total": 158,
+  "write_tools_covered": 126,
+  "write_tools_uncovered": 32,
+  "write_tools_uncovered_pct": 20.3,
+  "headline": "Across 13 open-source agent repositories, 20.3% of the 158 write-capable tool definitions they ship are never referenced by any test.",
+  "secondary_repo_level": "7.7% of those 13 repositories (1) have no test touching any write tool at all.",
+  "sensitivity_exhaustive_test_scan_only": {
+    "note": "Restricted to repositories whose entire test suite was read (no cap applied), so a missed reference cannot be an artefact of sampling. The headline is credible to the extent this figure matches it.",
+    "repos_analyzed": 7,
+    "untested_repos": 1,
+    "untested_repos_pct": 14.3,
+    "write_tools_total": 87,
+    "write_tools_uncovered": 18,
+    "write_tools_uncovered_pct": 20.7
+  },
+  "repos": [
+    {
+      "repo": "langchain-ai/langchain",
+      "url": "https://github.com/langchain-ai/langchain",
+      "framework": "LangChain",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/_compile_integration_test.yml",
+        ".github/workflows/_lint.yml",
+        ".github/workflows/_refresh_model_profiles.yml",
+        ".github/workflows/_release.yml",
+        ".github/workflows/_test.yml",
+        ".github/workflows/_test_pydantic.yml",
+        ".github/workflows/_test_vcr.yml",
+        ".github/workflows/auto-label-by-package.yml",
+        ".github/workflows/block_fork_main_prs.yml",
+        ".github/workflows/bump_uv_pin.yml"
+      ],
+      "source_files_total": 1741,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 1491,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "langchain-ai/langchain-community",
+      "url": "https://github.com/langchain-ai/langchain-community",
+      "framework": "LangChain",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/_compile_integration_test.yml",
+        ".github/workflows/_lint.yml",
+        ".github/workflows/_release.yml",
+        ".github/workflows/_test.yml",
+        ".github/workflows/_test_pydantic.yml",
+        ".github/workflows/check_diffs.yml",
+        ".github/workflows/pr_labeler_file.yml",
+        ".github/workflows/pr_labeler_title.yml",
+        ".github/workflows/pr_lint.yml"
+      ],
+      "source_files_total": 1207,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 957,
+      "source_scan_complete": false,
+      "post_only_tool_count": 7,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "slack"
+      ],
+      "write_tool_count": 12,
+      "write_tools_sample": [
+        {
+          "name": "HuggingFaceTextToSpeechModelInference",
+          "path": "libs/community/langchain_community/tools/audio/huggingface_text_to_speech_inference.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write",
+            "http_post"
+          ]
+        },
+        {
+          "name": "UCFunctionToolkit",
+          "path": "libs/community/langchain_community/tools/databricks/tool.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "E2BDataAnalysisTool",
+          "path": "libs/community/langchain_community/tools/e2b_data_analysis/tool.py",
+          "categories": [
+            "cloud_sdk_write",
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "EdenAiTextToSpeechTool",
+          "path": "libs/community/langchain_community/tools/edenai/audio_text_to_speech.py",
+          "categories": [
+            "file_open_write"
+          ]
+        },
+        {
+          "name": "CopyFileTool",
+          "path": "libs/community/langchain_community/tools/file_management/copy.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "DeleteFileTool",
+          "path": "libs/community/langchain_community/tools/file_management/delete.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "MoveFileTool",
+          "path": "libs/community/langchain_community/tools/file_management/move.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "WriteFileTool",
+          "path": "libs/community/langchain_community/tools/file_management/write.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "O365SearchEvents",
+          "path": "libs/community/langchain_community/tools/office365/events_search.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "O365SearchEmails",
+          "path": "libs/community/langchain_community/tools/office365/messages_search.py",
+          "categories": [
+            "db_write"
+          ]
+        }
+      ],
+      "test_files_total": 822,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 11,
+      "covered_write_tool_names": [
+        "CopyFileTool",
+        "DeleteFileTool",
+        "E2BDataAnalysisTool",
+        "EdenAiTextToSpeechTool",
+        "HuggingFaceTextToSpeechModelInference",
+        "MoveFileTool",
+        "O365SearchEmails",
+        "O365SearchEvents",
+        "O365SendMessage",
+        "SlackSendMessage"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "framework": "LangGraph",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/_integration_test.yml",
+        ".github/workflows/_lint.yml",
+        ".github/workflows/_sdk_integration_test.yml",
+        ".github/workflows/_test.yml",
+        ".github/workflows/_test_langgraph.yml",
+        ".github/workflows/_test_release.yml",
+        ".github/workflows/baseline.yml",
+        ".github/workflows/bench.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/deploy-redirects.yml"
+      ],
+      "source_files_total": 220,
+      "source_files_scanned": 220,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "Significant-Gravitas/AutoGPT",
+      "url": "https://github.com/Significant-Gravitas/AutoGPT",
+      "framework": "AutoGPT",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/batch-command-handler.yml",
+        ".github/workflows/batch-command-listener.yml",
+        ".github/workflows/batch-reconcile.yml",
+        ".github/workflows/classic-autogpt-ci.yml",
+        ".github/workflows/classic-autogpt-docker-cache-clean.yml",
+        ".github/workflows/classic-autogpt-docker-ci.yml",
+        ".github/workflows/classic-autogpt-docker-release.yml",
+        ".github/workflows/classic-autogpts-ci.yml",
+        ".github/workflows/classic-benchmark-ci.yml",
+        ".github/workflows/classic-benchmark_publish_package.yml"
+      ],
+      "source_files_total": 1055,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 805,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "stripe"
+      ],
+      "write_tool_count": 3,
+      "write_tools_sample": [
+        {
+          "name": "BrowserScreenshotTool",
+          "path": "autogpt_platform/backend/backend/copilot/tools/agent_browser.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "SearchDocsTool",
+          "path": "autogpt_platform/backend/backend/copilot/tools/search_docs.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "DeleteWorkspaceFileTool",
+          "path": "autogpt_platform/backend/backend/copilot/tools/workspace_files.py",
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "test_files_total": 494,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 3,
+      "covered_write_tool_names": [
+        "BrowserScreenshotTool",
+        "DeleteWorkspaceFileTool",
+        "SearchDocsTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "yoheinakajima/babyagi",
+      "url": "https://github.com/yoheinakajima/babyagi",
+      "framework": "BabyAGI",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": false,
+      "ci_workflows": [],
+      "source_files_total": 35,
+      "source_files_scanned": 35,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "microsoft/autogen",
+      "url": "https://github.com/microsoft/autogen",
+      "framework": "AutoGen",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/checks.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/docs.yml",
+        ".github/workflows/dotnet-build.yml",
+        ".github/workflows/dotnet-release.yml",
+        ".github/workflows/integration.yml",
+        ".github/workflows/issue-user-responded.yml",
+        ".github/workflows/lfs-check.yml",
+        ".github/workflows/pytest-mem0.yml",
+        ".github/workflows/pytest-redis-memory.yml"
+      ],
+      "source_files_total": 349,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 99,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 1,
+      "write_tools_sample": [
+        {
+          "name": "HttpTool",
+          "path": "python/packages/autogen-ext/src/autogen_ext/tools/http/_http_tool.py",
+          "categories": [
+            "http_destructive",
+            "http_post"
+          ]
+        }
+      ],
+      "test_files_total": 121,
+      "test_files_scanned": 121,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 1,
+      "covered_write_tool_names": [
+        "HttpTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "crewAIInc/crewAI",
+      "url": "https://github.com/crewAIInc/crewAI",
+      "framework": "CrewAI",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build-uv-cache.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/docs-broken-links.yml",
+        ".github/workflows/generate-tool-specs.yml",
+        ".github/workflows/linter.yml",
+        ".github/workflows/nightly.yml",
+        ".github/workflows/pr-size.yml",
+        ".github/workflows/pr-title.yml",
+        ".github/workflows/publish.yml",
+        ".github/workflows/stale.yml"
+      ],
+      "source_files_total": 895,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 645,
+      "source_scan_complete": false,
+      "post_only_tool_count": 15,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "stripe"
+      ],
+      "write_tool_count": 32,
+      "write_tools_sample": [
+        {
+          "name": "S3WriterTool",
+          "path": "lib/crewai-tools/src/crewai_tools/aws/s3/writer_tool.py",
+          "categories": [
+            "cloud_sdk_write"
+          ]
+        },
+        {
+          "name": "ArxivPaperTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/arxiv_paper_tool/arxiv_paper_tool.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "BrowserbaseLoadTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/browserbase_load_tool/browserbase_load_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "CouchbaseFTSVectorSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/couchbase_tool/couchbase_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "DaytonaFileTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/daytona_sandbox_tool/daytona_file_tool.py",
+          "categories": [
+            "cloud_sdk_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "ExaSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/exa_tools/exa_search_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "FileWriterTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/file_writer_tool/file_writer_tool.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "FileCompressorTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/files_compressor_tool/files_compressor_tool.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "FirecrawlCrawlWebsiteTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/firecrawl_crawl_website_tool/firecrawl_crawl_website_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "FirecrawlScrapeWebsiteTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/firecrawl_scrape_website_tool/firecrawl_scrape_website_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        }
+      ],
+      "test_files_total": 375,
+      "test_files_scanned": 375,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 19,
+      "covered_write_tool_names": [
+        "ArxivPaperTool",
+        "BrowserbaseLoadTool",
+        "CouchbaseFTSVectorSearchTool",
+        "ExaSearchTool",
+        "FileCompressorTool",
+        "FileWriterTool",
+        "FirecrawlCrawlWebsiteTool",
+        "FirecrawlScrapeWebsiteTool",
+        "FirecrawlSearchTool",
+        "MongoDBVectorSearchTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "run-llama/llama_index",
+      "url": "https://github.com/run-llama/llama_index",
+      "framework": "LlamaIndex",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build_package.yml",
+        ".github/workflows/close_new_integration_prs.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/core-typecheck.yml",
+        ".github/workflows/coverage_check.yml",
+        ".github/workflows/issue_classifier.yml",
+        ".github/workflows/lint.yml",
+        ".github/workflows/llama_dev_tests.yml",
+        ".github/workflows/pre_release.yml",
+        ".github/workflows/publish_sub_package.yml"
+      ],
+      "source_files_total": 2180,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 1930,
+      "source_scan_complete": false,
+      "post_only_tool_count": 10,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 13,
+      "write_tools_sample": [
+        {
+          "name": "AgentCoreCodeInterpreterToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-aws-bedrock-agentcore/llama_index/tools/aws_bedrock_agentcore/code_interpreter/base.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "AzureCodeInterpreterToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-azure-code-interpreter/llama_index/tools/azure_code_interpreter/base.py",
+          "categories": [
+            "cloud_sdk_write",
+            "file_open_write",
+            "http_post"
+          ]
+        },
+        {
+          "name": "BrightDataToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-brightdata/llama_index/tools/brightdata/base.py",
+          "categories": [
+            "file_open_write",
+            "http_post"
+          ]
+        },
+        {
+          "name": "CodeInterpreterToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-code-interpreter/llama_index/tools/code_interpreter/base.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "DatabaseToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-database/llama_index/tools/database/base.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "ElevenLabsToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-elevenlabs/llama_index/tools/elevenlabs/base.py",
+          "categories": [
+            "file_open_write"
+          ]
+        },
+        {
+          "name": "GoogleCalendarToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-google/llama_index/tools/google/calendar/base.py",
+          "categories": [
+            "file_open_write"
+          ]
+        },
+        {
+          "name": "GmailToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-google/llama_index/tools/google/gmail/base.py",
+          "categories": [
+            "file_open_write"
+          ]
+        },
+        {
+          "name": "JiraIssueToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-jira-issue/llama_index/tools/jira_issue/base.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "OpenAIImageGenerationToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-openai/llama_index/tools/openai/image_generation/base.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        }
+      ],
+      "test_files_total": 1624,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 13,
+      "covered_write_tool_names": [
+        "AgentCoreCodeInterpreterToolSpec",
+        "AzureCodeInterpreterToolSpec",
+        "BrightDataToolSpec",
+        "CodeInterpreterToolSpec",
+        "DatabaseToolSpec",
+        "ElevenLabsToolSpec",
+        "GmailToolSpec",
+        "GoogleCalendarToolSpec",
+        "JiraIssueToolSpec",
+        "OpenAIImageGenerationToolSpec"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "Aider-AI/aider",
+      "url": "https://github.com/Aider-AI/aider",
+      "framework": "Aider",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/check_pypi_version.yml",
+        ".github/workflows/docker-build-test.yml",
+        ".github/workflows/docker-release.yml",
+        ".github/workflows/issues.yml",
+        ".github/workflows/pages.yml",
+        ".github/workflows/pre-commit.yml",
+        ".github/workflows/release.yml",
+        ".github/workflows/ubuntu-tests.yml",
+        ".github/workflows/windows-tests.yml",
+        ".github/workflows/windows_check_pypi_version.yml"
+      ],
+      "source_files_total": 105,
+      "source_files_scanned": 105,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "SWE-agent/SWE-agent",
+      "url": "https://github.com/SWE-agent/SWE-agent",
+      "framework": "SWE-agent",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build-docs.yaml",
+        ".github/workflows/check-links-periodic.yaml",
+        ".github/workflows/check-links-pr.yaml",
+        ".github/workflows/pytest.yaml"
+      ],
+      "source_files_total": 67,
+      "source_files_scanned": 67,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "OpenBMB/ChatDev",
+      "url": "https://github.com/OpenBMB/ChatDev",
+      "framework": "ChatDev",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/validate-yamls.yml"
+      ],
+      "source_files_total": 187,
+      "source_files_scanned": 187,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "geekan/MetaGPT",
+      "url": "https://github.com/geekan/MetaGPT",
+      "framework": "MetaGPT",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build-package.yaml",
+        ".github/workflows/fulltest.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/stale.yaml",
+        ".github/workflows/unittest.yaml"
+      ],
+      "source_files_total": 509,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 259,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 13,
+      "write_tools_sample": [
+        {
+          "name": "WriteDesign",
+          "path": "metagpt/actions/design_api.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "GenerateTable",
+          "path": "metagpt/actions/invoice_ocr.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "PrepareDocuments",
+          "path": "metagpt/actions/prepare_documents.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "RebuildClassView",
+          "path": "metagpt/actions/rebuild_class_view.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "RunCode",
+          "path": "metagpt/actions/run_code.py",
+          "categories": [
+            "db_write",
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "WritePRD",
+          "path": "metagpt/actions/write_prd.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "ManualRecord",
+          "path": "metagpt/ext/android_assistant/actions/manual_record.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "ParseRecord",
+          "path": "metagpt/ext/android_assistant/actions/parse_record.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "SelfLearnAndReflect",
+          "path": "metagpt/ext/android_assistant/actions/self_learn_and_reflect.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "CodeReview",
+          "path": "metagpt/ext/cr/actions/code_review.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        }
+      ],
+      "test_files_total": 307,
+      "test_files_scanned": 307,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 13,
+      "covered_write_tool_names": [
+        "AddNewExperiences",
+        "CodeReview",
+        "GenerateTable",
+        "ManualRecord",
+        "ModifyCode",
+        "ParseRecord",
+        "PrepareDocuments",
+        "RebuildClassView",
+        "RunCode",
+        "SelfLearnAndReflect"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "TransformerOptimus/SuperAGI",
+      "url": "https://github.com/TransformerOptimus/SuperAGI",
+      "framework": "SuperAGI",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/codeql.yml"
+      ],
+      "source_files_total": 271,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 21,
+      "source_scan_complete": false,
+      "post_only_tool_count": 3,
+      "apis": [
+        "aws",
+        "database",
+        "email",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "slack"
+      ],
+      "write_tool_count": 9,
+      "write_tools_sample": [
+        {
+          "name": "SendEmailTool",
+          "path": "superagi/tools/email/send_email.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "SendEmailAttachmentTool",
+          "path": "superagi/tools/email/send_email_attachment.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "AppendFileTool",
+          "path": "superagi/tools/file/append_file.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "DeleteFileTool",
+          "path": "superagi/tools/file/delete_file.py",
+          "categories": [
+            "filesystem_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "ReadFileTool",
+          "path": "superagi/tools/file/read_file.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "GithubAddFileTool",
+          "path": "superagi/tools/github/add_file.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "GithubDeleteFileTool",
+          "path": "superagi/tools/github/delete_file.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "CreateIssueTool",
+          "path": "superagi/tools/jira/create_issue.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "SlackMessageTool",
+          "path": "superagi/tools/slack/send_message.py",
+          "categories": [
+            "messaging_write"
+          ]
+        }
+      ],
+      "test_files_total": 155,
+      "test_files_scanned": 155,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 6,
+      "covered_write_tool_names": [
+        "CreateIssueTool",
+        "GithubAddFileTool",
+        "GithubDeleteFileTool",
+        "ReadFileTool",
+        "SendEmailAttachmentTool",
+        "SendEmailTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "AntonOsika/gpt-engineer",
+      "url": "https://github.com/AntonOsika/gpt-engineer",
+      "framework": "gpt-engineer",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/automation.yml",
+        ".github/workflows/ci.yaml",
+        ".github/workflows/pre-commit.yaml",
+        ".github/workflows/release.yaml"
+      ],
+      "source_files_total": 54,
+      "source_files_scanned": 54,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "huggingface/smolagents",
+      "url": "https://github.com/huggingface/smolagents",
+      "framework": "smolagents",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build_documentation.yml",
+        ".github/workflows/build_pr_documentation.yml",
+        ".github/workflows/quality.yml",
+        ".github/workflows/tests.yml",
+        ".github/workflows/trufflehog.yml",
+        ".github/workflows/upload_pr_documentation.yml"
+      ],
+      "source_files_total": 18,
+      "source_files_scanned": 18,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 1,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "All-Hands-AI/OpenHands",
+      "url": "https://github.com/All-Hands-AI/OpenHands",
+      "framework": "OpenHands",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/desktop-macos.yml",
+        ".github/workflows/desktop-windows.yml",
+        ".github/workflows/docker.yml",
+        ".github/workflows/issue-duplicate-checker.yml",
+        ".github/workflows/mock-llm-docker-e2e.yml",
+        ".github/workflows/mock-llm-e2e-comment.yml",
+        ".github/workflows/mock-llm-e2e.yml",
+        ".github/workflows/npm-publish.yml",
+        ".github/workflows/pr-artifacts.yml"
+      ],
+      "source_files_total": 2,
+      "source_files_scanned": 2,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "github"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "camel-ai/camel",
+      "url": "https://github.com/camel-ai/camel",
+      "framework": "CAMEL",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build_package.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/dependency-review.yml",
+        ".github/workflows/docs_release_auto_sync_pr.yml",
+        ".github/workflows/documentation.yml",
+        ".github/workflows/pr-label-automation.yml",
+        ".github/workflows/pre_commit.yml",
+        ".github/workflows/profiling.yml",
+        ".github/workflows/publish_release.yml",
+        ".github/workflows/pytest_apps.yml"
+      ],
+      "source_files_total": 515,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 265,
+      "source_scan_complete": false,
+      "post_only_tool_count": 6,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "email",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "slack",
+        "stripe"
+      ],
+      "write_tool_count": 30,
+      "write_tools_sample": [
+        {
+          "name": "AsyncBrowserToolkit",
+          "path": "camel/toolkits/async_browser_toolkit.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "BrowserToolkit",
+          "path": "camel/toolkits/browser_toolkit.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "CodeExecutionToolkit",
+          "path": "camel/toolkits/code_execution.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "EarthScienceToolkit",
+          "path": "camel/toolkits/earth_science_toolkit.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "ExcelToolkit",
+          "path": "camel/toolkits/excel_toolkit.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "FileToolkit",
+          "path": "camel/toolkits/file_toolkit.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "GithubToolkit",
+          "path": "camel/toolkits/github_toolkit.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "GmailToolkit",
+          "path": "camel/toolkits/gmail_toolkit.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "HybridBrowserToolkit",
+          "path": "camel/toolkits/hybrid_browser_toolkit_py/hybrid_browser_toolkit.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "ImageGenToolkit",
+          "path": "camel/toolkits/image_generation_toolkit.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        }
+      ],
+      "test_files_total": 282,
+      "test_files_scanned": 282,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 29,
+      "covered_write_tool_names": [
+        "AgentCommunicationToolkit",
+        "AsyncBrowserToolkit",
+        "BrowserToolkit",
+        "CodeExecutionToolkit",
+        "ExcelToolkit",
+        "FileToolkit",
+        "GithubToolkit",
+        "GmailToolkit",
+        "HybridBrowserToolkit",
+        "IMAPMailToolkit"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "agno-agi/agno",
+      "url": "https://github.com/agno-agi/agno",
+      "framework": "Agno",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/claude.yml",
+        ".github/workflows/performance.yml",
+        ".github/workflows/pr-lint.yml",
+        ".github/workflows/pr-triage.yml",
+        ".github/workflows/release.yml",
+        ".github/workflows/test.yml",
+        ".github/workflows/test_on_release.yml"
+      ],
+      "source_files_total": 1077,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 827,
+      "source_scan_complete": false,
+      "post_only_tool_count": 10,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "database",
+        "email",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "slack"
+      ],
+      "write_tool_count": 34,
+      "write_tools_sample": [
+        {
+          "name": "FileSystemTools",
+          "path": "libs/agno/agno/fs/toolkit.py",
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "AirflowTools",
+          "path": "libs/agno/agno/tools/airflow.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "AntigravityTools",
+          "path": "libs/agno/agno/tools/antigravity.py",
+          "categories": [
+            "http_destructive",
+            "http_post"
+          ]
+        },
+        {
+          "name": "ArxivTools",
+          "path": "libs/agno/agno/tools/arxiv.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "AWSSESTool",
+          "path": "libs/agno/agno/tools/aws_ses.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "BrowserbaseTools",
+          "path": "libs/agno/agno/tools/browserbase.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "CodingTools",
+          "path": "libs/agno/agno/tools/coding.py",
+          "categories": [
+            "db_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "Crawl4aiTools",
+          "path": "libs/agno/agno/tools/crawl4ai.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "DiscordTools",
+          "path": "libs/agno/agno/tools/discord.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "E2BTools",
+          "path": "libs/agno/agno/tools/e2b.py",
+          "categories": [
+            "cloud_sdk_write",
+            "file_open_write"
+          ]
+        }
+      ],
+      "test_files_total": 1063,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 23,
+      "covered_write_tool_names": [
+        "AWSSESTool",
+        "AirflowTools",
+        "AntigravityTools",
+        "BrowserbaseTools",
+        "CodingTools",
+        "Crawl4aiTools",
+        "E2BTools",
+        "FileGenerationTools",
+        "GmailTools",
+        "JinaReaderTools"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "stanfordnlp/dspy",
+      "url": "https://github.com/stanfordnlp/dspy",
+      "framework": "DSPy",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build_and_release.yml",
+        ".github/workflows/dependency-range.yml",
+        ".github/workflows/docs-push.yml",
+        ".github/workflows/precommits_check.yml",
+        ".github/workflows/run_tests.yml"
+      ],
+      "source_files_total": 156,
+      "source_files_scanned": 156,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "url": "https://github.com/openai/openai-agents-python",
+      "framework": "OpenAI Agents SDK",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/docs.yml",
+        ".github/workflows/issues.yml",
+        ".github/workflows/publish.yml",
+        ".github/workflows/release-pr.yml",
+        ".github/workflows/release-tag.yml",
+        ".github/workflows/tests.yml"
+      ],
+      "source_files_total": 301,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 51,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 1,
+      "write_tools_sample": [
+        {
+          "name": "SandboxApplyPatchTool",
+          "path": "src/agents/sandbox/capabilities/tools/apply_patch_tool.py",
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "test_files_total": 328,
+      "test_files_scanned": 328,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 1,
+      "covered_write_tool_names": [
+        "SandboxApplyPatchTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "pydantic/pydantic-ai",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "framework": "PydanticAI",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/after-ci.yml",
+        ".github/workflows/agent-spend-report.yml",
+        ".github/workflows/agentics-maintenance.yml",
+        ".github/workflows/at-claude.yml",
+        ".github/workflows/bots.yml",
+        ".github/workflows/ci-duration-report.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/docs-preview.yml",
+        ".github/workflows/gateway-model-health.yml",
+        ".github/workflows/harness-compat.yml"
+      ],
+      "source_files_total": 333,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 83,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "openai/swarm",
+      "url": "https://github.com/openai/swarm",
+      "framework": "Swarm",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": false,
+      "ci_workflows": [],
+      "source_files_total": 6,
+      "source_files_scanned": 6,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "openai"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "OpenInterpreter/open-interpreter",
+      "url": "https://github.com/OpenInterpreter/open-interpreter",
+      "framework": "Open Interpreter",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/bazel.yml",
+        ".github/workflows/blob-size-policy.yml",
+        ".github/workflows/blocking-ci.yml",
+        ".github/workflows/cargo-ci.yml",
+        ".github/workflows/cargo-deny.yml",
+        ".github/workflows/codespell.yml",
+        ".github/workflows/issue-translator.yml",
+        ".github/workflows/postmerge-ci.yml",
+        ".github/workflows/public-ci.yml",
+        ".github/workflows/python-runtime-build.yml"
+      ],
+      "source_files_total": 64,
+      "source_files_scanned": 64,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "microsoft/TaskWeaver",
+      "url": "https://github.com/microsoft/TaskWeaver",
+      "framework": "TaskWeaver",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/deploy-website.yaml",
+        ".github/workflows/pytest.yml"
+      ],
+      "source_files_total": 139,
+      "source_files_scanned": 139,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "microsoft/JARVIS",
+      "url": "https://github.com/microsoft/JARVIS",
+      "framework": "JARVIS/HuggingGPT",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": false,
+      "ci_workflows": [],
+      "source_files_total": 20,
+      "source_files_scanned": 20,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "microsoft/UFO",
+      "url": "https://github.com/microsoft/UFO",
+      "framework": "UFO",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/document_deploy.yml"
+      ],
+      "source_files_total": 315,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 65,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "modelcontextprotocol/python-sdk",
+      "url": "https://github.com/modelcontextprotocol/python-sdk",
+      "framework": "MCP",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/claude.yml",
+        ".github/workflows/conformance.yml",
+        ".github/workflows/deploy-docs.yml",
+        ".github/workflows/docs-preview-cleanup.yml",
+        ".github/workflows/docs-preview.yml",
+        ".github/workflows/main.yml",
+        ".github/workflows/publish-pypi.yml",
+        ".github/workflows/shared.yml",
+        ".github/workflows/zizmor.yml"
+      ],
+      "source_files_total": 321,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 71,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "github",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "url": "https://github.com/mem0ai/mem0",
+      "framework": "Mem0",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci-gate.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/cli-node-cd.yml",
+        ".github/workflows/cli-node-ci.yml",
+        ".github/workflows/cli-python-cd.yml",
+        ".github/workflows/cli-python-ci.yml",
+        ".github/workflows/docs-llms-txt-check.yml",
+        ".github/workflows/issue-labeler.yml",
+        ".github/workflows/mem0-plugin-checks.yml"
+      ],
+      "source_files_total": 221,
+      "source_files_scanned": 221,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "letta-ai/letta",
+      "url": "https://github.com/letta-ai/letta",
+      "framework": "Letta/MemGPT",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/alembic-validation.yml",
+        ".github/workflows/close_stale_issues.yml",
+        ".github/workflows/core-integration-tests.yml",
+        ".github/workflows/core-lint.yml",
+        ".github/workflows/core-unit-sqlite-test.yaml",
+        ".github/workflows/core-unit-test.yml",
+        ".github/workflows/docker-image.yml",
+        ".github/workflows/docker-integration-tests.yaml",
+        ".github/workflows/fern-check.yml",
+        ".github/workflows/fern-docs-preview.yml"
+      ],
+      "source_files_total": 707,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 457,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "github",
+        "openai",
+        "shell",
+        "stripe"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "assafelovic/gpt-researcher",
+      "url": "https://github.com/assafelovic/gpt-researcher",
+      "framework": "GPT Researcher",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build.yml",
+        ".github/workflows/deploy.yml",
+        ".github/workflows/docker-build.yml",
+        ".github/workflows/llm-costs.yml",
+        ".github/workflows/plugin-quality-gate.yml"
+      ],
+      "source_files_total": 198,
+      "source_files_scanned": 198,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "Skyvern-AI/skyvern",
+      "url": "https://github.com/Skyvern-AI/skyvern",
+      "framework": "Skyvern",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/auto-merge-sync.yml",
+        ".github/workflows/auto-release.yml",
+        ".github/workflows/build-docker-image.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/claude-code-review.yml",
+        ".github/workflows/claude.yml",
+        ".github/workflows/inactive-issues-and-prs.yml",
+        ".github/workflows/publish-fern-docs.yml",
+        ".github/workflows/sdk-release.yml",
+        ".github/workflows/sync-skyvern-cloud.yml"
+      ],
+      "source_files_total": 1255,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 1005,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "browser-use/browser-use",
+      "url": "https://github.com/browser-use/browser-use",
+      "framework": "browser-use",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/claude.yml",
+        ".github/workflows/cloud_evals.yml",
+        ".github/workflows/docker.yml",
+        ".github/workflows/eval-on-pr.yml",
+        ".github/workflows/install-script.yml",
+        ".github/workflows/lint.yml",
+        ".github/workflows/package.yaml",
+        ".github/workflows/publish.yml",
+        ".github/workflows/stale-bot.yml",
+        ".github/workflows/test.yaml"
+      ],
+      "source_files_total": 161,
+      "source_files_scanned": 161,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "lavague-ai/LaVague",
+      "url": "https://github.com/lavague-ai/LaVague",
+      "framework": "LaVague",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/docs-checker.yaml",
+        ".github/workflows/docs-code.yaml",
+        ".github/workflows/format.yaml",
+        ".github/workflows/publish.yaml"
+      ],
+      "source_files_total": 74,
+      "source_files_scanned": 74,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "database",
+        "github",
+        "openai"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "kyegomez/swarms",
+      "url": "https://github.com/kyegomez/swarms",
+      "framework": "Swarms",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/RELEASE.yml",
+        ".github/workflows/dependency-review.yml",
+        ".github/workflows/label.yml",
+        ".github/workflows/lint.yml",
+        ".github/workflows/pyre.yml",
+        ".github/workflows/python-package.yml",
+        ".github/workflows/stale.yml",
+        ".github/workflows/test-main-features.yml",
+        ".github/workflows/tests.yml",
+        ".github/workflows/welcome.yml"
+      ],
+      "source_files_total": 228,
+      "source_files_scanned": 228,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "browser",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "langroid/langroid",
+      "url": "https://github.com/langroid/langroid",
+      "framework": "Langroid",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/docker-publish.yml",
+        ".github/workflows/mkdocs-deploy.yml",
+        ".github/workflows/pytest-subset.yml",
+        ".github/workflows/pytest.yml",
+        ".github/workflows/validate.yml"
+      ],
+      "source_files_total": 138,
+      "source_files_scanned": 138,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "deepset-ai/haystack",
+      "url": "https://github.com/deepset-ai/haystack",
+      "framework": "Haystack",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/auto_approve_api_ref_sync.yml",
+        ".github/workflows/branch_off.yml",
+        ".github/workflows/cflite_pr.yml",
+        ".github/workflows/check_api_ref.yml",
+        ".github/workflows/cla_draft_gate.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/coverage_comment.yml",
+        ".github/workflows/docker_release.yml",
+        ".github/workflows/docs-website-test-docs-snippets.yml",
+        ".github/workflows/docs_search_sync.yml"
+      ],
+      "source_files_total": 269,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 19,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "griptape-ai/griptape",
+      "url": "https://github.com/griptape-ai/griptape",
+      "framework": "Griptape",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/code-checks.yml",
+        ".github/workflows/create-stable-release.yml",
+        ".github/workflows/docs-integration-tests.yml",
+        ".github/workflows/publish.yml",
+        ".github/workflows/pull-request-links.yml",
+        ".github/workflows/unit-tests.yml"
+      ],
+      "source_files_total": 540,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 290,
+      "source_scan_complete": false,
+      "post_only_tool_count": 1,
+      "apis": [
+        "anthropic",
+        "aws",
+        "browser",
+        "database",
+        "email",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 3,
+      "write_tools_sample": [
+        {
+          "name": "BaseTool",
+          "path": "griptape/tools/base_tool.py",
+          "categories": [
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "ComputerTool",
+          "path": "griptape/tools/computer/tool.py",
+          "categories": [
+            "filesystem_write",
+            "shell_exec"
+          ]
+        },
+        {
+          "name": "EmailTool",
+          "path": "griptape/tools/email/tool.py",
+          "categories": [
+            "messaging_write"
+          ]
+        }
+      ],
+      "test_files_total": 407,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 3,
+      "covered_write_tool_names": [
+        "BaseTool",
+        "ComputerTool",
+        "EmailTool"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "Qodo-Ai/pr-agent",
+      "url": "https://github.com/Qodo-Ai/pr-agent",
+      "framework": "PR-Agent",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/build-and-test.yaml",
+        ".github/workflows/code_coverage.yaml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/docs-ci.yaml",
+        ".github/workflows/e2e_tests.yaml",
+        ".github/workflows/pr-agent-review.yaml",
+        ".github/workflows/pre-commit.yml",
+        ".github/workflows/publish.yml",
+        ".github/workflows/release-drafter.yml"
+      ],
+      "source_files_total": 89,
+      "source_files_scanned": 89,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "sweepai/sweep",
+      "url": "https://github.com/sweepai/sweep",
+      "framework": "Sweep",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/cypress.yml",
+        ".github/workflows/python.yml",
+        ".github/workflows/review.yml",
+        ".github/workflows/sweep.yml"
+      ],
+      "source_files_total": 118,
+      "source_files_scanned": 118,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "database",
+        "github",
+        "openai",
+        "shell",
+        "slack",
+        "stripe"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "OpenBMB/AgentVerse",
+      "url": "https://github.com/OpenBMB/AgentVerse",
+      "framework": "AgentVerse",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/test.yml"
+      ],
+      "source_files_total": 139,
+      "source_files_scanned": 139,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "aiwaves-cn/agents",
+      "url": "https://github.com/aiwaves-cn/agents",
+      "framework": "Agents",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": false,
+      "ci_workflows": [],
+      "source_files_total": 71,
+      "source_files_scanned": 71,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 1,
+      "apis": [
+        "browser",
+        "github",
+        "google",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 1,
+      "write_tools_sample": [
+        {
+          "name": "MailTool",
+          "path": "src/agents/tools/mail.py",
+          "categories": [
+            "file_open_write"
+          ]
+        }
+      ],
+      "test_files_total": 0,
+      "test_files_scanned": 0,
+      "coverage_scan_complete": true,
+      "covered_write_tools": 0,
+      "covered_write_tool_names": [],
+      "has_test_coverage": false
+    },
+    {
+      "repo": "Upsonic/Upsonic",
+      "url": "https://github.com/Upsonic/Upsonic",
+      "framework": "Upsonic",
+      "resolved": true,
+      "has_write_ops": true,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/claude-code-review.yml",
+        ".github/workflows/claude.yml",
+        ".github/workflows/release.yml",
+        ".github/workflows/sync-dev.yml",
+        ".github/workflows/test_publisher.yml"
+      ],
+      "source_files_total": 529,
+      "source_files_scanned": 250,
+      "source_files_skipped_by_cap": 279,
+      "source_scan_complete": false,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "database",
+        "email",
+        "github",
+        "google",
+        "openai",
+        "shell",
+        "slack"
+      ],
+      "write_tool_count": 6,
+      "write_tools_sample": [
+        {
+          "name": "create_directory",
+          "path": "src/upsonic/agent/autonomous_agent/filesystem_toolkit.py",
+          "categories": [
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "e2b_download_file",
+          "path": "src/upsonic/tools/custom_tools/e2b.py",
+          "categories": [
+            "file_open_write"
+          ]
+        },
+        {
+          "name": "move_email",
+          "path": "src/upsonic/tools/custom_tools/mail.py",
+          "categories": [
+            "db_write"
+          ]
+        },
+        {
+          "name": "download_attachments",
+          "path": "src/upsonic/tools/custom_tools/mail.py",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ]
+        },
+        {
+          "name": "send_message",
+          "path": "src/upsonic/tools/custom_tools/slack.py",
+          "categories": [
+            "messaging_write"
+          ]
+        },
+        {
+          "name": "send_message_thread",
+          "path": "src/upsonic/tools/custom_tools/slack.py",
+          "categories": [
+            "messaging_write"
+          ]
+        }
+      ],
+      "test_files_total": 435,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "covered_write_tools": 4,
+      "covered_write_tool_names": [
+        "create_directory",
+        "download_attachments",
+        "e2b_download_file",
+        "move_email"
+      ],
+      "has_test_coverage": true
+    },
+    {
+      "repo": "superagent-ai/superagent",
+      "url": "https://github.com/superagent-ai/superagent",
+      "framework": "Superagent",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/ci.yml"
+      ],
+      "source_files_total": 22,
+      "source_files_scanned": 22,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "aws",
+        "github",
+        "google",
+        "openai"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "entropy-research/Devon",
+      "url": "https://github.com/entropy-research/Devon",
+      "framework": "Devon",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": false,
+      "ci_workflows": [],
+      "source_files_total": 113,
+      "source_files_scanned": 113,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "github",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    },
+    {
+      "repo": "THUDM/AgentBench",
+      "url": "https://github.com/THUDM/AgentBench",
+      "framework": "AgentBench",
+      "resolved": true,
+      "has_write_ops": false,
+      "tree_truncated": false,
+      "has_ci": true,
+      "ci_workflows": [
+        ".github/workflows/lite-configs.yml"
+      ],
+      "source_files_total": 82,
+      "source_files_scanned": 82,
+      "source_files_skipped_by_cap": 0,
+      "source_scan_complete": true,
+      "post_only_tool_count": 0,
+      "apis": [
+        "anthropic",
+        "database",
+        "openai",
+        "shell"
+      ],
+      "write_tool_count": 0,
+      "write_tools_sample": [],
+      "screened_out": "no_write_capable_tool_definition"
+    }
+  ],
+  "github_api_calls": 0
+}

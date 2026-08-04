@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.DS_Store
+traces/*.json
+!traces/.gitkeep
+results/
+*.env
+.idea/
+.vscode/
+
+# Part A HTTP cache (regenerable; keeps re-runs off the GitHub rate limit)
+.cache/

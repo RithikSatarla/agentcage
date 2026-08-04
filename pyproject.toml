@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentcage"
+version = "0.1.0"
+description = "Stateful mocking for untested AI agents"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Rithik Satarla", email = "rithiksatarla@gmail.com" }]
+requires-python = ">=3.9"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "httpx>=0.25",
+    "requests>=2.31",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "black>=23.0", "ruff>=0.1"]
+
+[project.urls]
+Homepage = "https://github.com/rithi/agentcage"
+Protocol = "https://github.com/rithi/agentcage/blob/main/PROTOCOL.md"
+
+[project.scripts]
+agentcage-part-a = "part_a.run:main"
+
+[tool.setuptools]
+packages = ["part_a", "part_b"]
+
+[tool.setuptools.package-data]
+part_a = ["repos.json", "results.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+# Ruff's documented defaults plus import sorting. Pinned explicitly so CI does not
+# change behaviour when ruff changes its defaults. pyupgrade (UP) is deliberately
+# absent: it rewrites Dict/Optional annotations, and this package supports 3.9.
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.black]
+line-length = 100

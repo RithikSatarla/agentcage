@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "timestamp": "2026-08-04T19:28:48.203219+00:00",
+  "timestamp": "2026-08-04T21:34:01.001068+00:00",
   "tool_version": "0.1.0",
-  "elapsed_seconds": 18.2,
+  "elapsed_seconds": 23.1,
   "config": {
     "max_tool_files_per_repo": 250,
     "max_test_files_per_repo": 400,
@@ -103,7 +103,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -140,97 +139,123 @@
         "slack"
       ],
       "write_tool_count": 12,
-      "write_tools_sample": [
+      "test_files_total": 822,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "HuggingFaceTextToSpeechModelInference",
           "path": "libs/community/langchain_community/tools/audio/huggingface_text_to_speech_inference.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write",
             "http_post"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "UCFunctionToolkit",
           "path": "libs/community/langchain_community/tools/databricks/tool.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "E2BDataAnalysisTool",
           "path": "libs/community/langchain_community/tools/e2b_data_analysis/tool.py",
+          "style": "class",
           "categories": [
             "cloud_sdk_write",
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "EdenAiTextToSpeechTool",
           "path": "libs/community/langchain_community/tools/edenai/audio_text_to_speech.py",
+          "style": "class",
           "categories": [
             "file_open_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CopyFileTool",
           "path": "libs/community/langchain_community/tools/file_management/copy.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "DeleteFileTool",
           "path": "libs/community/langchain_community/tools/file_management/delete.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "MoveFileTool",
           "path": "libs/community/langchain_community/tools/file_management/move.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "WriteFileTool",
           "path": "libs/community/langchain_community/tools/file_management/write.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "O365SearchEvents",
           "path": "libs/community/langchain_community/tools/office365/events_search.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "O365SearchEmails",
           "path": "libs/community/langchain_community/tools/office365/messages_search.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "O365SendMessage",
+          "path": "libs/community/langchain_community/tools/office365/send_message.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SlackSendMessage",
+          "path": "libs/community/langchain_community/tools/slack/send_message.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 822,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 11,
-      "covered_write_tool_names": [
-        "CopyFileTool",
-        "DeleteFileTool",
-        "E2BDataAnalysisTool",
-        "EdenAiTextToSpeechTool",
-        "HuggingFaceTextToSpeechModelInference",
-        "MoveFileTool",
-        "O365SearchEmails",
-        "O365SearchEvents",
-        "O365SendMessage",
-        "SlackSendMessage"
-      ],
       "has_test_coverage": true
     },
     {
@@ -266,7 +291,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -305,38 +329,39 @@
         "stripe"
       ],
       "write_tool_count": 3,
-      "write_tools_sample": [
+      "test_files_total": 494,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "BrowserScreenshotTool",
           "path": "autogpt_platform/backend/backend/copilot/tools/agent_browser.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "SearchDocsTool",
           "path": "autogpt_platform/backend/backend/copilot/tools/search_docs.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "DeleteWorkspaceFileTool",
           "path": "autogpt_platform/backend/backend/copilot/tools/workspace_files.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 494,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 3,
-      "covered_write_tool_names": [
-        "BrowserScreenshotTool",
-        "DeleteWorkspaceFileTool",
-        "SearchDocsTool"
-      ],
       "has_test_coverage": true
     },
     {
@@ -360,7 +385,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -398,23 +422,22 @@
         "shell"
       ],
       "write_tool_count": 1,
-      "write_tools_sample": [
-        {
-          "name": "HttpTool",
-          "path": "python/packages/autogen-ext/src/autogen_ext/tools/http/_http_tool.py",
-          "categories": [
-            "http_destructive",
-            "http_post"
-          ]
-        }
-      ],
       "test_files_total": 121,
       "test_files_scanned": 121,
       "coverage_scan_complete": true,
-      "covered_write_tools": 1,
-      "covered_write_tool_names": [
-        "HttpTool"
+      "write_tools": [
+        {
+          "name": "HttpTool",
+          "path": "python/packages/autogen-ext/src/autogen_ext/tools/http/_http_tool.py",
+          "style": "class",
+          "categories": [
+            "http_destructive",
+            "http_post"
+          ],
+          "covered": true
+        }
       ],
+      "covered_write_tools": 1,
       "has_test_coverage": true
     },
     {
@@ -454,95 +477,303 @@
         "stripe"
       ],
       "write_tool_count": 32,
-      "write_tools_sample": [
+      "test_files_total": 375,
+      "test_files_scanned": 375,
+      "coverage_scan_complete": true,
+      "write_tools": [
         {
           "name": "S3WriterTool",
           "path": "lib/crewai-tools/src/crewai_tools/aws/s3/writer_tool.py",
+          "style": "class",
           "categories": [
             "cloud_sdk_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "ArxivPaperTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/arxiv_paper_tool/arxiv_paper_tool.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "BrowserbaseLoadTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/browserbase_load_tool/browserbase_load_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CouchbaseFTSVectorSearchTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/couchbase_tool/couchbase_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "DaytonaFileTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/daytona_sandbox_tool/daytona_file_tool.py",
+          "style": "class",
           "categories": [
             "cloud_sdk_write",
             "vcs_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "ExaSearchTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/exa_tools/exa_search_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "FileWriterTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/file_writer_tool/file_writer_tool.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "FileCompressorTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/files_compressor_tool/files_compressor_tool.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "FirecrawlCrawlWebsiteTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/firecrawl_crawl_website_tool/firecrawl_crawl_website_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "FirecrawlScrapeWebsiteTool",
           "path": "lib/crewai-tools/src/crewai_tools/tools/firecrawl_scrape_website_tool/firecrawl_scrape_website_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "FirecrawlSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/firecrawl_search_tool/firecrawl_search_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "LinkupSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/linkup/linkup_search_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "MongoDBVectorSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/mongodb_vector_search_tool/vector_search.py",
+          "style": "class",
+          "categories": [
+            "db_write",
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "MultiOnTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/multion_tool/multion_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "NL2SQLTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/nl2sql/nl2sql_tool.py",
+          "style": "class",
+          "categories": [
+            "db_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "OxylabsAmazonProductScraperTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/oxylabs_amazon_product_scraper_tool/oxylabs_amazon_product_scraper_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "OxylabsAmazonSearchScraperTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/oxylabs_amazon_search_scraper_tool/oxylabs_amazon_search_scraper_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "OxylabsGoogleSearchScraperTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/oxylabs_google_search_scraper_tool/oxylabs_google_search_scraper_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "OxylabsUniversalScraperTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/oxylabs_universal_scraper_tool/oxylabs_universal_scraper_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PatronusLocalEvaluatorTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/patronus_eval_tool/patronus_local_evaluator_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "ScrapegraphScrapeTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/scrapegraph_scrape_tool/scrapegraph_scrape_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "ScrapflyScrapeWebsiteTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/scrapfly_scrape_website_tool/scrapfly_scrape_website_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "SeleniumScrapingTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/selenium_scraping_tool/selenium_scraping_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SerpApiBaseTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/serpapi_tool/serpapi_base_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "SingleStoreSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/singlestore_search_tool/singlestore_search_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SnowflakeSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/snowflake_search_tool/snowflake_search_tool.py",
+          "style": "class",
+          "categories": [
+            "db_write",
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SpiderTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/spider_tool/spider_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "TavilyExtractorTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/tavily_extractor_tool/tavily_extractor_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "TavilyGetResearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/tavily_get_research_tool/tavily_get_research_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "TavilyResearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/tavily_research_tool/tavily_research_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TavilySearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/tavily_search_tool/tavily_search_tool.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "WeaviateVectorSearchTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/weaviate_tool/vector_search.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": false
         }
       ],
-      "test_files_total": 375,
-      "test_files_scanned": 375,
-      "coverage_scan_complete": true,
       "covered_write_tools": 19,
-      "covered_write_tool_names": [
-        "ArxivPaperTool",
-        "BrowserbaseLoadTool",
-        "CouchbaseFTSVectorSearchTool",
-        "ExaSearchTool",
-        "FileCompressorTool",
-        "FileWriterTool",
-        "FirecrawlCrawlWebsiteTool",
-        "FirecrawlScrapeWebsiteTool",
-        "FirecrawlSearchTool",
-        "MongoDBVectorSearchTool"
-      ],
       "has_test_coverage": true
     },
     {
@@ -581,97 +812,133 @@
         "shell"
       ],
       "write_tool_count": 13,
-      "write_tools_sample": [
+      "test_files_total": 1624,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "AgentCoreCodeInterpreterToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-aws-bedrock-agentcore/llama_index/tools/aws_bedrock_agentcore/code_interpreter/base.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "AzureCodeInterpreterToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-azure-code-interpreter/llama_index/tools/azure_code_interpreter/base.py",
+          "style": "class",
           "categories": [
             "cloud_sdk_write",
             "file_open_write",
             "http_post"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "BrightDataToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-brightdata/llama_index/tools/brightdata/base.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "http_post"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CodeInterpreterToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-code-interpreter/llama_index/tools/code_interpreter/base.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "DatabaseToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-database/llama_index/tools/database/base.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ElevenLabsToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-elevenlabs/llama_index/tools/elevenlabs/base.py",
+          "style": "class",
           "categories": [
             "file_open_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GoogleCalendarToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-google/llama_index/tools/google/calendar/base.py",
+          "style": "class",
           "categories": [
             "file_open_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GmailToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-google/llama_index/tools/google/gmail/base.py",
+          "style": "class",
           "categories": [
             "file_open_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "JiraIssueToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-jira-issue/llama_index/tools/jira_issue/base.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "OpenAIImageGenerationToolSpec",
           "path": "llama-index-integrations/tools/llama-index-tools-openai/llama_index/tools/openai/image_generation/base.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "RequestsToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-requests/llama_index/tools/requests/base.py",
+          "style": "class",
+          "categories": [
+            "http_destructive",
+            "http_post"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SlackToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-slack/llama_index/tools/slack/base.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TypecastToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-typecast/llama_index/tools/typecast/base.py",
+          "style": "class",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 1624,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 13,
-      "covered_write_tool_names": [
-        "AgentCoreCodeInterpreterToolSpec",
-        "AzureCodeInterpreterToolSpec",
-        "BrightDataToolSpec",
-        "CodeInterpreterToolSpec",
-        "DatabaseToolSpec",
-        "ElevenLabsToolSpec",
-        "GmailToolSpec",
-        "GoogleCalendarToolSpec",
-        "JiraIssueToolSpec",
-        "OpenAIImageGenerationToolSpec"
-      ],
       "has_test_coverage": true
     },
     {
@@ -710,7 +977,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -740,7 +1006,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -766,7 +1031,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -798,99 +1062,135 @@
         "shell"
       ],
       "write_tool_count": 13,
-      "write_tools_sample": [
+      "test_files_total": 307,
+      "test_files_scanned": 307,
+      "coverage_scan_complete": true,
+      "write_tools": [
         {
           "name": "WriteDesign",
           "path": "metagpt/actions/design_api.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GenerateTable",
           "path": "metagpt/actions/invoice_ocr.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "PrepareDocuments",
           "path": "metagpt/actions/prepare_documents.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "RebuildClassView",
           "path": "metagpt/actions/rebuild_class_view.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "RunCode",
           "path": "metagpt/actions/run_code.py",
+          "style": "class",
           "categories": [
             "db_write",
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "WritePRD",
           "path": "metagpt/actions/write_prd.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ManualRecord",
           "path": "metagpt/ext/android_assistant/actions/manual_record.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ParseRecord",
           "path": "metagpt/ext/android_assistant/actions/parse_record.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "SelfLearnAndReflect",
           "path": "metagpt/ext/android_assistant/actions/self_learn_and_reflect.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CodeReview",
           "path": "metagpt/ext/cr/actions/code_review.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "ModifyCode",
+          "path": "metagpt/ext/cr/actions/modify_code.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "AddNewExperiences",
+          "path": "metagpt/ext/werewolf/actions/experience_operation.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "view_page_element_to_scrape",
+          "path": "metagpt/tools/libs/web_scraping.py",
+          "style": "decorator",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 307,
-      "test_files_scanned": 307,
-      "coverage_scan_complete": true,
       "covered_write_tools": 13,
-      "covered_write_tool_names": [
-        "AddNewExperiences",
-        "CodeReview",
-        "GenerateTable",
-        "ManualRecord",
-        "ModifyCode",
-        "ParseRecord",
-        "PrepareDocuments",
-        "RebuildClassView",
-        "RunCode",
-        "SelfLearnAndReflect"
-      ],
       "has_test_coverage": true
     },
     {
@@ -921,87 +1221,97 @@
         "slack"
       ],
       "write_tool_count": 9,
-      "write_tools_sample": [
+      "test_files_total": 155,
+      "test_files_scanned": 155,
+      "coverage_scan_complete": true,
+      "write_tools": [
         {
           "name": "SendEmailTool",
           "path": "superagi/tools/email/send_email.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "SendEmailAttachmentTool",
           "path": "superagi/tools/email/send_email_attachment.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "AppendFileTool",
           "path": "superagi/tools/file/append_file.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write",
             "vcs_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "DeleteFileTool",
           "path": "superagi/tools/file/delete_file.py",
+          "style": "class",
           "categories": [
             "filesystem_write",
             "vcs_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "ReadFileTool",
           "path": "superagi/tools/file/read_file.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GithubAddFileTool",
           "path": "superagi/tools/github/add_file.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GithubDeleteFileTool",
           "path": "superagi/tools/github/delete_file.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CreateIssueTool",
           "path": "superagi/tools/jira/create_issue.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "SlackMessageTool",
           "path": "superagi/tools/slack/send_message.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": false
         }
       ],
-      "test_files_total": 155,
-      "test_files_scanned": 155,
-      "coverage_scan_complete": true,
       "covered_write_tools": 6,
-      "covered_write_tool_names": [
-        "CreateIssueTool",
-        "GithubAddFileTool",
-        "GithubDeleteFileTool",
-        "ReadFileTool",
-        "SendEmailAttachmentTool",
-        "SendEmailTool"
-      ],
       "has_test_coverage": true
     },
     {
@@ -1029,7 +1339,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1062,7 +1371,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1094,7 +1402,6 @@
         "github"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1135,97 +1442,291 @@
         "stripe"
       ],
       "write_tool_count": 30,
-      "write_tools_sample": [
+      "test_files_total": 282,
+      "test_files_scanned": 282,
+      "coverage_scan_complete": true,
+      "write_tools": [
         {
           "name": "AsyncBrowserToolkit",
           "path": "camel/toolkits/async_browser_toolkit.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "BrowserToolkit",
           "path": "camel/toolkits/browser_toolkit.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CodeExecutionToolkit",
           "path": "camel/toolkits/code_execution.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "EarthScienceToolkit",
           "path": "camel/toolkits/earth_science_toolkit.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "ExcelToolkit",
           "path": "camel/toolkits/excel_toolkit.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "FileToolkit",
           "path": "camel/toolkits/file_toolkit.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GithubToolkit",
           "path": "camel/toolkits/github_toolkit.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "GmailToolkit",
           "path": "camel/toolkits/gmail_toolkit.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "HybridBrowserToolkit",
           "path": "camel/toolkits/hybrid_browser_toolkit_py/hybrid_browser_toolkit.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ImageGenToolkit",
           "path": "camel/toolkits/image_generation_toolkit.py",
+          "style": "class",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "IMAPMailToolkit",
+          "path": "camel/toolkits/imap_mail_toolkit.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "LinkedInToolkit",
+          "path": "camel/toolkits/linkedin_toolkit.py",
+          "style": "class",
+          "categories": [
+            "http_destructive",
+            "http_post"
+          ],
+          "covered": true
+        },
+        {
+          "name": "AgentCommunicationToolkit",
+          "path": "camel/toolkits/message_agent_toolkit.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "OutlookMailToolkit",
+          "path": "camel/toolkits/microsoft_outlook_mail_toolkit.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "NetworkXToolkit",
+          "path": "camel/toolkits/networkx_toolkit.py",
+          "style": "class",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "NoteTakingToolkit",
+          "path": "camel/toolkits/note_taking_toolkit.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PlanningWorktreeToolkit",
+          "path": "camel/toolkits/planning_worktree_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write",
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PPTXToolkit",
+          "path": "camel/toolkits/pptx_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PyAutoGUIToolkit",
+          "path": "camel/toolkits/pyautogui_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "ResendToolkit",
+          "path": "camel/toolkits/resend_toolkit.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "ScreenshotToolkit",
+          "path": "camel/toolkits/screenshot_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SemanticScholarToolkit",
+          "path": "camel/toolkits/semantic_scholar_toolkit.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "http_post"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SlackToolkit",
+          "path": "camel/toolkits/slack_toolkit.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SQLToolkit",
+          "path": "camel/toolkits/sql_toolkit.py",
+          "style": "class",
+          "categories": [
+            "db_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TerminalToolkit",
+          "path": "camel/toolkits/terminal_toolkit/terminal_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TodoToolkit",
+          "path": "camel/toolkits/todo_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "VideoAnalysisToolkit",
+          "path": "camel/toolkits/video_analysis_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "VideoDownloaderToolkit",
+          "path": "camel/toolkits/video_download_toolkit.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "WebDeployToolkit",
+          "path": "camel/toolkits/web_deploy_toolkit.py",
+          "style": "class",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "WhatsAppToolkit",
+          "path": "camel/toolkits/whatsapp_toolkit.py",
+          "style": "class",
+          "categories": [
+            "http_post",
+            "messaging_write"
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 282,
-      "test_files_scanned": 282,
-      "coverage_scan_complete": true,
       "covered_write_tools": 29,
-      "covered_write_tool_names": [
-        "AgentCommunicationToolkit",
-        "AsyncBrowserToolkit",
-        "BrowserToolkit",
-        "CodeExecutionToolkit",
-        "ExcelToolkit",
-        "FileToolkit",
-        "GithubToolkit",
-        "GmailToolkit",
-        "HybridBrowserToolkit",
-        "IMAPMailToolkit"
-      ],
       "has_test_coverage": true
     },
     {
@@ -1263,97 +1764,330 @@
         "slack"
       ],
       "write_tool_count": 34,
-      "write_tools_sample": [
+      "test_files_total": 1063,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "FileSystemTools",
           "path": "libs/agno/agno/fs/toolkit.py",
+          "style": "class",
           "categories": [
             "vcs_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "AirflowTools",
           "path": "libs/agno/agno/tools/airflow.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "AntigravityTools",
           "path": "libs/agno/agno/tools/antigravity.py",
+          "style": "class",
           "categories": [
             "http_destructive",
             "http_post"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ArxivTools",
           "path": "libs/agno/agno/tools/arxiv.py",
+          "style": "class",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "AWSSESTool",
           "path": "libs/agno/agno/tools/aws_ses.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "BrowserbaseTools",
           "path": "libs/agno/agno/tools/browserbase.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "CodingTools",
           "path": "libs/agno/agno/tools/coding.py",
+          "style": "class",
           "categories": [
             "db_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "Crawl4aiTools",
           "path": "libs/agno/agno/tools/crawl4ai.py",
+          "style": "class",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "DiscordTools",
           "path": "libs/agno/agno/tools/discord.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "E2BTools",
           "path": "libs/agno/agno/tools/e2b.py",
+          "style": "class",
           "categories": [
             "cloud_sdk_write",
             "file_open_write"
-          ]
+          ],
+          "covered": true
+        },
+        {
+          "name": "ElevenLabsTools",
+          "path": "libs/agno/agno/tools/eleven_labs.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "EmailTools",
+          "path": "libs/agno/agno/tools/email.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "FileTools",
+          "path": "libs/agno/agno/tools/file.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write",
+            "vcs_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "FileGenerationTools",
+          "path": "libs/agno/agno/tools/file_generation.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "GmailTools",
+          "path": "libs/agno/agno/tools/google/gmail.py",
+          "style": "class",
+          "categories": [
+            "db_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "JinaReaderTools",
+          "path": "libs/agno/agno/tools/jina.py",
+          "style": "class",
+          "categories": [
+            "db_write",
+            "http_post"
+          ],
+          "covered": true
+        },
+        {
+          "name": "JiraTools",
+          "path": "libs/agno/agno/tools/jira.py",
+          "style": "class",
+          "categories": [
+            "vcs_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "LinearTools",
+          "path": "libs/agno/agno/tools/linear.py",
+          "style": "class",
+          "categories": [
+            "http_post",
+            "vcs_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "LocalFileSystemTools",
+          "path": "libs/agno/agno/tools/local_file_system.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "MorphTools",
+          "path": "libs/agno/agno/tools/models/morph.py",
+          "style": "class",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "MoviePyVideoTools",
+          "path": "libs/agno/agno/tools/moviepy_video.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PlivoTools",
+          "path": "libs/agno/agno/tools/plivo.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PostgresTools",
+          "path": "libs/agno/agno/tools/postgres.py",
+          "style": "class",
+          "categories": [
+            "db_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "PythonTools",
+          "path": "libs/agno/agno/tools/python.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write",
+            "shell_exec"
+          ],
+          "covered": false
+        },
+        {
+          "name": "RedmineTools",
+          "path": "libs/agno/agno/tools/redmine.py",
+          "style": "class",
+          "categories": [
+            "vcs_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "RedshiftTools",
+          "path": "libs/agno/agno/tools/redshift.py",
+          "style": "class",
+          "categories": [
+            "db_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "ResendTools",
+          "path": "libs/agno/agno/tools/resend.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "ShellTools",
+          "path": "libs/agno/agno/tools/shell.py",
+          "style": "class",
+          "categories": [
+            "shell_exec"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SlackTools",
+          "path": "libs/agno/agno/tools/slack.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "SmallestTools",
+          "path": "libs/agno/agno/tools/smallest.py",
+          "style": "class",
+          "categories": [
+            "file_open_write",
+            "filesystem_write",
+            "http_post"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TelegramTools",
+          "path": "libs/agno/agno/tools/telegram.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write",
+            "messaging_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "TwilioTools",
+          "path": "libs/agno/agno/tools/twilio.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": false
+        },
+        {
+          "name": "VisualizationTools",
+          "path": "libs/agno/agno/tools/visualization.py",
+          "style": "class",
+          "categories": [
+            "filesystem_write"
+          ],
+          "covered": true
+        },
+        {
+          "name": "WebexTools",
+          "path": "libs/agno/agno/tools/webex.py",
+          "style": "class",
+          "categories": [
+            "messaging_write"
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 1063,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 23,
-      "covered_write_tool_names": [
-        "AWSSESTool",
-        "AirflowTools",
-        "AntigravityTools",
-        "BrowserbaseTools",
-        "CodingTools",
-        "Crawl4aiTools",
-        "E2BTools",
-        "FileGenerationTools",
-        "GmailTools",
-        "JinaReaderTools"
-      ],
       "has_test_coverage": true
     },
     {
@@ -1383,7 +2117,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1417,22 +2150,21 @@
         "shell"
       ],
       "write_tool_count": 1,
-      "write_tools_sample": [
-        {
-          "name": "SandboxApplyPatchTool",
-          "path": "src/agents/sandbox/capabilities/tools/apply_patch_tool.py",
-          "categories": [
-            "vcs_write"
-          ]
-        }
-      ],
       "test_files_total": 328,
       "test_files_scanned": 328,
       "coverage_scan_complete": true,
-      "covered_write_tools": 1,
-      "covered_write_tool_names": [
-        "SandboxApplyPatchTool"
+      "write_tools": [
+        {
+          "name": "SandboxApplyPatchTool",
+          "path": "src/agents/sandbox/capabilities/tools/apply_patch_tool.py",
+          "style": "class",
+          "categories": [
+            "vcs_write"
+          ],
+          "covered": true
+        }
       ],
+      "covered_write_tools": 1,
       "has_test_coverage": true
     },
     {
@@ -1469,7 +2201,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1490,7 +2221,6 @@
         "openai"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1525,7 +2255,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1554,7 +2283,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1576,7 +2304,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1603,7 +2330,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1635,7 +2361,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1673,7 +2398,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1710,7 +2434,6 @@
         "stripe"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1742,7 +2465,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1779,7 +2501,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1817,7 +2538,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1847,7 +2567,6 @@
         "openai"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1883,7 +2602,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1915,7 +2633,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1951,7 +2668,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -1987,39 +2703,40 @@
         "shell"
       ],
       "write_tool_count": 3,
-      "write_tools_sample": [
+      "test_files_total": 407,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "BaseTool",
           "path": "griptape/tools/base_tool.py",
+          "style": "class",
           "categories": [
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "ComputerTool",
           "path": "griptape/tools/computer/tool.py",
+          "style": "class",
           "categories": [
             "filesystem_write",
             "shell_exec"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "EmailTool",
           "path": "griptape/tools/email/tool.py",
+          "style": "class",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": true
         }
       ],
-      "test_files_total": 407,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 3,
-      "covered_write_tool_names": [
-        "BaseTool",
-        "ComputerTool",
-        "EmailTool"
-      ],
       "has_test_coverage": true
     },
     {
@@ -2054,7 +2771,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -2087,7 +2803,6 @@
         "stripe"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -2112,7 +2827,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -2137,20 +2851,21 @@
         "shell"
       ],
       "write_tool_count": 1,
-      "write_tools_sample": [
-        {
-          "name": "MailTool",
-          "path": "src/agents/tools/mail.py",
-          "categories": [
-            "file_open_write"
-          ]
-        }
-      ],
       "test_files_total": 0,
       "test_files_scanned": 0,
       "coverage_scan_complete": true,
+      "write_tools": [
+        {
+          "name": "MailTool",
+          "path": "src/agents/tools/mail.py",
+          "style": "class",
+          "categories": [
+            "file_open_write"
+          ],
+          "covered": false
+        }
+      ],
       "covered_write_tools": 0,
-      "covered_write_tool_names": [],
       "has_test_coverage": false
     },
     {
@@ -2186,61 +2901,67 @@
         "slack"
       ],
       "write_tool_count": 6,
-      "write_tools_sample": [
+      "test_files_total": 435,
+      "test_files_scanned": 400,
+      "coverage_scan_complete": false,
+      "write_tools": [
         {
           "name": "create_directory",
           "path": "src/upsonic/agent/autonomous_agent/filesystem_toolkit.py",
+          "style": "decorator",
           "categories": [
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "e2b_download_file",
           "path": "src/upsonic/tools/custom_tools/e2b.py",
+          "style": "decorator",
           "categories": [
             "file_open_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "move_email",
           "path": "src/upsonic/tools/custom_tools/mail.py",
+          "style": "decorator",
           "categories": [
             "db_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "download_attachments",
           "path": "src/upsonic/tools/custom_tools/mail.py",
+          "style": "decorator",
           "categories": [
             "file_open_write",
             "filesystem_write"
-          ]
+          ],
+          "covered": true
         },
         {
           "name": "send_message",
           "path": "src/upsonic/tools/custom_tools/slack.py",
+          "style": "decorator",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": false
         },
         {
           "name": "send_message_thread",
           "path": "src/upsonic/tools/custom_tools/slack.py",
+          "style": "decorator",
           "categories": [
             "messaging_write"
-          ]
+          ],
+          "covered": false
         }
       ],
-      "test_files_total": 435,
-      "test_files_scanned": 400,
-      "coverage_scan_complete": false,
       "covered_write_tools": 4,
-      "covered_write_tool_names": [
-        "create_directory",
-        "download_attachments",
-        "e2b_download_file",
-        "move_email"
-      ],
       "has_test_coverage": true
     },
     {
@@ -2267,7 +2988,6 @@
         "openai"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -2292,7 +3012,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     },
     {
@@ -2318,7 +3037,6 @@
         "shell"
       ],
       "write_tool_count": 0,
-      "write_tools_sample": [],
       "screened_out": "no_write_capable_tool_definition"
     }
   ],

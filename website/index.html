@@ -6,11 +6,12 @@
 <title>AgentCage — stateful mocking for AI agents that write</title>
 <meta name="description" content="Across 13 open-source agent repositories, 20.3% of the write-capable tools they ship are never referenced by any test. AgentCage is the stateful alternative to replay fixtures.">
 <meta property="og:title" content="AgentCage">
-<meta property="og:description" content="20.3% of write-capable agent tools are never referenced by any test. Reproducible study + the stateful alternative to replay fixtures.">
+<meta property="og:description" content="20.3% of write-capable agent tools are never referenced by any test. Reproducible study plus the stateful alternative to replay fixtures.">
 <style>
 :root {
   --paper: #fcfcfb;
   --surface: #f3f5f4;
+  --raised: #ffffff;
   --ink: #161a19;
   --muted: #5f6b68;
   --line: #dde2e0;
@@ -24,26 +25,20 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0e1214;
-    --surface: #161d20;
-    --ink: #e7ecea;
-    --muted: #94a2a0;
-    --line: #242e32;
-    --accent: #56cbdb;
-    --pass: #4ec98a;
-    --fail: #ff8163;
-    --shadow: 0 1px 2px rgba(0,0,0,.3);
+    --paper: #0e1214; --surface: #161d20; --raised: #131a1d; --ink: #e7ecea;
+    --muted: #94a2a0; --line: #242e32; --accent: #56cbdb; --pass: #4ec98a;
+    --fail: #ff8163; --shadow: 0 1px 2px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0e1214; --surface: #161d20; --ink: #e7ecea; --muted: #94a2a0;
-  --line: #242e32; --accent: #56cbdb; --pass: #4ec98a; --fail: #ff8163;
-  --shadow: 0 1px 2px rgba(0,0,0,.3);
+  --paper: #0e1214; --surface: #161d20; --raised: #131a1d; --ink: #e7ecea;
+  --muted: #94a2a0; --line: #242e32; --accent: #56cbdb; --pass: #4ec98a;
+  --fail: #ff8163; --shadow: 0 1px 2px rgba(0,0,0,.3);
 }
 :root[data-theme="light"] {
-  --paper: #fcfcfb; --surface: #f3f5f4; --ink: #161a19; --muted: #5f6b68;
-  --line: #dde2e0; --accent: #10606e; --pass: #1c7a4a; --fail: #b03a26;
-  --shadow: 0 1px 2px rgba(20,30,28,.05);
+  --paper: #fcfcfb; --surface: #f3f5f4; --raised: #ffffff; --ink: #161a19;
+  --muted: #5f6b68; --line: #dde2e0; --accent: #10606e; --pass: #1c7a4a;
+  --fail: #b03a26; --shadow: 0 1px 2px rgba(20,30,28,.05);
 }
 
 * { box-sizing: border-box; }
@@ -58,47 +53,88 @@ body {
 
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 a:focus-visible, button:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px;
+  outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px;
 }
 
-h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; letter-spacing: -0.01em; }
+h1, h2 { font-family: var(--serif); font-weight: 600; text-wrap: balance; letter-spacing: -0.01em; }
 h1 { font-size: clamp(2.1rem, 5.5vw, 3.1rem); line-height: 1.1; margin: 0 0 1rem; }
 h2 { font-size: 1.55rem; line-height: 1.25; margin: 0 0 .75rem; }
-h3 { font-size: 1.08rem; margin: 0 0 .4rem; font-family: var(--sans); font-weight: 620; }
+h3 { font-size: 1.02rem; margin: 0 0 .4rem; font-family: var(--sans); font-weight: 620; }
 p { margin: 0 0 1rem; }
 .lede { font-size: 1.16rem; color: var(--muted); margin-bottom: 1.75rem; }
-
 .eyebrow {
   font-family: var(--mono); font-size: .72rem; letter-spacing: .12em;
   text-transform: uppercase; color: var(--muted); margin: 0 0 .7rem;
 }
-
 section { padding: 3.25rem 0; border-top: 1px solid var(--line); }
 section:first-of-type { border-top: 0; }
 header.hero { padding: 4.5rem 0 1rem; }
+.caption { font-size: .85rem; color: var(--muted); margin: .65rem 0 0; }
 
-/* --- transcript: the product in one block --- */
+/* --- transcript --- */
 .transcript {
   font-family: var(--mono); font-size: .845rem; line-height: 1.7;
   background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
   padding: 1.15rem 1.25rem; overflow-x: auto; box-shadow: var(--shadow);
 }
-.transcript .req { color: var(--ink); font-weight: 600; white-space: pre; }
-.transcript .note { color: var(--muted); }
+.transcript .req { color: var(--ink); font-weight: 600; }
+.transcript .note, .transcript .lbl { color: var(--muted); }
 .transcript .row { display: block; white-space: pre; }
-.transcript .lbl { color: var(--muted); }
 .transcript .ok { color: var(--pass); }
 .transcript .bad { color: var(--fail); font-weight: 600; }
 .transcript hr { border: 0; border-top: 1px dashed var(--line); margin: .85rem 0; }
-.caption { font-size: .85rem; color: var(--muted); margin: .65rem 0 0; }
 
-@keyframes settle { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
-.transcript .reveal { animation: settle .5s ease-out .5s backwards; }
-@media (prefers-reduced-motion: reduce) { .transcript .reveal { animation: none; } }
+/* --- live console --- */
+.console {
+  border: 1px solid var(--line); border-radius: 5px; background: var(--raised);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.console-head {
+  display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline;
+  justify-content: space-between; padding: .85rem 1.1rem;
+  border-bottom: 1px solid var(--line); background: var(--surface);
+}
+.console-head .id, .console-head .state { font-family: var(--mono); font-size: .84rem; }
+.console-head .state { color: var(--muted); }
+.console-body { padding: 1.1rem; }
+.controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.controls button {
+  font: inherit; font-size: .87rem; font-family: var(--mono);
+  padding: .5rem .85rem; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  transition: border-color .14s ease, color .14s ease;
+}
+.controls button:hover { border-color: var(--accent); color: var(--accent); }
+.controls button.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.controls button.primary:hover { opacity: .9; color: var(--paper); }
+.controls button.ghost { color: var(--muted); }
+
+.ledger { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: .8rem; }
+.ledger th {
+  text-align: left; font-weight: 500; color: var(--muted); font-size: .68rem;
+  letter-spacing: .09em; text-transform: uppercase; padding: 0 .5rem .45rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.ledger td { padding: .42rem .5rem .42rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ledger tr:last-child td { border-bottom: 0; }
+.ledger .ok { color: var(--pass); }
+.ledger .bad { color: var(--fail); }
+.ledger .dim { color: var(--muted); }
+.empty { color: var(--muted); font-size: .87rem; font-family: var(--sans); }
+.totals {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem;
+  margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--line);
+}
+.total { font-family: var(--mono); font-size: .84rem; }
+.total .k { color: var(--muted); display: block; font-size: .72rem;
+  letter-spacing: .08em; text-transform: uppercase; margin-bottom: .2rem; }
+.total .v { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.total .v.bad { color: var(--fail); font-weight: 600; }
+.total .v.ok { color: var(--pass); }
 
 /* --- figures --- */
 .figure {
-  border: 1px solid var(--line); border-radius: 4px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 4px; background: var(--raised);
   padding: 1.4rem 1.5rem; box-shadow: var(--shadow);
 }
 .headline-num {
@@ -106,6 +142,17 @@ header.hero { padding: 4.5rem 0 1rem; }
   letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
 }
 .headline-sub { color: var(--muted); margin-top: .6rem; max-width: 32rem; }
+.chart { margin: 0; }
+.chart img, .chart svg { width: 100%; height: auto; display: block; }
+.fig-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  .fig-light { display: none; }
+  .fig-dark { display: block; }
+}
+:root[data-theme="dark"] .fig-light { display: none; }
+:root[data-theme="dark"] .fig-dark { display: block; }
+:root[data-theme="light"] .fig-light { display: block; }
+:root[data-theme="light"] .fig-dark { display: none; }
 
 .readout { width: 100%; border-collapse: collapse; font-size: .93rem; margin-top: 1.4rem; }
 .readout th, .readout td { padding: .5rem .2rem; border-bottom: 1px solid var(--line); text-align: left; }
@@ -124,13 +171,11 @@ p code, li code, td code {
   background: var(--surface); border: 1px solid var(--line);
   padding: .05em .35em; border-radius: 3px; font-size: .87em;
 }
-
 .caveat {
   border-left: 2px solid var(--fail); padding: .1rem 0 .1rem 1.1rem;
   color: var(--muted); font-size: .95rem;
 }
 .caveat strong { color: var(--ink); }
-
 .actions { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.75rem 0 0; }
 .btn {
   display: inline-block; padding: .58rem 1.05rem; border-radius: 4px;
@@ -141,7 +186,6 @@ p code, li code, td code {
 .btn:hover { border-color: var(--accent); color: var(--accent); }
 .btn.solid { background: var(--accent); border-color: var(--accent); color: var(--paper); }
 .btn.solid:hover { opacity: .9; color: var(--paper); }
-
 .status td:first-child { font-weight: 520; }
 .pill {
   font-family: var(--mono); font-size: .7rem; letter-spacing: .06em;
@@ -151,15 +195,11 @@ p code, li code, td code {
 .pill.live { color: var(--pass); }
 .pill.pending { color: var(--muted); }
 .pill.none { color: var(--fail); }
-
 .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem 2rem; }
 ul { padding-left: 1.15rem; margin: 0 0 1rem; }
 li { margin-bottom: .45rem; }
-
-footer {
-  border-top: 1px solid var(--line); padding: 2rem 0 3.5rem;
-  color: var(--muted); font-size: .87rem;
-}
+footer { border-top: 1px solid var(--line); padding: 2rem 0 3.5rem; color: var(--muted); font-size: .87rem; }
+.scroll { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -169,12 +209,58 @@ footer {
 <header class="hero">
   <p class="eyebrow">Open-source study · working code</p>
   <h1>Agents write to production. Their tests don&rsquo;t.</h1>
-  <p class="lede">The standard way to test an agent is to record an HTTP response and replay
-  it. A replay fixture holds no state — so it cannot catch the one failure mode that only
-  writes have.</p>
+  <p class="lede">The standard way to test an agent is to record an HTTP response and
+  replay it. A replay fixture holds no state — so it cannot catch the one failure mode
+  that only writes have.</p>
 </header>
 
 <section>
+  <p class="eyebrow">Try it</p>
+  <h2>Send the same refund twice</h2>
+  <p>One charge for $50.00. Issue a refund, then issue it again — the way an agent does
+  when it fails to parse the first response. The fixture column is what your test suite
+  sees today.</p>
+
+  <div class="console">
+    <div class="console-head">
+      <span class="id">charge <strong>ch_00000001</strong> · $50.00 captured</span>
+      <span class="state">amount_refunded: <strong id="chg-refunded">$0.00</strong></span>
+    </div>
+    <div class="console-body">
+      <div class="controls">
+        <button type="button" class="primary" data-amount="5000">POST /v1/refunds&nbsp;&nbsp;$50.00</button>
+        <button type="button" data-amount="3000">POST /v1/refunds&nbsp;&nbsp;$30.00</button>
+        <button type="button" data-amount="7500">POST /v1/refunds&nbsp;&nbsp;$75.00</button>
+        <button type="button" class="ghost" id="btn-reset">Reset</button>
+      </div>
+
+      <div class="scroll">
+        <table class="ledger">
+          <thead>
+            <tr><th style="width:2.2rem">#</th><th style="width:6rem">Request</th>
+                <th style="width:8rem">Replay fixture</th><th>AgentCage</th></tr>
+          </thead>
+          <tbody id="ledger-body"></tbody>
+        </table>
+      </div>
+
+      <div class="totals" aria-live="polite">
+        <div class="total"><span class="k">Refunded — against fixture</span>
+          <span class="v bad" id="total-fixture">$0.00</span></div>
+        <div class="total"><span class="k">Refunded — against AgentCage</span>
+          <span class="v ok" id="total-cage">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="caption">The fixture accepts every request, so it will cheerfully refund more
+  than the charge was ever worth. The rules on the right mirror
+  <code>part_b/stripe_mock.py</code>, which is the canonical implementation and the one
+  covered by the test suite.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Why fixtures can't catch it</p>
+  <h2>The defect lives in the state transition</h2>
   <div class="bleed">
     <div class="transcript">
 <span class="row"><span class="req">POST /v1/refunds</span>  <span class="note">{"charge": "ch_00000001", "amount": 5000}</span></span>
@@ -182,25 +268,27 @@ footer {
 <span class="row"><span class="lbl">     agentcage       →</span> <span class="ok">200 OK</span>   <span class="note">charge.amount_refunded  0 → 5000</span></span>
 <hr>
 <span class="row"><span class="req">POST /v1/refunds</span>  <span class="note">{"charge": "ch_00000001", "amount": 5000}</span>  <span class="note">← the agent retries</span></span>
-<span class="row reveal"><span class="lbl">     replay fixture  →</span> <span class="ok">200 OK</span>   <span class="note">suite passes. customer refunded twice.</span></span>
-<span class="row reveal"><span class="lbl">     agentcage       →</span> <span class="bad">400 charge_already_refunded</span></span>
+<span class="row"><span class="lbl">     replay fixture  →</span> <span class="ok">200 OK</span>   <span class="note">suite passes. customer refunded twice.</span></span>
+<span class="row"><span class="lbl">     agentcage       →</span> <span class="bad">400 charge_already_refunded</span></span>
     </div>
-    <p class="caption">Both requests are byte-identical. Only a mock that holds state can
-    answer them differently — which is exactly what the correct answer requires.</p>
   </div>
+  <p class="caption">Both requests are byte-identical. No assertion over a fixture's
+  responses can separate them, because the fixture has nothing to remember. The suite is
+  not incomplete — it is structurally incapable.</p>
 </section>
 
 <section>
   <p class="eyebrow">The measurement</p>
-  <h2>How much of this is actually tested?</h2>
+  <h2>How much of this is tested today?</h2>
   <p>We screened 45 Python agent repositories, mechanically extracted every
-  framework-idiomatic tool definition, and kept the ones whose bodies perform a real state
-  mutation.</p>
+  framework-idiomatic tool definition, and kept the ones whose bodies perform a real
+  state mutation.</p>
 
   <div class="figure">
     <div class="headline-num">20.3%</div>
-    <p class="headline-sub">of write-capable tool definitions in open-source LLM agents are
-    never referenced by any test — 32 of 158, across 13 repositories.</p>
+    <p class="headline-sub">of write-capable tool definitions in open-source LLM agents
+    are never referenced by any test — 32 of 158, across 13 repositories.
+    <br><span style="font-size:.92rem">95% CI 14.7–27.2% (Wilson score interval).</span></p>
 
     <table class="readout">
       <tr><th>Measure</th><th style="text-align:right">Value</th></tr>
@@ -215,20 +303,55 @@ footer {
   </div>
 
   <p style="margin-top:1.5rem"><strong>The bar was set as low as it goes.</strong> A tool
-  counts as tested if its identifier appears <em>anywhere</em> in the project&rsquo;s test
+  counts as tested if its identifier appears <em>anywhere</em> in the project's test
   sources — no assertion, no destructive path exercised, not even executed. One in five
   fails that. So 20.3% is a floor, not a ceiling.</p>
+</section>
 
-  <p>Restricting to the 7 repositories whose <em>entire</em> test suite was read gives
-  20.7%. The result is not an artefact of sampling.</p>
+<section>
+  <p class="eyebrow">Breakdown</p>
+  <h2>Version-control and shell tools are the least tested</h2>
+  <p>Pooling every write into one number hides the useful question: <em>which</em>
+  dangerous operations are the untested ones. Each detected tool carries the categories
+  that qualified it, so coverage breaks down by the kind of side effect it has.</p>
 
-  <p class="caveat"><strong>What this does not say.</strong> The detectors find
-  framework-idiomatic tool definitions — <code>@tool</code>, <code>BaseTool</code>, JSON
-  tool schemas. 32 of the 45 candidates screened out, including agents like
-  <code>aider</code> and <code>OpenHands</code> that write to disk and shell out constantly
-  but expose no such surface. The denominator of 13 reflects detector coverage as much as it
-  reflects the ecosystem. Part A is exploratory, not pre-registered, and the protocol lists
-  all seven detector revisions — including two that made this finding weaker.</p>
+  <figure class="chart">
+    <img class="fig-light" src="figures/fig_category_light.svg"
+         alt="Test coverage by kind of write operation. Version-control writes 47% uncovered of 15 tools; cloud SDK writes 40% of 5; shell execution 33% of 36; outbound messaging 30% of 23; file open in write mode 12% of 32; filesystem mutation 12% of 57; database and ORM writes 6% of 18.">
+    <img class="fig-dark" src="figures/fig_category_dark.svg" alt="" aria-hidden="true">
+  </figure>
+
+  <p><strong>Version-control writes</strong> — tools that open pull requests, push
+  commits, or write files into a repository — are the least covered at 46.7% never
+  referenced. <strong>Shell execution</strong> follows at 33.3% of 36 tools, and it has
+  the least bounded blast radius of any category, since a shell tool can produce every
+  other category's effects. Filesystem and database writes are comparatively well
+  covered.</p>
+
+  <p class="caveat"><strong>Read the intervals, not the ordering.</strong> Several
+  categories hold fewer than 20 tools and their confidence intervals overlap heavily. The
+  claim is only that the extremes separate: version-control and shell tools are less
+  covered than database and filesystem tools. Categories also overlap — a tool may match
+  several — so the counts do not sum to 158.</p>
+
+  <figure class="chart" style="margin-top:2rem">
+    <img class="fig-light" src="figures/fig_repos_light.svg"
+         alt="Write-capable tool definitions per repository, split by whether each is referenced by a test.">
+    <img class="fig-dark" src="figures/fig_repos_dark.svg" alt="" aria-hidden="true">
+  </figure>
+
+  <p class="caption">Coverage is not uniform: 84.4% of all untested tools sit in three
+  repositories, each shipping a large tool catalogue. The pooled figure describes the
+  ecosystem's tool population rather than a typical project.</p>
+
+  <p class="caveat" style="margin-top:1.5rem"><strong>What this does not say.</strong> The
+  study detects framework-idiomatic tool definitions — <code>@tool</code>,
+  <code>BaseTool</code>, JSON tool schemas. 32 of the 45 candidates screened out,
+  including agents like <code>aider</code> and <code>OpenHands</code> that write to disk
+  constantly but expose no such surface. The denominator of 13 reflects detector coverage
+  as much as it reflects the ecosystem. Part A is exploratory, not pre-registered, and
+  the <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">protocol</a>
+  lists all seven detector revisions — including two that made this finding weaker.</p>
 </section>
 
 <section>
@@ -248,9 +371,9 @@ stripe.post_refund(charge=charge.id, amount=5000)
 # StripeError: Charge ch_00000001 has already been refunded.
 #              (400 charge_already_refunded)</code></pre>
 
-  <p>Capture is passive. It attaches through each HTTP library&rsquo;s own documented hook
-  points and never rewrites a request, injects a response, or short-circuits the transport —
-  a test asserts the caller receives exactly what the transport returned.</p>
+  <p>Capture is passive. It attaches through each HTTP library's own documented hook
+  points and never rewrites a request, injects a response, or short-circuits the
+  transport — a test asserts the caller receives exactly what the transport returned.</p>
 
 <pre><code>import httpx
 from part_b.interceptor import Interceptor
@@ -262,8 +385,8 @@ run_my_agent(client)
 
 for trace in cage.writes:          # POST / PUT / PATCH / DELETE
     print(trace.method, trace.path, trace.status_code)</code></pre>
-  <p class="caption">Credential headers are redacted at capture time, so traces are safe to
-  commit.</p>
+  <p class="caption">Credential headers are redacted at capture time, so traces are safe
+  to commit.</p>
 </section>
 
 <section>
@@ -273,41 +396,30 @@ for trace in cage.writes:          # POST / PUT / PATCH / DELETE
 cd agentcage
 pip install -e ".[dev]"
 
-pytest tests/            # full suite, no network
-python -m part_a.run     # the full study — no credentials needed</code></pre>
-  <p>The study costs 45 GitHub API calls, which fits inside the unauthenticated hourly
-  limit. It re-runs weekly in CI, and every push re-runs the pipeline against the live API
-  to prove it still works. Every figure on this page, in the README, and in the paper is
-  generated from <code>part_a/results.json</code> — a test fails the build if any of them
-  drift.</p>
+pytest tests/                          # full suite, no network
+python -m part_a.run                   # the study — no credentials needed
+python -m part_a.analyze               # intervals, categories, figures
+python -m part_b.demo_double_refund    # the trace above, for real</code></pre>
+  <p>The study costs 45 GitHub API calls, inside the unauthenticated hourly limit. It
+  re-runs weekly in CI, and every push re-runs the pipeline against the live API. Every
+  figure on this page and in the paper is generated from
+  <code>part_a/results.json</code> — a test fails the build if any of them drift.</p>
   <div class="actions">
     <a class="btn solid" href="https://github.com/RithikSatarla/agentcage">Repository</a>
-    <a class="btn" href="agentcage-paper.pdf">Paper (PDF, 7pp)</a>
+    <a class="btn" href="agentcage-paper.pdf">Paper (PDF)</a>
     <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Protocol</a>
-    <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/part_a/results.json">Raw results</a>
+    <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/part_a/analysis.json">Analysis data</a>
   </div>
-</section>
-
-<section>
-  <p class="eyebrow">The paper</p>
-  <h2>Untested by Construction</h2>
-  <p><em>Test Coverage of Write-Capable Tools in Open-Source LLM Agents.</em> Seven pages.
-  Method, full per-repository results, the detector revision history, and threats to
-  validity — including the screening rate that bounds what the headline means.</p>
-  <p>The paper&rsquo;s numbers are generated from the results file rather than typed, so it
-  cannot drift from the data. Part B&rsquo;s evaluation is pre-registered in it: hypothesis,
-  four defect classes, and an explicit falsification threshold, all written down before the
-  experiment runs.</p>
-  <p class="caveat">Not yet submitted to arXiv. This page will link the listing when it
-  exists, and not before.</p>
 </section>
 
 <section>
   <p class="eyebrow">Status</p>
   <h2>What exists today</h2>
+  <div class="scroll">
   <table class="readout status">
     <tr><th>Component</th><th>State</th></tr>
     <tr><td>Part A measurement</td><td><span class="pill live">working</span> reproducible, weekly in CI</td></tr>
+    <tr><td>Secondary analysis + figures</td><td><span class="pill live">working</span> generated from results</td></tr>
     <tr><td>Interceptor — httpx + requests</td><td><span class="pill live">working</span></td></tr>
     <tr><td>Stateful Stripe model</td><td><span class="pill live">working</span> charges, refunds, idempotency</td></tr>
     <tr><td>Test suite</td><td><span class="pill live">working</span> green on Python 3.9–3.12</td></tr>
@@ -315,15 +427,19 @@ python -m part_a.run     # the full study — no credentials needed</code></pre>
     <tr><td>Part B evaluation</td><td><span class="pill none">not run</span> pre-registered only</td></tr>
     <tr><td>GitHub / S3 / Postgres models</td><td><span class="pill none">not built</span></td></tr>
   </table>
-  <p class="caption">This table stays honest as the project moves. Anything marked
-  <em>not run</em> has no results behind it, and nothing on this page claims otherwise.</p>
+  </div>
+  <p class="caption">Anything marked <em>not run</em> has no results behind it, and
+  nothing on this page claims otherwise. Part B's hypothesis, resolution tiers, defect
+  classes, falsification threshold and kill criterion were all written down before the
+  experiment.</p>
 </section>
 
 <section>
   <p class="eyebrow">Design partners</p>
   <h2>Looking for teams running agents that write</h2>
-  <p>The Stripe model is the first of many. Which API gets built next, and what fidelity it
-  needs, should be decided by teams with a real agent in production rather than guessed.</p>
+  <p>The Stripe model is the first of many. Which API gets built next, and what fidelity
+  it needs, should be decided by teams with a real agent in production rather than
+  guessed.</p>
 
   <div class="cols">
     <div>
@@ -345,8 +461,9 @@ python -m part_a.run     # the full study — no credentials needed</code></pre>
     </div>
   </div>
 
-  <p style="margin-top:.5rem">No pricing, no contract, no beta waitlist. The code is public
-  and the study is reproducible — start by running it and telling us where it is wrong.</p>
+  <p style="margin-top:.5rem">No pricing, no contract, no beta waitlist. The code is
+  public and the study is reproducible — start by running it and telling us where it is
+  wrong.</p>
 
   <div class="actions">
     <a class="btn solid" href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Get in touch</a>
@@ -362,5 +479,93 @@ python -m part_a.run     # the full study — no credentials needed</code></pre>
 </footer>
 
 </div>
+
+<script>
+(function () {
+  "use strict";
+  // Mirrors the refund rules in part_b/stripe_mock.py. That module is canonical and is
+  // the one covered by the test suite; this is the browser-side twin, so the difference
+  // can be felt rather than described.
+  var CHARGE = { id: "ch_00000001", captured: 5000 };
+  var state, attempts;
+
+  function money(cents) { return "$" + (cents / 100).toFixed(2); }
+
+  function refund(amount) {
+    var remaining = CHARGE.captured - state.refunded;
+    if (remaining <= 0) {
+      return { status: 400, code: "charge_already_refunded" };
+    }
+    if (amount > remaining) {
+      return { status: 400, code: "amount_too_large",
+               detail: "greater than unrefunded amount (" + money(remaining) + ")" };
+    }
+    var before = state.refunded;
+    state.refunded += amount;
+    return { status: 200, code: "succeeded",
+             detail: "amount_refunded " + before + " → " + state.refunded };
+  }
+
+  function cell(text, cls) {
+    var td = document.createElement("td");
+    if (cls) { td.className = cls; }
+    td.textContent = text;
+    return td;
+  }
+
+  function render() {
+    var body = document.getElementById("ledger-body");
+    body.innerHTML = "";
+
+    if (attempts.length === 0) {
+      var row = document.createElement("tr");
+      var td = cell("No requests yet — press a button above.", "empty");
+      td.colSpan = 4;
+      row.appendChild(td);
+      body.appendChild(row);
+    }
+
+    var fixtureTotal = 0;
+    attempts.forEach(function (a, i) {
+      fixtureTotal += a.amount;            // the fixture accepts everything
+      var tr = document.createElement("tr");
+      tr.appendChild(cell(String(i + 1), "dim"));
+      tr.appendChild(cell(money(a.amount)));
+      tr.appendChild(cell("200 OK", "ok"));
+      tr.appendChild(cell(
+        a.result.status === 200
+          ? "200 OK  " + a.result.detail
+          : "400 " + a.result.code + (a.result.detail ? "  " + a.result.detail : ""),
+        a.result.status === 200 ? "ok" : "bad"
+      ));
+      body.appendChild(tr);
+    });
+
+    document.getElementById("chg-refunded").textContent = money(state.refunded);
+    document.getElementById("total-fixture").textContent = money(fixtureTotal);
+    document.getElementById("total-cage").textContent = money(state.refunded);
+  }
+
+  function reset() {
+    state = { refunded: 0 };
+    attempts = [];
+    render();
+  }
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll(".controls button[data-amount]"),
+    function (btn) {
+      btn.addEventListener("click", function () {
+        var amount = parseInt(btn.getAttribute("data-amount"), 10);
+        attempts.push({ amount: amount, result: refund(amount) });
+        render();
+      });
+    }
+  );
+  document.getElementById("btn-reset").addEventListener("click", reset);
+
+  reset();
+})();
+</script>
 </body>
 </html>

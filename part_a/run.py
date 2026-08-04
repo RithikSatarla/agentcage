@@ -465,10 +465,6 @@ def analyze_repo(fetcher: Fetcher, candidate: dict, workers: int) -> Dict[str, o
     record["apis"] = detect_apis(sources.values())
     record["write_tool_count"] = len(write_tools)
     record["has_write_ops"] = bool(write_tools)
-    record["write_tools_sample"] = [
-        {"name": t["name"], "path": t["path"], "categories": t["categories"]}
-        for t in write_tools[:10]
-    ]
 
     if not write_tools:
         record["screened_out"] = "no_write_capable_tool_definition"
@@ -484,14 +480,26 @@ def analyze_repo(fetcher: Fetcher, candidate: dict, workers: int) -> Dict[str, o
     test_sources = read_many(fetcher, repo, scanned_tests, workers)
     corpus = "\n".join(test_sources.values())
 
-    covered: List[str] = []
+    # Every tool is recorded with its own coverage flag, not a sample. Downstream
+    # analysis needs the full population to break coverage down by category.
+    covered = 0
+    detail: List[Dict[str, object]] = []
     for tool in write_tools:
         name = str(tool["name"])
-        if re.search(r"\b" + re.escape(name) + r"\b", corpus):
-            covered.append(name)
-    record["covered_write_tools"] = len(covered)
-    record["covered_write_tool_names"] = sorted(set(covered))[:10]
-    record["has_test_coverage"] = bool(covered)
+        is_covered = bool(re.search(r"\b" + re.escape(name) + r"\b", corpus))
+        covered += int(is_covered)
+        detail.append(
+            {
+                "name": name,
+                "path": tool["path"],
+                "style": tool["style"],
+                "categories": tool["categories"],
+                "covered": is_covered,
+            }
+        )
+    record["write_tools"] = detail
+    record["covered_write_tools"] = covered
+    record["has_test_coverage"] = covered > 0
     return record
 
 

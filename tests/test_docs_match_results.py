@@ -16,10 +16,13 @@ ROOT = Path(__file__).resolve().parent.parent
 RESULTS = json.loads((ROOT / "part_a" / "results.json").read_text(encoding="utf-8"))
 SENS = RESULTS["sensitivity_exhaustive_test_scan_only"]
 
+ANALYSIS = json.loads((ROOT / "part_a" / "analysis.json").read_text(encoding="utf-8"))
+
 README = (ROOT / "README.md").read_text(encoding="utf-8")
 WEBSITE = (ROOT / "website" / "index.html").read_text(encoding="utf-8")
 MACROS = (ROOT / "paper" / "generated_macros.tex").read_text(encoding="utf-8")
 TABLE = (ROOT / "paper" / "generated_table.tex").read_text(encoding="utf-8")
+CAT_TABLE = (ROOT / "paper" / "generated_category_table.tex").read_text(encoding="utf-8")
 
 PCT = RESULTS["write_tools_uncovered_pct"]
 TOOLS = RESULTS["write_tools_total"]
@@ -110,6 +113,55 @@ def test_paper_source_carries_no_unreproducible_figures():
     tex = (ROOT / "paper" / "agentcage_arxiv.tex").read_text(encoding="utf-8")
     for bad in UNREPRODUCIBLE:
         assert bad not in tex, f"paper contains unreproducible claim {bad!r}"
+
+
+# --- the secondary analysis is derived from the study, not authored ------------
+
+
+def test_analysis_totals_match_the_study():
+    assert ANALYSIS["tools_total"] == TOOLS
+    assert ANALYSIS["tools_uncovered"] == UNCOVERED
+    assert ANALYSIS["uncovered_pct"] == PCT
+
+
+def test_analysis_category_counts_are_internally_consistent():
+    for cat in ANALYSIS["categories"]:
+        assert cat["covered"] + cat["uncovered"] == cat["tools"]
+        assert cat["uncovered"] <= cat["tools"]
+        lo, hi = cat["ci95"]
+        assert 0.0 <= lo <= cat["uncovered_pct"] <= hi <= 100.0, cat["category"]
+
+
+def test_ambiguous_category_is_excluded_from_the_breakdown():
+    """http_post never qualifies a tool, so it must not appear as a write category."""
+    assert "http_post" not in {c["category"] for c in ANALYSIS["categories"]}
+
+
+def test_confidence_interval_brackets_the_point_estimate():
+    lo, hi = ANALYSIS["uncovered_ci95"]
+    assert lo < PCT < hi
+
+
+def test_paper_category_table_covers_every_category():
+    for cat in ANALYSIS["categories"]:
+        assert cat["label"].replace("/", "/") in CAT_TABLE, cat["label"]
+
+
+def test_website_quotes_the_interval_and_category_findings():
+    lo, hi = ANALYSIS["uncovered_ci95"]
+    assert f"{lo}" in WEBSITE and f"{hi}" in WEBSITE, "website omits the confidence interval"
+    vcs = next(c for c in ANALYSIS["categories"] if c["category"] == "vcs_write")
+    shell = next(c for c in ANALYSIS["categories"] if c["category"] == "shell_exec")
+    assert f"{vcs['uncovered_pct']}%" in WEBSITE
+    assert f"{shell['uncovered_pct']}%" in WEBSITE
+
+
+def test_website_figures_exist_in_both_themes():
+    for name in ("fig_category", "fig_repos"):
+        for mode in ("light", "dark"):
+            path = ROOT / "website" / "figures" / f"{name}_{mode}.svg"
+            assert path.exists(), f"missing {path.name}"
+            assert f'src="figures/{name}_{mode}.svg"' in WEBSITE
 
 
 def test_quoted_test_counts_agree_across_documents():

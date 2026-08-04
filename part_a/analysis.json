@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "source_timestamp": "2026-08-04T21:34:01.001068+00:00",
+  "tools_total": 158,
+  "tools_uncovered": 32,
+  "uncovered_pct": 20.3,
+  "uncovered_ci95": [
+    14.7,
+    27.2
+  ],
+  "interval_note": "Wilson 95% score interval on the pooled proportion of write-capable tool definitions never referenced by a test.",
+  "categories": [
+    {
+      "category": "filesystem_write",
+      "label": "Filesystem mutation",
+      "tools": 57,
+      "uncovered": 7,
+      "covered": 50,
+      "uncovered_pct": 12.3,
+      "ci95": [
+        6.1,
+        23.2
+      ]
+    },
+    {
+      "category": "shell_exec",
+      "label": "Shell execution",
+      "tools": 36,
+      "uncovered": 12,
+      "covered": 24,
+      "uncovered_pct": 33.3,
+      "ci95": [
+        20.2,
+        49.7
+      ]
+    },
+    {
+      "category": "file_open_write",
+      "label": "File open (write mode)",
+      "tools": 32,
+      "uncovered": 4,
+      "covered": 28,
+      "uncovered_pct": 12.5,
+      "ci95": [
+        5.0,
+        28.1
+      ]
+    },
+    {
+      "category": "messaging_write",
+      "label": "Outbound messaging",
+      "tools": 23,
+      "uncovered": 7,
+      "covered": 16,
+      "uncovered_pct": 30.4,
+      "ci95": [
+        15.6,
+        50.9
+      ]
+    },
+    {
+      "category": "db_write",
+      "label": "Database / ORM writes",
+      "tools": 18,
+      "uncovered": 1,
+      "covered": 17,
+      "uncovered_pct": 5.6,
+      "ci95": [
+        1.0,
+        25.8
+      ]
+    },
+    {
+      "category": "vcs_write",
+      "label": "Version-control writes",
+      "tools": 15,
+      "uncovered": 7,
+      "covered": 8,
+      "uncovered_pct": 46.7,
+      "ci95": [
+        24.8,
+        69.9
+      ]
+    },
+    {
+      "category": "cloud_sdk_write",
+      "label": "Cloud SDK writes",
+      "tools": 5,
+      "uncovered": 2,
+      "covered": 3,
+      "uncovered_pct": 40.0,
+      "ci95": [
+        11.8,
+        76.9
+      ]
+    },
+    {
+      "category": "http_destructive",
+      "label": "HTTP PUT/PATCH/DELETE",
+      "tools": 4,
+      "uncovered": 0,
+      "covered": 4,
+      "uncovered_pct": 0.0,
+      "ci95": [
+        0.0,
+        49.0
+      ]
+    }
+  ],
+  "category_note": "A tool may match several categories, so these groups overlap and their counts do not sum to the total.",
+  "styles": [
+    {
+      "style": "class",
+      "tools": 151,
+      "uncovered": 30,
+      "uncovered_pct": 19.9
+    },
+    {
+      "style": "decorator",
+      "tools": 7,
+      "uncovered": 2,
+      "uncovered_pct": 28.6
+    }
+  ],
+  "repos": [
+    {
+      "repo": "agno-agi/agno",
+      "tools": 34,
+      "covered": 23,
+      "uncovered": 11,
+      "uncovered_pct": 32.4,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "crewAIInc/crewAI",
+      "tools": 32,
+      "covered": 19,
+      "uncovered": 13,
+      "uncovered_pct": 40.6,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "camel-ai/camel",
+      "tools": 30,
+      "covered": 29,
+      "uncovered": 1,
+      "uncovered_pct": 3.3,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "run-llama/llama_index",
+      "tools": 13,
+      "covered": 13,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "geekan/MetaGPT",
+      "tools": 13,
+      "covered": 13,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "langchain-ai/langchain-community",
+      "tools": 12,
+      "covered": 11,
+      "uncovered": 1,
+      "uncovered_pct": 8.3,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "TransformerOptimus/SuperAGI",
+      "tools": 9,
+      "covered": 6,
+      "uncovered": 3,
+      "uncovered_pct": 33.3,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "Upsonic/Upsonic",
+      "tools": 6,
+      "covered": 4,
+      "uncovered": 2,
+      "uncovered_pct": 33.3,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "Significant-Gravitas/AutoGPT",
+      "tools": 3,
+      "covered": 3,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "griptape-ai/griptape",
+      "tools": 3,
+      "covered": 3,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": false
+    },
+    {
+      "repo": "microsoft/autogen",
+      "tools": 1,
+      "covered": 1,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "tools": 1,
+      "covered": 1,
+      "uncovered": 0,
+      "uncovered_pct": 0.0,
+      "has_ci": true,
+      "exhaustive_scan": true
+    },
+    {
+      "repo": "aiwaves-cn/agents",
+      "tools": 1,
+      "covered": 0,
+      "uncovered": 1,
+      "uncovered_pct": 100.0,
+      "has_ci": false,
+      "exhaustive_scan": true
+    }
+  ],
+  "ci_comparison": {
+    "with_ci": {
+      "tools": 157,
+      "uncovered": 31,
+      "uncovered_pct": 19.7
+    },
+    "without_ci": {
+      "tools": 1,
+      "uncovered": 1,
+      "uncovered_pct": 100.0
+    },
+    "note": "Descriptive only. Almost every analysed repository runs CI, so this contrast rests on very few projects and no inference is drawn from it."
+  },
+  "concentration": {
+    "uncovered_in_top3_repos": 27,
+    "share_of_all_uncovered": 84.4
+  }
+}

@@ -180,6 +180,11 @@ Each of these is checkable, which is the point:
 - *"20.3% of the write-capable agent tools we can identify — 32 of 158 across 13 repos —
   are never referenced by a test. Clone it and run it; it takes four minutes and no
   credentials."*
+- *"Break it down by what the tool actually does and it sharpens: version-control writes
+  are 46.7% untested, shell execution 33.3% of 36 tools. The categories with the least
+  bounded blast radius are the least covered."*
+- *"84.4% of the untested tools sit in three repositories. That's a real nuance — it's a
+  property of large tool catalogues, not of every project."*
 - *"We screened 45 repos and 32 screened out, so the denominator says as much about our
   detector coverage as about the ecosystem. That's the honest read."*
 - *"The detectors went through seven revisions. Two of them removed false positives that

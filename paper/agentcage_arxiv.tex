@@ -18,6 +18,7 @@
 
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{titlesec}
@@ -265,15 +266,69 @@ definitions (\AcUncoveredPct{}) are never referenced by any test.
 
 \input{generated_table}
 
+\paragraph{Interval.} The pooled estimate carries a Wilson 95\% score interval of
+\AcCiLo{}--\AcCiHi{}\%. We report the Wilson rather than the normal approximation
+because several per-category counts below are small, where the normal interval
+misbehaves near 0 and 1.
+
 \paragraph{Sensitivity.} Restricting to the \AcSensRepos{} repositories whose entire
 test suite was read---where a missed reference cannot be an artefact of sampling---gives
 \AcSensUncovered{} of \AcSensTools{} tools uncovered, or \AcSensPct{}. The agreement
 with the headline indicates the estimate is not driven by the read cap.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_repos}
+\caption{Write-capable tool definitions per repository, split by whether each is
+referenced anywhere in that repository's tests. Counts at the right are
+uncovered/total. Generated from \texttt{part\_a/results.json}.}
+\label{fig:repos}
+\end{figure}
+
+\paragraph{Concentration.} Coverage is not uniform. Figure~\ref{fig:repos} shows the
+uncovered mass is concentrated: \AcConcPct{} of all untested tools sit in just three
+repositories, each of which ships a large tool catalogue. Pooling across repositories of
+very different sizes therefore describes the ecosystem's tool population rather than a
+typical project, and the pooled figure should be read that way.
+
 \paragraph{Repository-level view.} \AcRepoUntested{} of \AcRepos{} repositories
 (\AcRepoUntestedPct{}) have no test touching any write tool: \AcUntestedRepoList{},
 which ships no test files at all. We report this figure for completeness while noting
 it rests on a single repository and is far less informative than the tool-level result.
+
+\subsection{Which write operations go untested}
+\label{sec:categories}
+
+Pooling every write into one number hides the question a practitioner actually has:
+\emph{which} dangerous operations are the untested ones. Each detected tool carries the
+categories that qualified it, so coverage can be broken down by the kind of side effect
+the tool has (Figure~\ref{fig:category}, Table~\ref{tab:category}). Because a tool may
+match several categories, these groups overlap and their counts do not sum to
+\AcTools{}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_category}
+\caption{Test coverage by kind of write operation, for categories with at least five
+tools. Percentages are the share never referenced by any test.}
+\label{fig:category}
+\end{figure}
+
+\input{generated_category_table}
+
+Two observations survive the small counts. \textbf{Version-control writes are the least
+covered category} at \AcVcsPct{} uncovered---tools that create pull requests, push
+commits, or write files into a repository. \textbf{Shell execution is next} at
+\AcShellPct{} of \AcShellN{} tools, the largest category with poor coverage and the one
+with the least bounded blast radius, since a shell tool can perform any of the other
+categories' effects. By contrast, filesystem mutation and database writes are comparatively
+well covered.
+
+The intervals are wide---several categories have fewer than 20 tools---and we draw no
+inference about ordering between adjacent categories. The claim is limited to the two
+extremes being separated: version-control and shell tools are less covered than database
+and filesystem tools, and the direction is consistent with these being the categories
+whose effects are hardest to set up and assert against in a unit test.
 
 \subsection{Detector revision history}
 \label{sec:revisions}

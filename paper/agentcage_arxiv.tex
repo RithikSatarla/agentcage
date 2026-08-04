@@ -2,43 +2,97 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1in]{geometry}
-\usepackage{booktabs}
+
+% --- page geometry -----------------------------------------------------------
+% A 5.9in measure keeps running text near 75 characters. The full 6.5in of a
+% 1in-margin article is too wide to read comfortably at 11pt.
+\usepackage[letterpaper, textwidth=5.9in, textheight=8.6in, centering,
+            headsep=18pt, footskip=26pt]{geometry}
+
+% --- fonts and microtypography ----------------------------------------------
 \usepackage{amsmath}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+\usepackage[protrusion=true, expansion=true]{microtype}
+\linespread{1.045}
+
+\usepackage{booktabs}
+\usepackage{array}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[font=small, labelfont=bf, labelsep=period,
+            justification=justified]{caption}
 \usepackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black,
-            urlcolor=blue!50!black}
+\hypersetup{colorlinks=true, linkcolor=AcLink, citecolor=AcLink, urlcolor=AcLink,
+            pdftitle={Untested by Construction},
+            pdfauthor={Rithik Satarla}}
+
+\definecolor{AcLink}{HTML}{10515E}
+\definecolor{AcRule}{HTML}{B8BEBC}
+\definecolor{AcCodeBg}{HTML}{F6F7F7}
 
 \input{generated_macros}
 
-% Long \texttt{} paths (part_b/demo_double_refund.py) cannot be hyphenated, so TeX
-% would rather overrun the margin than stretch a line. Let it stretch instead.
+% Long \texttt{} paths cannot be hyphenated, so TeX would rather overrun the
+% margin than stretch a line. Let it stretch instead.
 \emergencystretch=3em
-\hbadness=2000
+\hbadness=2500
+
+% --- section headings --------------------------------------------------------
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.75em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.7em}{}
+% No trailing [.] here: every \paragraph label in this document already ends in a
+% period, and titlesec would render "Scope.." if it added its own.
+\titleformat{\paragraph}[runin]{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\paragraph}{0pt}{1.3ex plus .4ex minus .1ex}{0.65em}
+\titlespacing*{\section}{0pt}{1.9ex plus .6ex minus .2ex}{1.0ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{1.5ex plus .5ex minus .2ex}{0.7ex plus .15ex}
+
+% --- running head ------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\footnotesize\itshape Untested by Construction}
+\fancyhead[R]{\footnotesize\thepage}
 
 \lstset{
   basicstyle=\ttfamily\footnotesize,
   breaklines=true,
   frame=single,
-  framesep=4pt,
-  rulecolor=\color{black!30},
+  framesep=5pt,
+  xleftmargin=6pt,
+  backgroundcolor=\color{AcCodeBg},
+  rulecolor=\color{AcRule},
   columns=fullflexible,
+  aboveskip=1.1\baselineskip,
+  belowskip=0.9\baselineskip,
 }
 
-\title{\textbf{Untested by Construction: Test Coverage of Write-Capable Tools\\
-in Open-Source LLM Agents}}
-
-\author{Rithik Satarla\\
-\texttt{rithiksatarla@gmail.com}}
-
-\date{\today}
+\renewcommand{\arraystretch}{1.15}
 
 \begin{document}
-\maketitle
+
+% --- title block -------------------------------------------------------------
+\thispagestyle{plain}
+\begin{center}
+  {\LARGE\bfseries Untested by Construction\par}
+  \vspace{0.5em}
+  {\large Test Coverage of Write-Capable Tools in Open-Source LLM Agents\par}
+  \vspace{1.4em}
+  {\normalsize Rithik Satarla\par}
+  \vspace{0.25em}
+  {\small\texttt{rithiksatarla@gmail.com}\par}
+  \vspace{0.5em}
+  {\small\today\par}
+\end{center}
+\vspace{0.4em}
+{\color{AcRule}\hrule height 0.5pt}
+\vspace{1.6em}
 
 \begin{abstract}
+\noindent
 Large language model agents increasingly hold credentials for systems that change
 state: they issue refunds, delete records, push branches, and send mail. The dominant
 way to test such an agent is to record an HTTP response and replay it. A replay
@@ -64,6 +118,13 @@ in-memory API model in which writes mutate state and subsequent reads observe th
 mutation. We pre-register an evaluation of whether this surfaces defects that replay
 fixtures cannot. All code, data, and the detector revision history are public.
 \end{abstract}
+
+\vspace{0.6em}
+{\small\noindent\textbf{Keywords:} LLM agents; tool use; software testing; test coverage;
+mocking; state machines; empirical software engineering.\par}
+\vspace{0.4em}
+{\color{AcRule}\hrule height 0.5pt}
+\vspace{1.2em}
 
 \section{Introduction}
 

@@ -115,6 +115,44 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
   </div>
 </section>
 
+<!-- Findings -->
+<section>
+  <div class="wrap">
+    <h3 class="section">What happened when we ran it</h3>
+    <p class="lede">We pointed three real open-source agent tools at the model, with
+    their own code unchanged. Every one of their test suites passes. Every one of them
+    got a write wrong.</p>
+
+    <ol class="findings">
+      <li>
+        <p class="who"><span class="repo">camel-ai/camel</span><span class="what">GithubToolkit</span></p>
+        <p class="defect">Reads a file from the default branch, then writes that version
+        to a different branch. GitHub rejects it. The error is never caught.</p>
+        <p class="suite">Its 9 tests pass &mdash; with the entire GitHub library replaced
+        by a mock that always says yes.</p>
+      </li>
+      <li>
+        <p class="who"><span class="repo">agno-agi/agno</span><span class="what">JiraTools</span></p>
+        <p class="defect">One call to create an issue. Two issues created. The tool
+        reports a single success and never sees the duplicate.</p>
+        <p class="suite">The retry happens inside the HTTP client, below the tool.</p>
+      </li>
+      <li>
+        <p class="who"><span class="repo">run-llama/llama_index</span><span class="what">JiraIssueToolSpec</span></p>
+        <p class="defect">Same shape, different project. One call, two issues, one
+        reported success.</p>
+        <p class="suite">Written independently of agno, and wrong the same way.</p>
+      </li>
+    </ol>
+
+    <p class="caveat">Three agents is a small number, and the models were built against
+    these clients, so the clean parts of the result say more about fit than about
+    generality. The limitations are written down in full, alongside every request each
+    agent made.
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Read the protocol</a>.</p>
+  </div>
+</section>
+
 <!-- StatBox -->
 <section>
   <div class="wrap">

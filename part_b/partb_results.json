@@ -1,0 +1,844 @@
+{
+  "schema_version": 1,
+  "protocol": "PROTOCOL.md \u00a73A",
+  "frame": "vcs_write (substituted; see \u00a73A.10)",
+  "agents_in_frame": 7,
+  "agents_run": 3,
+  "agents_excluded": 4,
+  "exclusions": [
+    {
+      "repo": "TransformerOptimus/SuperAGI",
+      "tools_in_frame": 5,
+      "category": "no runnable test suite",
+      "reason": "The suite does not collect. superagi/config/config.py imports pydantic.BaseSettings, removed in pydantic 2. Installing pydantic 1.10.13 moves the failure to fastapi: the GitHub write path imports superagi.helper.s3_helper, which imports fastapi, and fastapi<0.100 with pydantic 1 fails to construct its own models on Python 3.14. Four successive attempts are recorded in PROTOCOL.md \u00a73A.10. Note that the blocking import has nothing to do with GitHub.",
+      "static_note": "Not run, so it contributes nothing to the primary outcome. Read statically, superagi/tools/github/add_file.py:86 treats HTTP 422 as success for both the file write and the pull request. This is an observation about source, not a measurement, and is excluded from every count in this file."
+    },
+    {
+      "repo": "Significant-Gravitas/AutoGPT",
+      "tools_in_frame": 1,
+      "category": "filesystem-only writes",
+      "reason": "DeleteWorkspaceFileTool mutates local workspace state. \u00a73A.2 excludes tools with no HTTP surface for the interceptor to observe."
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "tools_in_frame": 1,
+      "category": "filesystem-only writes",
+      "reason": "SandboxApplyPatchTool applies a patch inside a sandbox filesystem. No remote API call to model."
+    },
+    {
+      "repo": "crewAIInc/crewAI",
+      "tools_in_frame": 1,
+      "category": "credentials we cannot substitute",
+      "reason": "DaytonaFileTool writes through the Daytona sandbox SDK, which requires a Daytona API key and a live workspace. \u00a73A.2 excludes tools whose writes need credentials we cannot substitute."
+    }
+  ],
+  "primary_outcome": {
+    "definition": "proportion of sampled agents exhibiting at least one class-1-4 defect (\u00a73A.7)",
+    "numerator": 3,
+    "denominator": 3,
+    "proportion": 1.0,
+    "falsification_threshold": 0.2,
+    "h1_supported": true
+  },
+  "secondary_outcomes": {
+    "tiers": {
+      "T1": 18,
+      "T2": 22,
+      "T3": 0,
+      "MISS": 0
+    },
+    "requests_graded": 40,
+    "miss_rate": 0.0,
+    "miss_classes": {
+      "MODELABLE": 0,
+      "PRODUCTION-STATE-DEPENDENT": 0
+    },
+    "production_dependent_share_of_misses": null,
+    "kill_criterion_threshold": 0.5,
+    "kill_criterion_evaluable": false,
+    "kill_criterion_triggered": null,
+    "defects_by_class": {
+      "1": 2,
+      "2": 0,
+      "3": 1,
+      "4": 0
+    }
+  },
+  "limitations": [
+    "The models were built iteratively against these clients: an endpoint was added whenever a run reached one that was missing. MISS=0 and T3=0 therefore measure how well the model fits the sample it was developed against, not how well the approach generalises. Read the tier distribution as a statement about this sample only.",
+    "Because there are no MISSes, the \u00a73A.8 kill criterion has no denominator and has not been tested. It is reported as not evaluable, not as passed.",
+    "Three agents is a small denominator. The primary outcome is a descriptive proportion over the agents that could be run, not an estimate of a rate in any wider population.",
+    "agno and llama_index both drive the same client library (python-jira), so their class-1 observations share a root cause -- an automatic transport retry inside urllib3 -- and are not independent observations.",
+    "The duplicate-write scenarios inject a dropped response. The fault belongs to the scenario, not to the model, and is recorded on every affected request; without it the client would not have retried.",
+    "The GitHub model creates forks synchronously. The real endpoint returns 202 and completes asynchronously, so a real client can legitimately see a 404 immediately afterwards where the model never will.",
+    "SuperAGI could not be run. The 422-treated-as-success reading of its source is an observation about code, not a measurement, and is excluded from every count here."
+  ],
+  "agents": [
+    {
+      "agent": "camel-ai/camel",
+      "tool": "GithubToolkit",
+      "tool_path": "camel/toolkits/github_toolkit.py",
+      "api": "github",
+      "seam": "none (client constructed inline; traffic redirected below the tool)",
+      "suite": {
+        "command": "pytest test/toolkits/test_github_toolkit.py",
+        "cwd": "part_b/.agents/camel",
+        "result": "passed",
+        "tests": 9,
+        "note": "Passes with the entire `github` module replaced by MagicMock in sys.modules, so no HTTP shape, state or error path is exercised by it."
+      },
+      "requests_graded": 13,
+      "tiers": {
+        "T1": 6,
+        "T2": 7,
+        "T3": 0,
+        "MISS": 0
+      },
+      "miss_classes": {
+        "MODELABLE": 0,
+        "PRODUCTION-STATE-DEPENDENT": 0
+      },
+      "defects": [
+        {
+          "class": 3,
+          "name": "stale read",
+          "scenario": "pull-request-repeat",
+          "evidence": "GET /repos/acme/widgets/contents/README.md (seq 10) supplied the version token used by PUT /repos/acme/widgets/contents/README.md (seq 11), which the API rejected 409 as out of date",
+          "reported": "GithubException: README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a: 409 {\"message\": \"README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a\"}",
+          "requests": [
+            10,
+            11
+          ]
+        }
+      ],
+      "defect_classes": [
+        3
+      ],
+      "graded_requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (repository returned)",
+          "reference": "https://docs.github.com/en/rest/repos/repos#get-a-repository"
+        },
+        {
+          "seq": 2,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (branch returned, including its head commit sha)",
+          "reference": "https://docs.github.com/en/rest/branches/branches#get-a-branch"
+        },
+        {
+          "seq": 3,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (reference created)",
+          "reference": "https://docs.github.com/en/rest/git/refs#create-a-reference"
+        },
+        {
+          "seq": 4,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 200,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 200 is documented for this endpoint (file returned, base64 encoded, with its blob sha)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#get-repository-content"
+        },
+        {
+          "seq": 5,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (file created)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents"
+        },
+        {
+          "seq": 6,
+          "method": "POST",
+          "path": "/repos/acme/widgets/pulls",
+          "status": 201,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 201 is documented for this endpoint (pull request created)",
+          "reference": "https://docs.github.com/en/rest/pulls/pulls#create-a-pull-request"
+        },
+        {
+          "seq": 7,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (repository returned)",
+          "reference": "https://docs.github.com/en/rest/repos/repos#get-a-repository"
+        },
+        {
+          "seq": 8,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (branch returned, including its head commit sha)",
+          "reference": "https://docs.github.com/en/rest/branches/branches#get-a-branch"
+        },
+        {
+          "seq": 9,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "status": 422,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 422 is documented for this endpoint (reference already exists, or the sha is invalid)",
+          "reference": "https://docs.github.com/en/rest/git/refs#create-a-reference"
+        },
+        {
+          "seq": 10,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 200,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 200 is documented for this endpoint (file returned, base64 encoded, with its blob sha)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#get-repository-content"
+        },
+        {
+          "seq": 11,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 409,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 409 is documented for this endpoint (the supplied sha does not match the file being replaced)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents"
+        },
+        {
+          "seq": 12,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (repository returned)",
+          "reference": "https://docs.github.com/en/rest/repos/repos#get-a-repository"
+        },
+        {
+          "seq": 13,
+          "method": "GET",
+          "path": "/repos/acme/widgets/issues",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issues listed)",
+          "reference": "https://docs.github.com/en/rest/issues/issues#list-repository-issues"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "pull-request-first",
+          "description": "open a pull request that edits one file on a new branch",
+          "reported": "Title: Update readme\nBody: None\n",
+          "raised": null,
+          "requests": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "pull-request-repeat",
+          "description": "run the identical call again, as an agent re-attempting the task would; the branch now exists and holds the first edit",
+          "reported": "None",
+          "raised": "GithubException: README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a: 409 {\"message\": \"README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a\"}",
+          "requests": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "name": "issue-list-after",
+          "description": "read back the issue list to confirm the toolkit's read path works against the model",
+          "reported": "[]",
+          "raised": null,
+          "requests": [
+            12,
+            13
+          ]
+        }
+      ],
+      "final_state": {
+        "branches": {
+          "main": [
+            "README.md"
+          ],
+          "agent-patch": [
+            "README.md"
+          ]
+        },
+        "branch_contents": {
+          "main": {
+            "README.md": "v0\n"
+          },
+          "agent-patch": {
+            "README.md": "v1\n"
+          }
+        },
+        "pull_requests": [
+          {
+            "number": 1,
+            "title": "Update readme",
+            "head": "agent-patch",
+            "merged": false
+          }
+        ],
+        "issue_count": 0
+      }
+    },
+    {
+      "agent": "agno-agi/agno",
+      "tool": "JiraTools",
+      "tool_path": "libs/agno/agno/tools/jira.py",
+      "api": "jira",
+      "seam": "configuration (server_url)",
+      "suite": {
+        "command": "import agno.tools.jira",
+        "cwd": "part_b",
+        "result": "passed",
+        "tests": null,
+        "note": "Installed from the published package; the toolkit imports and constructs against a server URL without error."
+      },
+      "requests_graded": 10,
+      "tiers": {
+        "T1": 5,
+        "T2": 5,
+        "T3": 0,
+        "MISS": 0
+      },
+      "miss_classes": {
+        "MODELABLE": 0,
+        "PRODUCTION-STATE-DEPENDENT": 0
+      },
+      "defects": [
+        {
+          "class": 1,
+          "name": "duplicate write",
+          "scenario": "create-interrupted",
+          "evidence": "2 identical successful POSTs to /rest/api/2/issue within one tool call; the tool reported a single success",
+          "reported": "{\"key\": \"KAN-2\", \"url\": \"http://model.invalid/browse/KAN-2\"}",
+          "requests": [
+            2,
+            3
+          ]
+        }
+      ],
+      "defect_classes": [
+        1
+      ],
+      "graded_requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/rest/api/2/serverInfo",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (server version information)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-server-info/"
+        },
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": true,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 3,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 4,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-2",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 5,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 6,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-3",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 7,
+          "method": "GET",
+          "path": "/rest/api/2/field",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (field metadata listed)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/"
+        },
+        {
+          "seq": 8,
+          "method": "GET",
+          "path": "/rest/api/2/search/jql",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issues matching the JQL query)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/"
+        },
+        {
+          "seq": 9,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-999/comment",
+          "status": 404,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 404 is documented for this endpoint (no such issue)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/"
+        },
+        {
+          "seq": 10,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/worklog",
+          "status": 400,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 400 is documented for this endpoint (invalid duration)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-worklogs/"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "create-interrupted",
+          "description": "create_issue whose response is dropped after the model applied it",
+          "reported": "{\"key\": \"KAN-2\", \"url\": \"http://model.invalid/browse/KAN-2\"}",
+          "raised": null,
+          "requests": [
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "create-retry",
+          "description": "the identical create_issue call again, as a caller that saw a failure would retry it",
+          "reported": "{\"key\": \"KAN-3\", \"url\": \"http://model.invalid/browse/KAN-3\"}",
+          "raised": null,
+          "requests": [
+            5,
+            6
+          ]
+        },
+        {
+          "name": "search-after-retry",
+          "description": "search the project to count what actually exists after the retry",
+          "reported": "[{\"key\": \"KAN-1\", \"summary\": \"Login returns 500\", \"status\": \"To Do\", \"assignee\": \"Unassigned\"}, {\"key\": \"KAN-2\", \"summary\": \"Login returns 500\", \"status\": \"To Do\", \"assignee\": \"Unassigned\"}, {\"key\": \"KAN-3\", \"summary\": \"Login returns 500\", \"status\": \"To Do\", \"assignee\": \"Unassigned\"}]",
+          "raised": null,
+          "requests": [
+            7,
+            8
+          ]
+        },
+        {
+          "name": "comment-on-missing-issue",
+          "description": "add_comment to an issue key that does not exist",
+          "reported": "{\"error\": \"JiraError HTTP 404 url: http://model.invalid/rest/api/2/issue/KAN-999/comment\\n\\ttext: Issue does not exist or you do not have permission to see it.\\n\\t\\n\\tresponse headers = {'Server': 'BaseHTTP/0.6 Python/3.14.3', 'Date': 'Wed, 05 Aug 2026 17:56:09 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '98', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Remaining': '49",
+          "raised": null,
+          "requests": [
+            9
+          ]
+        },
+        {
+          "name": "worklog-invalid-duration",
+          "description": "add_worklog with a duration Jira rejects",
+          "reported": "{\"error\": \"JiraError HTTP 400 url: http://model.invalid/rest/api/2/issue/KAN-1/worklog\\n\\ttext: Invalid time duration entered.\\n\\t\\n\\tresponse headers = {'Server': 'BaseHTTP/0.6 Python/3.14.3', 'Date': 'Wed, 05 Aug 2026 17:56:10 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '80', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Remaining': '4999', 'X-RateLimit-Reset': '0'}\\n\\",
+          "raised": null,
+          "requests": [
+            10
+          ]
+        }
+      ],
+      "final_state": {
+        "issues": [
+          {
+            "key": "KAN-1",
+            "summary": "Login returns 500",
+            "status": "To Do"
+          },
+          {
+            "key": "KAN-2",
+            "summary": "Login returns 500",
+            "status": "To Do"
+          },
+          {
+            "key": "KAN-3",
+            "summary": "Login returns 500",
+            "status": "To Do"
+          }
+        ],
+        "issue_count": 3,
+        "deleted": []
+      }
+    },
+    {
+      "agent": "run-llama/llama_index",
+      "tool": "JiraIssueToolSpec",
+      "tool_path": "llama-index-integrations/tools/llama-index-tools-jira-issue/llama_index/tools/jira_issue/base.py",
+      "api": "jira",
+      "seam": "configuration (server_url)",
+      "suite": {
+        "command": "import llama_index.tools.jira_issue.base",
+        "cwd": "part_b",
+        "result": "passed",
+        "tests": null,
+        "note": "Installed from the published package llama-index-tools-jira-issue."
+      },
+      "requests_graded": 17,
+      "tiers": {
+        "T1": 7,
+        "T2": 10,
+        "T3": 0,
+        "MISS": 0
+      },
+      "miss_classes": {
+        "MODELABLE": 0,
+        "PRODUCTION-STATE-DEPENDENT": 0
+      },
+      "defects": [
+        {
+          "class": 1,
+          "name": "duplicate write",
+          "scenario": "create-interrupted",
+          "evidence": "2 identical successful POSTs to /rest/api/2/issue within one tool call; the tool reported a single success",
+          "reported": "{'error': False, 'message': 'Issue KAN-2 created successfully.', 'issue_key': 'KAN-2'}",
+          "requests": [
+            3,
+            4
+          ]
+        }
+      ],
+      "defect_classes": [
+        1
+      ],
+      "graded_requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/rest/api/2/serverInfo",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (server version information)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-server-info/"
+        },
+        {
+          "seq": 2,
+          "method": "GET",
+          "path": "/rest/api/2/project/KAN",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (project returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-projects/"
+        },
+        {
+          "seq": 3,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": true,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 4,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 5,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-2",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 6,
+          "method": "GET",
+          "path": "/rest/api/2/project/KAN",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (project returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-projects/"
+        },
+        {
+          "seq": 7,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 8,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-3",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 9,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 10,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "status": 200,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 200 is documented for this endpoint (transitions available from the issue's current status)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-transitions-get"
+        },
+        {
+          "seq": 11,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "status": 204,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 204 is documented for this endpoint (transitioned, no content returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-transitions-post"
+        },
+        {
+          "seq": 12,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 13,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "status": 200,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 200 is documented for this endpoint (transitions available from the issue's current status)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-transitions-get"
+        },
+        {
+          "seq": 14,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issue returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 15,
+          "method": "DELETE",
+          "path": "/rest/api/2/issue/10001",
+          "status": 204,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 204 is documented for this endpoint (deleted, no content returned)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-delete"
+        },
+        {
+          "seq": 16,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "status": 404,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 404 is documented for this endpoint (no such issue, or it was deleted, or no access)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        },
+        {
+          "seq": 17,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "status": 404,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 404 is documented for this endpoint (no such issue, or it was deleted, or no access)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "create-interrupted",
+          "description": "create_issue whose response is dropped after the model applied it",
+          "reported": "{'error': False, 'message': 'Issue KAN-2 created successfully.', 'issue_key': 'KAN-2'}",
+          "raised": null,
+          "requests": [
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "name": "create-retry",
+          "description": "the identical create_issue call again, as a caller that saw a failure would retry it",
+          "reported": "{'error': False, 'message': 'Issue KAN-3 created successfully.', 'issue_key': 'KAN-3'}",
+          "raised": null,
+          "requests": [
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "name": "status-allowed",
+          "description": "move an issue to a status the workflow offers from where it is",
+          "reported": "{'error': False, 'message': 'Issue KAN-1 status updated to Done.'}",
+          "raised": null,
+          "requests": [
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "name": "status-not-in-workflow",
+          "description": "move the same issue to a status not reachable from its new one; the available transitions changed as a result of the previous write, which is the part a recorded response cannot represent",
+          "reported": "{'error': True, 'message': \"Status 'In Progress' not available for issue KAN-1. Available transitions: ['To Do']\"}",
+          "raised": null,
+          "requests": [
+            12,
+            13
+          ]
+        },
+        {
+          "name": "delete",
+          "description": "delete an issue that exists",
+          "reported": "{'error': False, 'message': 'Issue KAN-1 deleted successfully.'}",
+          "raised": null,
+          "requests": [
+            14,
+            15
+          ]
+        },
+        {
+          "name": "delete-again",
+          "description": "delete the same issue a second time",
+          "reported": "{'error': True, 'message': 'Failed to delete issue KAN-1: JiraError HTTP 404 url: http://model.invalid/rest/api/2/issue/KAN-1\\n\\ttext: Issue does not exist or you do not have permission to see it.\\n\\t\\n\\tresponse headers = {\\'Server\\': \\'BaseHTTP/0.6 Python/3.14.3\\', \\'Date\\': \\'Wed, 05 Aug 2026 17:56:24 GMT\\', \\'Content-Type\\': \\'application/json; charset=utf-8\\', \\'Content-Length\\': \\'98\\', \\'X-",
+          "raised": null,
+          "requests": [
+            16
+          ]
+        },
+        {
+          "name": "update-deleted-issue",
+          "description": "update the summary of an issue that was already deleted",
+          "reported": "{'error': True, 'message': 'Failed to update issue KAN-1: JiraError HTTP 404 url: http://model.invalid/rest/api/2/issue/KAN-1\\n\\ttext: Issue does not exist or you do not have permission to see it.\\n\\t\\n\\tresponse headers = {\\'Server\\': \\'BaseHTTP/0.6 Python/3.14.3\\', \\'Date\\': \\'Wed, 05 Aug 2026 17:56:24 GMT\\', \\'Content-Type\\': \\'application/json; charset=utf-8\\', \\'Content-Length\\': \\'98\\', \\'X-",
+          "raised": null,
+          "requests": [
+            17
+          ]
+        },
+        {
+          "name": "due-date-invalid",
+          "description": "set a due date in a format Jira rejects",
+          "reported": "{'error': True, 'message': 'Invalid date format. Use YYYY-MM-DD.'}",
+          "raised": null,
+          "requests": []
+        }
+      ],
+      "final_state": {
+        "issues": [
+          {
+            "key": "KAN-2",
+            "summary": "Checkout total is wrong",
+            "status": "To Do"
+          },
+          {
+            "key": "KAN-3",
+            "summary": "Checkout total is wrong",
+            "status": "To Do"
+          }
+        ],
+        "issue_count": 2,
+        "deleted": [
+          "KAN-1"
+        ]
+      }
+    }
+  ]
+}

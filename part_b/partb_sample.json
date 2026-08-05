@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "frame": "vcs_write",
+  "frame_note": "Substituted for the pre-registered payment frame, which was empty. See PROTOCOL.md \u00a73A.10.",
+  "source_timestamp": "2026-08-04T21:34:01.001068+00:00",
+  "repos_in_frame": 7,
+  "tools_in_frame": 15,
+  "tools_uncovered_in_frame": 7,
+  "sample": [
+    {
+      "repo": "TransformerOptimus/SuperAGI",
+      "url": "https://github.com/TransformerOptimus/SuperAGI",
+      "vcs_tools": 5,
+      "vcs_tools_uncovered": 2,
+      "tools": [
+        {
+          "name": "AppendFileTool",
+          "path": "superagi/tools/file/append_file.py",
+          "covered": false,
+          "categories": [
+            "file_open_write",
+            "filesystem_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "DeleteFileTool",
+          "path": "superagi/tools/file/delete_file.py",
+          "covered": false,
+          "categories": [
+            "filesystem_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "GithubAddFileTool",
+          "path": "superagi/tools/github/add_file.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "GithubDeleteFileTool",
+          "path": "superagi/tools/github/delete_file.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "CreateIssueTool",
+          "path": "superagi/tools/jira/create_issue.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "agno-agi/agno",
+      "url": "https://github.com/agno-agi/agno",
+      "vcs_tools": 5,
+      "vcs_tools_uncovered": 4,
+      "tools": [
+        {
+          "name": "FileSystemTools",
+          "path": "libs/agno/agno/fs/toolkit.py",
+          "covered": false,
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "FileTools",
+          "path": "libs/agno/agno/tools/file.py",
+          "covered": false,
+          "categories": [
+            "filesystem_write",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "JiraTools",
+          "path": "libs/agno/agno/tools/jira.py",
+          "covered": false,
+          "categories": [
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "LinearTools",
+          "path": "libs/agno/agno/tools/linear.py",
+          "covered": false,
+          "categories": [
+            "http_post",
+            "vcs_write"
+          ]
+        },
+        {
+          "name": "RedmineTools",
+          "path": "libs/agno/agno/tools/redmine.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "Significant-Gravitas/AutoGPT",
+      "url": "https://github.com/Significant-Gravitas/AutoGPT",
+      "vcs_tools": 1,
+      "vcs_tools_uncovered": 0,
+      "tools": [
+        {
+          "name": "DeleteWorkspaceFileTool",
+          "path": "autogpt_platform/backend/backend/copilot/tools/workspace_files.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "crewAIInc/crewAI",
+      "url": "https://github.com/crewAIInc/crewAI",
+      "vcs_tools": 1,
+      "vcs_tools_uncovered": 1,
+      "tools": [
+        {
+          "name": "DaytonaFileTool",
+          "path": "lib/crewai-tools/src/crewai_tools/tools/daytona_sandbox_tool/daytona_file_tool.py",
+          "covered": false,
+          "categories": [
+            "cloud_sdk_write",
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "run-llama/llama_index",
+      "url": "https://github.com/run-llama/llama_index",
+      "vcs_tools": 1,
+      "vcs_tools_uncovered": 0,
+      "tools": [
+        {
+          "name": "JiraIssueToolSpec",
+          "path": "llama-index-integrations/tools/llama-index-tools-jira-issue/llama_index/tools/jira_issue/base.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "camel-ai/camel",
+      "url": "https://github.com/camel-ai/camel",
+      "vcs_tools": 1,
+      "vcs_tools_uncovered": 0,
+      "tools": [
+        {
+          "name": "GithubToolkit",
+          "path": "camel/toolkits/github_toolkit.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "url": "https://github.com/openai/openai-agents-python",
+      "vcs_tools": 1,
+      "vcs_tools_uncovered": 0,
+      "tools": [
+        {
+          "name": "SandboxApplyPatchTool",
+          "path": "src/agents/sandbox/capabilities/tools/apply_patch_tool.py",
+          "covered": true,
+          "categories": [
+            "vcs_write"
+          ]
+        }
+      ],
+      "suite_runs": null,
+      "excluded": null,
+      "exclusion_reason": null
+    }
+  ]
+}

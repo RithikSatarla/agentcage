@@ -113,7 +113,41 @@ ecosystem's tool population, not a typical project.
   have made the number look worse. Each revision and its effect on the headline is in
   [PROTOCOL.md §2.7](PROTOCOL.md).
 
-Part A is exploratory. Part B's evaluation is pre-registered and has not been run.
+Part A is exploratory. Part B's evaluation was pre-registered before any data existed and
+has now been run — below.
+
+## Part B: what the agents did
+
+Three of the agents holding tools in the frame were run against a stateful model, with
+their own code unmodified. All three suites pass. All three showed a write-path defect
+the suites do not.
+
+| Agent | Tool | Suite | Defect found |
+|---|---|---|---|
+| [camel-ai/camel](https://github.com/camel-ai/camel) | `GithubToolkit` | 9 tests, pass | **Stale read** — reads a file from the default branch, writes that sha to a different branch, 409 uncaught |
+| [agno-agi/agno](https://github.com/agno-agi/agno) | `JiraTools` | imports clean | **Duplicate write** — one `create_issue` call, two issues, one success reported |
+| [run-llama/llama_index](https://github.com/run-llama/llama_index) | `JiraIssueToolSpec` | imports clean | **Duplicate write** — same shape |
+
+**3 of 3** agents exhibited at least one of the four pre-registered defect classes,
+against a 20% falsification threshold. 40 requests graded: 18 exact, 22 behaviourally
+equivalent.
+
+camel's suite is worth looking at. It passes with the entire `github` module replaced by
+`MagicMock` in `sys.modules`, so every call succeeds by construction and no sha, status
+or error path is ever exercised. That is what "covered" meant for this tool in Part A —
+a test references it — and it is why the two numbers measure different things.
+
+Read the honest caveats before quoting any of this: the models were built iteratively
+against these clients, so the zero miss rate measures fit to this sample rather than
+generality, the kill criterion has **no denominator and was not tested**, three agents is
+a small number, and the two duplicate-write findings share one root cause (an automatic
+retry inside `urllib3`, below both tools). All of it is in
+[PROTOCOL.md §3A.10](PROTOCOL.md) and under `limitations` in
+[part_b/partb_results.json](part_b/partb_results.json).
+
+Every trace is committed in [part_b/traces/](part_b/traces/) and is byte-identical
+between runs, so `python -m part_b.experiment --grade` re-derives every number above
+without running anything.
 
 ## Quickstart
 
@@ -171,19 +205,33 @@ twice, is refused the second time, and the customer is paid once.
 | [part_a/results.json](part_a/results.json) | Full results, per repository and per tool |
 | [part_b/interceptor.py](part_b/interceptor.py) | Passive HTTP capture for httpx and requests |
 | [part_b/stripe_mock.py](part_b/stripe_mock.py) | Stateful Stripe model — charges, refunds, idempotency |
+| [part_b/github_mock.py](part_b/github_mock.py) | Stateful GitHub model — issues, branch-keyed contents, pulls |
+| [part_b/jira_mock.py](part_b/jira_mock.py) | Stateful Jira model — issues, comments, worklogs, transitions |
+| [part_b/server.py](part_b/server.py) | Serves any model on a localhost socket, so real clients reach it |
+| [part_b/redirect.py](part_b/redirect.py) | Sends an agent's API traffic to a model when the tool exposes no seam |
+| [part_b/experiment.py](part_b/experiment.py) | Runs the sampled agents, grades them against §3A |
+| [part_b/traces/](part_b/traces/) | The raw evidence: every request each agent made |
 | [tests/](tests/) | Unit, integration and doc-consistency tests; no network |
 | [PROTOCOL.md](PROTOCOL.md) | Methodology, detector definitions, threats to validity |
 
 ## Status
 
-Part A is complete and reproducible. Part B is a working foundation, not a finished
-framework: the interceptor and the Stripe model do what this README shows, and the
-[pre-registered evaluation in PROTOCOL.md §3A](PROTOCOL.md) has **not been run** — it
-fixes the hypothesis, resolution tiers, miss classification, defect classes, a 20%
-falsification threshold and a 50% kill criterion, all before any data exists.
+Part A is complete and reproducible. Part B has now been run: the
+[pre-registered evaluation in PROTOCOL.md §3A](PROTOCOL.md) fixed the hypothesis,
+resolution tiers, miss classification, defect classes, a 20% falsification threshold and
+a 50% kill criterion before any data existed, and the four departures the run required
+are logged in §3A.10 rather than quietly repaired.
 
-Not built yet: other API models (GitHub, S3, Postgres), trace-driven replay, a pytest
-plugin, and a live deployment of [`website/`](website/).
+Two of those departures are worth knowing about up front. The pre-registered frame turned
+out to be **empty** — no tool in the measured population performs a payment operation, so
+the Stripe model the protocol was written around had no target, and the frame moved to
+version-control writes. And that substituted category turned out to be three different
+APIs rather than one, which is why there is a Jira model as well as a GitHub one.
+
+Not built yet: more API models (S3, Postgres), trace-driven replay, and a pytest plugin.
+Four of the seven agents in the frame were not run, each for a reason fixed in advance —
+one suite that will not collect, two tools that only touch a local filesystem, one that
+needs credentials that cannot be substituted.
 
 ## License
 

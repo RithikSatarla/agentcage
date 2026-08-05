@@ -21,6 +21,14 @@ results/
 # Part A HTTP cache (regenerable; keeps re-runs off the GitHub rate limit)
 .cache/
 
+# Part B phase 2 working directories. Each sampled agent gets its own environment,
+# because they disagree about their dependencies (SuperAGI pins pydantic 1, the rest
+# need pydantic 2), plus a shallow clone where the tool source is not on PyPI.
+# part_b/traces/ is deliberately NOT ignored: those traces are the evidence for §3A,
+# and the root-level rule above is anchored to the root, so it does not reach them.
+part_b/.venv-*/
+part_b/.agents/
+
 # LaTeX build artefacts. generated_macros.tex and generated_table.tex ARE tracked:
 # they are the paper's numbers, produced by paper/make_tables.py from results.json.
 paper/*.aux

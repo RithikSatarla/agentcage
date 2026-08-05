@@ -436,15 +436,86 @@ defects the Stripe model was built for:
 **Effect on the primary outcome.** None yet: no agent has been run against either model.
 The proportion in §3A.7 remains unmeasured, and no number is claimed for it.
 
+**2026-08-05 — phase 2 ran. Four departures, recorded below.**
+
+The seven repositories holding the fifteen `vcs_write` tools were drawn mechanically by
+`part_b/sample_vcs.py`. Three were run, four excluded. Results are in
+`part_b/partb_results.json`; every trace is in `part_b/traces/`.
+
+**(a) The frame is three APIs, not one.** `vcs_write` matches the verbs `create_issue(`,
+`create_file(`, `delete_file(` and `create_pull_request(`. Those names are not specific to
+version control, so the category is not "GitHub tools". Of its fifteen tools, three call
+the GitHub API, five call issue trackers (Jira, Linear, Redmine) and seven write to a
+local filesystem or a sandbox. The GitHub model built in phase 1 therefore addressed
+three of fifteen. A Jira model (`part_b/jira_mock.py`) was added, because Jira is the
+best-represented single API in the measured population — three clients, written
+independently in three projects. This was not foreseen when the frame was substituted.
+
+**(b) Redirection was needed for one agent.** §3A.3 says to re-run the write paths
+"through the interceptor". The interceptor is passive by construction and cannot move
+traffic. agno and llama_index both accept a `server_url`, so they were pointed at the
+model by configuration. camel's toolkit constructs `Github(auth=Token(token))` inline,
+with no base URL and no injectable client — there is no seam. Its traffic was rewritten
+one layer below the tool, inside the HTTP client the tool imports
+(`part_b/redirect.py`); the toolkit source is upstream's, unedited. The rewrite lives in
+a separate module from the interceptor precisely so that a recorded trace can never
+silently be the product of one.
+
+**(c) The duplicate-write scenarios inject a dropped response.** A retry needs a reason.
+The scenario drops the response to the first `POST /issue` *after* the model has applied
+it — the shape of the failure that causes duplicate writes in production, where the write
+lands and the caller never learns it did. The fault belongs to the scenario, is recorded
+on every affected request, and never changes a model rule.
+
+**(d) SuperAGI was excluded after four attempts to run it.** §3A.3 step 1 excludes an
+agent whose suite already fails. SuperAGI's does not collect: `superagi/config/config.py`
+imports `pydantic.BaseSettings`, removed in pydantic 2. Installing pydantic 1.10.13 moved
+the failure to fastapi, and `fastapi<0.100` on pydantic 1 fails to build its own models on
+Python 3.14. The blocking import is reached only because the GitHub write path imports
+`superagi.helper.s3_helper`, which imports fastapi — coupling that has nothing to do with
+GitHub. It contributes nothing to any count. Read statically,
+`superagi/tools/github/add_file.py:86` treats HTTP 422 as success for both the file write
+and the pull request; that is an observation about source, not a measurement, and is
+excluded from every number reported here.
+
+**What the run showed.** 3 of 3 agents exhibited at least one class-1–4 defect, above the
+20% falsification threshold, so **H1 is supported on this sample**. camel: a class-3 stale
+read — it reads a file from the default branch with no `ref`, then writes that sha to a
+different branch, and the 409 that follows is uncaught. agno and llama_index: a class-1
+duplicate write — a single call to `create_issue` created two issues, because the
+transport retried underneath the tool, and both reported one success. All three suites
+pass; camel's passes with the entire `github` module replaced by `MagicMock`.
+
+**What the run does not show.** MISS = 0 and T3 = 0 because the models were built
+iteratively against these clients: whenever a run reached a missing endpoint, that
+endpoint was added. Those two figures measure how well the model fits the sample it was
+developed against, not how well the approach generalises. In particular the §3A.8 kill
+criterion has no denominator and **has not been tested** — it is reported as not
+evaluable, never as passed. agno and llama_index drive the same client library, so their
+class-1 observations share one root cause and are not independent. Three agents is a small
+denominator and the proportion is descriptive only. The full list is under `limitations`
+in `part_b/partb_results.json`.
+
 ---
 
 ## 4. Reproduction
 
 ```bash
 pip install -e ".[dev]"
-pytest tests/                # Part B + doc consistency, no network
-python -m part_a.run         # Part A: regenerates part_a/results.json
+pytest tests/                    # Part B + doc consistency, no network
+python -m part_a.run             # Part A: regenerates part_a/results.json
+
+python -m part_b.sample_vcs      # draw the phase-2 sample from results.json
+python -m part_b.setup_agents    # build one environment per sampled agent
+python -m part_b.experiment      # run them, grade, write partb_results.json
+python -m part_b.experiment --grade   # re-grade committed traces, run nothing
 ```
+
+Phase 2 needs no credentials: every model runs on a localhost socket and no request
+leaves the machine. `setup_agents` clones two repositories and builds four virtual
+environments, which takes a few minutes; `--check` reports what is already present.
+Traces are byte-identical between runs — the clock is injected and the server's ephemeral
+port is normalised out — so a re-run that changes a trace means a behaviour changed.
 
 Part A needs no credentials — 45 unauthenticated API calls fit inside the 60/hour limit.
 Set `GITHUB_TOKEN` to raise the limit to 5000/hour. Responses cache under `.cache/`, so a

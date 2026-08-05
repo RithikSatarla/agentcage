@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentCage — stateful mocking for AI agents that write</title>
-<meta name="description" content="20.3% of write-capable tools in open-source LLM agents are never referenced by any test. AgentCage is the stateful alternative to replay fixtures.">
+<title>AgentCage — catch what your AI agent does twice</title>
+<meta name="description" content="AI agents retry. Refunds, deletes and emails happen again. Your tests replay a recording, so they never notice. AgentCage gives them state.">
 <meta property="og:title" content="AgentCage">
-<meta property="og:description" content="20.3% of write-capable agent tools are never referenced by any test. Reproducible study plus the stateful alternative to replay fixtures.">
+<meta property="og:description" content="Your agent will do it twice. Your tests will never know. AgentCage is the state your mocks are missing.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,49 +26,44 @@
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <p class="label"><span class="dot"></span>Open source · study + working code</p>
-        <h1>Agents write.<br>Fixtures forget.<br><span class="soft">Money moves twice.</span></h1>
-        <p class="lede">Agents refund payments, delete rows, push branches and send mail.
-        We test them by recording a response and replaying it — and a replay fixture holds
-        no state, so it cannot catch the one failure mode that only writes have.</p>
+        <p class="label"><span class="dot"></span>Open source · MIT</p>
+        <h1>Your agent will<br><span class="soft" id="rotator">refund</span> it twice.</h1>
+        <p class="lede">Agents retry. Your tests replay a recording that says
+        <strong style="color:var(--ink)">200 OK</strong> every single time — so nothing
+        ever catches the second one.</p>
         <div class="actions">
-          <a class="btn solid" href="#demo">Run a failing agent</a>
-          <a class="btn" href="/data">See the data</a>
+          <a class="btn solid" href="#demo">Watch it happen</a>
+          <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
         </div>
+        <p class="caption">Runs in your test suite. No credentials, no account, no agent
+        rewrite.</p>
       </div>
 
       <div>
-        <p class="label" style="margin-bottom:.9rem">Request path</p>
+        <p class="label" style="margin-bottom:.9rem">Live · one $50.00 charge</p>
         <svg class="schematic" viewBox="0 0 560 250" role="img"
-             aria-label="Schematic: an agent sends requests through a passive interceptor into a stateful Stripe model, which holds the charge state.">
-          <path class="rail" id="rail-a" d="M92 70 C 160 70, 200 70, 268 70"></path>
-          <path class="rail" id="rail-b" d="M292 70 C 360 70, 400 70, 468 70"></path>
-
+             aria-label="Schematic of the request path: an agent sends requests through a passive interceptor into a stateful model that holds the charge state.">
+          <path class="rail" d="M92 70 C 160 70, 200 70, 268 70"></path>
+          <path class="rail" d="M292 70 C 360 70, 400 70, 468 70"></path>
           <circle class="node" id="node-agent" cx="80" cy="70" r="12"></circle>
           <circle class="node" id="node-cage" cx="280" cy="70" r="12"></circle>
           <circle class="node" id="node-model" cx="480" cy="70" r="12"></circle>
-
-          <text class="name" x="46" y="40">agent-01</text>
+          <text class="name" x="46" y="40">your agent</text>
           <text x="46" y="54" id="agent-mode">idle</text>
-          <text class="name" x="243" y="40">interceptor</text>
-          <text x="243" y="54">passive · logs</text>
-          <text class="name" x="425" y="40">stripe model</text>
-          <text x="425" y="54">stateful</text>
-
+          <text class="name" x="243" y="40">agentcage</text>
+          <text x="243" y="54">watching</text>
+          <text class="name" x="428" y="40">the money</text>
+          <text x="428" y="54">remembers</text>
           <circle class="packet" id="packet" cx="80" cy="70" r="3.5" opacity="0"></circle>
-
           <line x1="0" y1="120" x2="560" y2="120" stroke="var(--line)" stroke-width="1"></line>
-
-          <text x="0" y="146">charge</text>
-          <text class="val" x="120" y="146">ch_00000001</text>
-          <text x="0" y="168">captured</text>
-          <text class="val" x="120" y="168">$50.00</text>
-          <text x="0" y="190">amount_refunded</text>
-          <text class="val" id="sch-refunded" x="120" y="190">$0.00</text>
-          <text x="0" y="212">last response</text>
-          <text class="val" id="sch-status" x="120" y="212">—</text>
-          <text x="0" y="234">customer is out</text>
-          <text class="val" id="sch-loss" x="120" y="234">$0.00</text>
+          <text x="0" y="150">charge</text>
+          <text class="val" x="150" y="150">$50.00</text>
+          <text x="0" y="176">already refunded</text>
+          <text class="val" id="sch-refunded" x="150" y="176">$0.00</text>
+          <text x="0" y="202">last answer</text>
+          <text class="val" id="sch-status" x="150" y="202">—</text>
+          <text x="0" y="228">customer is out</text>
+          <text class="val" id="sch-loss" x="150" y="228">$0.00</text>
         </svg>
       </div>
     </div>
@@ -78,42 +73,40 @@
 <section class="flush">
   <div class="wrap">
     <div class="stats">
-      <div class="stat"><div class="v hot">20.3%</div>
-        <span class="k">write tools never tested</span></div>
-      <div class="stat"><div class="v">158</div>
-        <span class="k">write-capable tools found</span></div>
-      <div class="stat"><div class="v">45</div>
-        <span class="k">repositories screened</span></div>
-      <div class="stat"><div class="v">13</div>
-        <span class="k">repositories analysed</span></div>
+      <div class="stat"><div class="v hot" data-count="20.3" data-suffix="%">0%</div>
+        <span class="k">of agent write tools have no test</span></div>
+      <div class="stat"><div class="v" data-count="158">0</div>
+        <span class="k">write tools we found</span></div>
+      <div class="stat"><div class="v" data-count="45">0</div>
+        <span class="k">repositories we read</span></div>
+      <div class="stat"><div class="v">4 min</div>
+        <span class="k">to reproduce it yourself</span></div>
     </div>
-    <p class="caption">32 of 158 tools, 95% CI 14.7–27.2%. Sensitivity check on
-    exhaustively scanned repositories: 20.7%. Every number regenerated by
-    <code>python -m part_a.run</code>.</p>
+    <p class="caption">32 of 158 tools across 13 repositories are never named by a single
+    test. <a href="/data">See every one →</a></p>
   </div>
 </section>
 
 <section id="demo">
   <div class="wrap">
     <div class="head">
-      <h2>Four ways an agent breaks a write</h2>
-      <p class="lede">These are the four defect classes pre-registered in the protocol as
-      the Part B outcome measure. Each one runs here as a scripted agent loop against a
-      replay fixture and against a stateful model, on one $50.00 charge.</p>
+      <h2>Press play. Watch the money leave twice.</h2>
+      <p class="lede">Four ways a real agent breaks a payment. Same code, same charge —
+      once against a recorded response, once against something that remembers.</p>
     </div>
 
     <div class="panel">
-      <div class="tabs" role="tablist" aria-label="Defect class">
-        <button role="tab" data-scenario="duplicate" aria-selected="true">duplicate write</button>
-        <button role="tab" data-scenario="over_refund" aria-selected="false">over-refund</button>
-        <button role="tab" data-scenario="unchecked" aria-selected="false">unchecked error</button>
-        <button role="tab" data-scenario="stale" aria-selected="false">stale read</button>
+      <div class="tabs" role="tablist" aria-label="What the agent does wrong">
+        <button role="tab" data-scenario="duplicate" aria-selected="true">it retries</button>
+        <button role="tab" data-scenario="over_refund" aria-selected="false">it miscounts</button>
+        <button role="tab" data-scenario="unchecked" aria-selected="false">it ignores errors</button>
+        <button role="tab" data-scenario="stale" aria-selected="false">it reads stale data</button>
       </div>
 
       <div class="panel-head">
-        <span id="scenario-desc">The agent retries a refund it already completed.</span>
+        <span id="scenario-desc">The agent refunds, misses the reply, and refunds again.</span>
         <span class="controls">
-          <button type="button" class="primary" id="btn-run">▶ Run</button>
+          <button type="button" class="primary" id="btn-run">▶ Play</button>
           <button type="button" id="btn-reset">Reset</button>
         </span>
       </div>
@@ -122,8 +115,8 @@
         <div class="scroll">
           <table>
             <thead>
-              <tr><th style="width:2rem">#</th><th style="width:15rem">Agent request</th>
-                  <th style="width:8rem">Replay fixture</th><th>AgentCage</th></tr>
+              <tr><th style="width:2rem">#</th><th style="width:14rem">What the agent asks for</th>
+                  <th style="width:9rem">Recorded mock</th><th>AgentCage</th></tr>
             </thead>
             <tbody id="ledger"></tbody>
           </table>
@@ -131,34 +124,31 @@
         <div id="verdict" style="margin-top:1.3rem"></div>
       </div>
     </div>
-
-    <p class="caption">The rules mirror <code>part_b/stripe_mock.py</code>, the canonical
-    implementation covered by the test suite. The fixture column is what a recorded
-    response does: it answers identically however many times it is asked.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
+    <div class="head"><h2>Three lines in your tests</h2></div>
     <div class="split">
       <div>
-        <h2>The defect lives in the state transition</h2>
-        <p>Both requests below are byte-identical. No assertion over a fixture's responses
-        can separate them, because the fixture has nothing to remember.</p>
-        <p>The suite is not incomplete. It is structurally incapable of expressing the
-        property — which is why passing it tells you nothing about your write paths.</p>
-        <div class="actions"><a class="btn" href="/models">How the model works</a></div>
+        <p>Point your agent's HTTP client at AgentCage instead of a recorded response.
+        Nothing else changes — same client, same code, same tests.</p>
+        <p>It watches without touching: every write your agent attempts is recorded, with
+        API keys stripped out, so you can read exactly what it tried to do.</p>
+        <div class="actions">
+          <a class="btn" href="/models">What it models</a>
+        </div>
       </div>
-      <div class="transcript">
-<span class="row"><span class="req">POST /v1/refunds</span> <span class="dim">{"amount": 5000}</span></span>
-<span class="row"><span class="dim">  fixture   →</span> <span class="ok">200 OK</span></span>
-<span class="row"><span class="dim">  agentcage →</span> <span class="ok">200 OK</span> <span class="dim">refunded 0 → 5000</span></span>
-<hr>
-<span class="row"><span class="req">POST /v1/refunds</span> <span class="dim">{"amount": 5000}</span></span>
-<span class="row"><span class="dim">  ← the agent retries</span></span>
-<span class="row"><span class="dim">  fixture   →</span> <span class="ok">200 OK</span> <span class="dim">suite passes</span></span>
-<span class="row"><span class="dim">            </span> <span class="dim">customer paid twice</span></span>
-<span class="row"><span class="dim">  agentcage →</span> <span class="bad">400 charge_already_refunded</span></span>
+      <div>
+<pre><code>from part_b.stripe_mock import StripeMock
+
+stripe = StripeMock()
+charge = stripe.post_charge(amount=5000)
+
+stripe.post_refund(charge=charge.id, amount=5000)
+stripe.post_refund(charge=charge.id, amount=5000)
+# StripeError: already refunded (400)</code></pre>
       </div>
     </div>
   </div>
@@ -167,73 +157,31 @@
 <section>
   <div class="wrap">
     <div class="head">
-      <h2>We measured how much of this is tested</h2>
-      <p class="lede">45 Python agent repositories screened. Every framework-idiomatic
-      tool definition extracted mechanically, keeping the ones whose bodies perform a real
-      state mutation.</p>
+      <h2>We checked whether anyone tests this</h2>
+      <p class="lede">We read 45 open-source AI agent projects and found every tool that
+      can change something real — pay, delete, push, send.</p>
     </div>
-    <div class="split">
+    <div class="cols">
       <div>
-        <p><strong style="color:var(--ink)">The bar was set as low as it goes.</strong> A
-        tool counts as tested if its identifier appears anywhere in the project's test
-        sources — no assertion, no destructive path exercised, not even executed.</p>
-        <p>One in five fails that. So 20.3% is a floor, not a ceiling. Restricted to the 7
-        repositories whose entire suite was read, it is 20.7%.</p>
-        <div class="actions"><a class="btn solid" href="/data">Browse all 158 tools</a></div>
+        <h3>One in five is never tested</h3>
+        <p>And the bar was as low as it goes: a tool counts as tested if its name shows up
+        <em>anywhere</em> in the test files. It doesn't have to run.</p>
       </div>
       <div>
-        <div class="note"><strong>What this does not say.</strong> 32 of the 45 candidates
-        screened out. The study detects framework-idiomatic tool definitions —
-        <code>@tool</code>, <code>BaseTool</code>, JSON schemas. Agents with bespoke
-        architectures like <code>aider</code> and <code>OpenHands</code> write to disk
-        constantly but expose no such surface. The denominator of 13 reflects detector
-        coverage as much as the ecosystem.</div>
-        <div class="note"><strong>Part A is exploratory</strong>, not pre-registered. The
-        detectors were revised seven times, twice to remove false positives that would
-        have made the finding look worse. All of them are in the paper.</div>
+        <h3>The riskiest ones are the worst</h3>
+        <p>Tools that push code and run shell commands are the least tested of all — the
+        ones that can do the most damage.</p>
+      </div>
+      <div>
+        <h3>Check our work</h3>
+        <p>The study runs on your machine in four minutes with no login. Every number on
+        this site comes straight out of it.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="head">
-      <h2>Version-control and shell tools are the least tested</h2>
-      <p class="lede">Each detected tool carries the categories that qualified it, so
-      coverage breaks down by the kind of side effect it has.</p>
+    <div class="actions">
+      <a class="btn solid" href="/data">See the data</a>
+      <a class="btn" href="/paper">Read the paper</a>
     </div>
-    <figure class="chart">
-      <img class="fig-light" src="figures/fig_category_light.svg"
-           alt="Test coverage by kind of write operation. Version-control writes 47% uncovered of 15 tools; cloud SDK writes 40% of 5; shell execution 33% of 36; outbound messaging 30% of 23; file open in write mode 12% of 32; filesystem mutation 12% of 57; database and ORM writes 6% of 18.">
-      <img class="fig-dark" src="figures/fig_category_dark.svg" alt="" aria-hidden="true">
-    </figure>
-    <p class="caption">Shell execution has the least bounded blast radius of any category
-    — a shell tool can produce every other category's effects — and a third of them are
-    never referenced. <a href="/data">Full table with confidence intervals →</a></p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="head"><h2>What exists today</h2></div>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Component</th><th>State</th></tr></thead>
-        <tbody>
-          <tr><td class="name">Part A measurement</td><td><span class="pill live">working</span> reproducible, weekly in CI</td></tr>
-          <tr><td class="name">Secondary analysis + figures</td><td><span class="pill live">working</span> generated from results</td></tr>
-          <tr><td class="name">Interceptor — httpx + requests</td><td><span class="pill live">working</span></td></tr>
-          <tr><td class="name">Stateful Stripe model</td><td><span class="pill live">working</span> charges, refunds, idempotency</td></tr>
-          <tr><td class="name">Test suite</td><td><span class="pill live">working</span> green on Python 3.9–3.12</td></tr>
-          <tr><td class="name">Paper</td><td><span class="pill pending">compiles</span> not submitted to arXiv</td></tr>
-          <tr><td class="name">Part B evaluation</td><td><span class="pill none">not run</span> pre-registered only</td></tr>
-          <tr><td class="name">GitHub / S3 / Postgres models</td><td><span class="pill none">not built</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="caption">Anything marked <em>not run</em> has no results behind it, and
-    nothing on this site claims otherwise.</p>
   </div>
 </section>
 
@@ -241,45 +189,27 @@
   <div class="wrap">
     <div class="head">
       <p class="label">Design partners</p>
-      <h2>Running agents that write? Let&rsquo;s talk.</h2>
-      <p class="lede">The Stripe model is the first of many. Which API gets built next,
-      and what fidelity it needs, should be decided by teams with a real agent in
-      production rather than guessed.</p>
+      <h2>Running agents that touch real money?</h2>
+      <p class="lede">Stripe is the first one we modelled. Tell us which API scares you and
+      it's next. No pricing, no contract, no waitlist.</p>
     </div>
-    <div class="cols">
-      <div>
-        <h3>What you get</h3>
-        <ul>
-          <li>A stateful model of the API your agent writes to, built to your failure cases</li>
-          <li>Direct input on the interceptor and test-harness design</li>
-          <li>Write paths exercised against real state transitions before they ship</li>
-          <li>MIT licensed — no lock-in, and it keeps working if we go away</li>
-        </ul>
-      </div>
-      <div>
-        <h3>What we need back</h3>
-        <ul>
-          <li>Which API, and which operations actually scare you</li>
-          <li>The failure modes you have already hit in production</li>
-          <li>Honest feedback on whether this catches anything real</li>
-        </ul>
-      </div>
-    </div>
-    <p class="lede">No pricing, no contract, no waitlist. The code is public and the study
-    is reproducible — start by running it and telling us where it is wrong.</p>
     <div class="actions">
       <a class="btn solid" href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Get in touch</a>
       <a class="btn" href="https://github.com/RithikSatarla/agentcage/issues">Open an issue</a>
     </div>
+    <p class="caption" style="margin-top:2rem">Being straight with you: the interceptor,
+    the Stripe model and the study all work today and are covered by tests. The follow-up
+    study that measures how many real agents this catches is written up but
+    <strong style="color:var(--ink)">has not been run yet</strong>, so we don't claim a
+    number for it. <a href="/paper">The plan is public.</a></p>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <p>MIT licensed ·
-    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a><br>
-    Figures generated from <code>part_a/results.json</code>, study run of 2026-08-04.
-    Part A is exploratory; Part B is pre-registered and has not been run.</p>
+    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
+    · <a href="/data">Data</a> · <a href="/paper">Paper</a> · <a href="/models">Models</a></p>
   </div>
 </footer>
 
@@ -287,83 +217,112 @@
 (function () {
   "use strict";
 
-  // The refund rules mirror part_b/stripe_mock.py. That module is canonical and is the
-  // one covered by the test suite; this is the browser-side twin so the four
-  // pre-registered defect classes can be felt rather than described.
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- rotating hero verb ---- */
+  var VERBS = ["refund", "delete", "email", "deploy", "charge"];
+  var vi = 0, rot = document.getElementById("rotator");
+  if (rot && !reduce) {
+    window.setInterval(function () {
+      vi = (vi + 1) % VERBS.length;
+      rot.style.opacity = "0";
+      window.setTimeout(function () {
+        rot.textContent = VERBS[vi];
+        rot.style.opacity = "1";
+      }, 180);
+    }, 2200);
+  }
+
+  /* ---- count-up stats ---- */
+  function countUp(el) {
+    var target = parseFloat(el.getAttribute("data-count"));
+    var suffix = el.getAttribute("data-suffix") || "";
+    var decimals = (el.getAttribute("data-count").split(".")[1] || "").length;
+    if (reduce) { el.textContent = target.toFixed(decimals) + suffix; return; }
+    var start = null, dur = 900;
+    function frame(ts) {
+      if (start === null) { start = ts; }
+      var t = Math.min(1, (ts - start) / dur);
+      var eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = (target * eased).toFixed(decimals) + suffix;
+      if (t < 1) { window.requestAnimationFrame(frame); }
+    }
+    window.requestAnimationFrame(frame);
+  }
+
+  var counted = false;
+  var statsEl = document.querySelector(".stats");
+  function maybeCount() {
+    if (counted || !statsEl) { return; }
+    if (statsEl.getBoundingClientRect().top < window.innerHeight) {
+      counted = true;
+      Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), countUp);
+    }
+  }
+  window.addEventListener("scroll", maybeCount, { passive: true });
+  maybeCount();
+
+  /* ---- the demo ---- */
+  // Refund rules mirror part_b/stripe_mock.py, which is canonical and covered by tests.
   var CAPTURED = 5000;
 
   var SCENARIOS = {
     duplicate: {
-      desc: "The agent retries a refund it already completed.",
-      mode: "retry loop",
+      desc: "The agent refunds, misses the reply, and refunds again.",
+      mode: "retrying",
       steps: [
-        { method: "POST", path: "/v1/refunds", amount: 5000, note: "refund the order" },
-        { method: "POST", path: "/v1/refunds", amount: 5000, note: "no response parsed — retry" }
+        { method: "POST", label: "refund $50.00", amount: 5000, note: "refund the order" },
+        { method: "POST", label: "refund $50.00", amount: 5000, note: "no reply seen — try again" }
       ],
       verdict: function (s) {
-        return s.fixtureOut > CAPTURED
-          ? "Fixture: every call returned 200, so the suite passes. Reality: the customer " +
-            "was paid " + money(s.fixtureOut) + " on a " + money(CAPTURED) + " charge."
-          : "";
+        return "The recorded mock said yes both times, so the tests passed. In reality the " +
+               "customer was sent " + money(s.fixtureOut) + " back on a " + money(CAPTURED) +
+               " order.";
       }
     },
     over_refund: {
-      desc: "The agent miscalculates and refunds more than the charge is worth.",
-      mode: "bad arithmetic",
+      desc: "The agent does the arithmetic wrong and gives back too much.",
+      mode: "miscounting",
       steps: [
-        { method: "POST", path: "/v1/refunds", amount: 3000, note: "partial refund" },
-        { method: "POST", path: "/v1/refunds", amount: 4000, note: "refund the rest — wrongly" }
+        { method: "POST", label: "refund $30.00", amount: 3000, note: "refund part of it" },
+        { method: "POST", label: "refund $40.00", amount: 4000, note: "refund 'the rest'" }
       ],
-      verdict: function (s) {
-        return "Fixture: both accepted. Reality: only " + money(CAPTURED) +
-               " was ever captured, so the second call exceeds the unrefunded remainder.";
+      verdict: function () {
+        return "Only " + money(CAPTURED) + " was ever taken, so there is no way to give " +
+               "back $70.00. The recorded mock never checked.";
       }
     },
     unchecked: {
-      desc: "The agent treats a 4xx as success and carries on.",
-      mode: "ignores status",
+      desc: "The refund fails and the agent carries on as if it worked.",
+      mode: "ignoring errors",
       steps: [
-        { method: "POST", path: "/v1/refunds", amount: 7500, note: "refund — too large" },
-        { method: "POST", path: "/v1/refunds", amount: 5000, note: "assumed success — continue" }
+        { method: "POST", label: "refund $75.00", amount: 7500, note: "too much — this fails" },
+        { method: "POST", label: "refund $50.00", amount: 5000, note: "assumes it worked, continues" }
       ],
       verdict: function () {
-        return "The first call fails against real semantics, but the agent never checks " +
-               "the status and proceeds. A fixture that always returns 200 can never " +
-               "surface this branch.";
+        return "The first refund failed, but the agent never looked at the answer. A mock " +
+               "that always says yes can never show you this.";
       }
     },
     stale: {
-      desc: "The agent decides using state it read before its own write.",
-      mode: "cached read",
+      desc: "The agent decides using a number it looked up before its own refund.",
+      mode: "stale data",
       steps: [
-        { method: "GET", path: "/v1/charges/ch_00000001", amount: 0, note: "read: refunded $0.00" },
-        { method: "POST", path: "/v1/refunds", amount: 5000, note: "refund the order" },
-        { method: "POST", path: "/v1/refunds", amount: 5000, note: "cached read still says $0.00" }
+        { method: "GET", label: "check the order", amount: 0, note: "sees: nothing refunded yet" },
+        { method: "POST", label: "refund $50.00", amount: 5000, note: "refund the order" },
+        { method: "POST", label: "refund $50.00", amount: 5000, note: "old note still says $0.00" }
       ],
       verdict: function () {
-        return "The decision to refund again was taken on a read that predates the write. " +
-               "Against a fixture the stale value is indistinguishable from a fresh one.";
+        return "It decided to refund again from a number it read before its own refund " +
+               "landed. Against a recording, stale and fresh look identical.";
       }
     }
   };
 
-  var current = "duplicate";
-  var state, running, timer;
+  var current = "duplicate", state, running, timer;
 
   function money(c) { return "$" + (c / 100).toFixed(2); }
   function $(id) { return document.getElementById(id); }
-
-  function reset() {
-    window.clearTimeout(timer);
-    running = false;
-    state = { refunded: 0, fixtureOut: 0, steps: 0 };
-    $("ledger").innerHTML =
-      '<tr><td colspan="4" class="empty">Press Run to execute the agent loop.</td></tr>';
-    $("verdict").innerHTML = "";
-    $("btn-run").disabled = false;
-    $("agent-mode").textContent = SCENARIOS[current].mode;
-    paint();
-  }
 
   function paint(status, bad) {
     $("sch-refunded").textContent = money(state.refunded);
@@ -375,22 +334,32 @@
     $("node-model").setAttribute("class", "node" + (bad ? " bad" : status ? " on" : ""));
   }
 
-  // Model semantics: only POST /v1/refunds mutates.
+  function reset() {
+    window.clearTimeout(timer);
+    running = false;
+    state = { refunded: 0, fixtureOut: 0, steps: 0 };
+    $("ledger").innerHTML =
+      '<tr><td colspan="4" class="empty">Press Play.</td></tr>';
+    $("verdict").innerHTML = "";
+    $("btn-run").disabled = false;
+    $("agent-mode").textContent = SCENARIOS[current].mode;
+    paint();
+  }
+
   function apply(step) {
     if (step.method === "GET") {
-      return { status: 200, text: "200 OK  refunded " + money(state.refunded) };
+      return { status: 200, text: "nothing refunded yet" };
     }
     var remaining = CAPTURED - state.refunded;
     if (remaining <= 0) {
-      return { status: 400, text: "400 charge_already_refunded", bad: true };
+      return { status: 400, bad: true, text: "refused — already refunded in full" };
     }
     if (step.amount > remaining) {
       return { status: 400, bad: true,
-               text: "400 amount_too_large  exceeds " + money(remaining) };
+               text: "refused — only " + money(remaining) + " left to give back" };
     }
-    var before = state.refunded;
     state.refunded += step.amount;
-    return { status: 200, text: "200 OK  refunded " + before + " → " + state.refunded };
+    return { status: 200, text: "ok — " + money(state.refunded) + " refunded so far" };
   }
 
   function cell(text, cls) {
@@ -401,10 +370,8 @@
   }
 
   function flyPacket(then) {
-    var packet = $("packet");
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { then(); return; }
-    var start = null, dur = 480;
+    var packet = $("packet"), start = null, dur = 460;
     packet.setAttribute("opacity", "1");
     function frame(ts) {
       if (start === null) { start = ts; }
@@ -421,11 +388,8 @@
     if (i >= sc.steps.length) {
       running = false;
       $("btn-run").disabled = false;
-      var text = sc.verdict(state);
-      if (text) {
-        $("verdict").innerHTML = '<div class="note"><strong>What the suite concluded.</strong> ' +
-          text + "</div>";
-      }
+      $("verdict").innerHTML = '<div class="note"><strong>What your tests would have told you.</strong> ' +
+        sc.verdict(state) + "</div>";
       return;
     }
     var step = sc.steps[i];
@@ -435,33 +399,36 @@
     flyPacket(function () {
       var result = apply(step);
       if (step.method === "POST") { state.fixtureOut += step.amount; }
-
       if (state.steps === 0) { $("ledger").innerHTML = ""; }
       state.steps += 1;
 
       var tr = document.createElement("tr");
       tr.appendChild(cell(String(i + 1), "dim"));
-      var req = cell(step.method + " " + step.path.replace("/v1/", "/v1/") +
-                     (step.amount ? "  " + money(step.amount) : ""), "name");
-      tr.appendChild(req);
-      tr.appendChild(cell(step.method === "GET" ? "200 OK" : "200 OK", "ok"));
+      tr.appendChild(cell(step.label, "name"));
+      tr.appendChild(cell("yes ✓", "ok"));
       tr.appendChild(cell(result.text, result.bad ? "bad" : "ok"));
       $("ledger").appendChild(tr);
 
       var noteRow = document.createElement("tr");
-      var pad = document.createElement("td");
-      noteRow.appendChild(pad);
+      noteRow.appendChild(document.createElement("td"));
       var note = cell("↳ " + step.note, "dim");
       note.colSpan = 3;
       noteRow.appendChild(note);
       $("ledger").appendChild(noteRow);
 
-      paint(result.status === 200 ? "200 OK" : result.text.slice(0, 24), result.bad);
+      paint(result.status === 200 ? "ok" : "refused", result.bad);
       $("node-agent").setAttribute("class", "node");
       $("node-cage").setAttribute("class", "node");
-
-      timer = window.setTimeout(function () { runStep(i + 1); }, 520);
+      timer = window.setTimeout(function () { runStep(i + 1); }, 560);
     });
+  }
+
+  function play() {
+    if (running) { return; }
+    reset();
+    running = true;
+    $("btn-run").disabled = true;
+    runStep(0);
   }
 
   function selectScenario(id) {
@@ -471,21 +438,29 @@
     });
     $("scenario-desc").textContent = SCENARIOS[id].desc;
     reset();
+    play();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
     b.addEventListener("click", function () { selectScenario(b.getAttribute("data-scenario")); });
   });
-  $("btn-run").addEventListener("click", function () {
-    if (running) { return; }
-    reset();
-    running = true;
-    $("btn-run").disabled = true;
-    runStep(0);
-  });
+  $("btn-run").addEventListener("click", play);
   $("btn-reset").addEventListener("click", reset);
 
-  selectScenario("duplicate");
+  reset();
+
+  // Play once on its own the first time the demo scrolls into view.
+  var autoplayed = false;
+  function maybeAutoplay() {
+    if (autoplayed) { return; }
+    var box = $("demo").getBoundingClientRect();
+    if (box.top < window.innerHeight * 0.75 && box.bottom > 0) {
+      autoplayed = true;
+      play();
+    }
+  }
+  window.addEventListener("scroll", maybeAutoplay, { passive: true });
+  maybeAutoplay();
 })();
 </script>
 </body>

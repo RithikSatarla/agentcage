@@ -42,12 +42,17 @@ def meter(covered: int, uncovered: int) -> str:
 
 
 def repo_rows() -> str:
+    """Rows carry data-* sort keys. Sorting on rendered text would break on percent
+    signs, meters and pills, so the numbers travel separately from their display."""
     rows = []
     for r in sorted(ANALYSIS["repos"], key=lambda x: -x["uncovered"]):
         scan = ("full" if r["exhaustive_scan"] else "capped")
         scan_cls = "live" if r["exhaustive_scan"] else "pending"
         rows.append(
-            f'    <tr><td class="name">{html.escape(r["repo"])}</td>'
+            f'    <tr data-repo="{html.escape(r["repo"].lower())}" data-scan="{scan}" '
+            f'data-tools="{r["tools"]}" data-covered="{r["covered"]}" '
+            f'data-uncovered="{r["uncovered"]}" data-pct="{r["uncovered_pct"]}">'
+            f'<td class="name">{html.escape(r["repo"])}</td>'
             f'<td class="n">{r["tools"]}</td>'
             f'<td class="n">{r["covered"]}</td>'
             f'<td class="n">{r["uncovered"]}</td>'
@@ -63,7 +68,10 @@ def category_rows() -> str:
     for c in sorted(ANALYSIS["categories"], key=lambda x: -x["uncovered_pct"]):
         lo, hi = c["ci95"]
         rows.append(
-            f'    <tr><td>{html.escape(c["label"])}</td>'
+            f'    <tr data-label="{html.escape(c["label"].lower())}" '
+            f'data-tools="{c["tools"]}" data-uncovered="{c["uncovered"]}" '
+            f'data-pct="{c["uncovered_pct"]}">'
+            f'<td>{html.escape(c["label"])}</td>'
             f'<td class="n">{c["tools"]}</td>'
             f'<td class="n">{c["uncovered"]}</td>'
             f'<td class="n">{c["uncovered_pct"]}%</td>'
@@ -102,7 +110,7 @@ def build() -> str:
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Study run {d['timestamp'][:10]}</p>
+    <p class="label">Study run {d['timestamp'][:10]}</p>
     <h1>Every number, and<br>where it came from.</h1>
     <p class="lede">{a['tools_total']} write-capable tool definitions across
     {d['total_repos_analyzed']} repositories, screened from {d['candidates_screened']}
@@ -136,16 +144,28 @@ def build() -> str:
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>By repository</h2>
-      <p class="lede sub">A tool counts as covered if its identifier appears anywhere in
+      <p class="lede">A tool counts as covered if its identifier appears anywhere in
       that repository's test sources — no assertion, no execution required.</p>
     </div>
+    <div class="filters">
+      <input type="search" id="repo-search" placeholder="filter repositories…"
+             aria-label="Filter repositories by name">
+      <button class="chip" type="button" data-scan="all" aria-pressed="true">all scans</button>
+      <button class="chip" type="button" data-scan="full" aria-pressed="false">exhaustive only</button>
+      <button class="chip" type="button" data-untested="1" aria-pressed="false">has untested tools</button>
+      <span class="rowcount" id="repo-count"></span>
+    </div>
     <div class="scroll">
-      <table class="data">
+      <table class="data" id="repo-table">
         <thead>
-          <tr><th>Repository</th><th class="n">Tools</th><th class="n">Covered</th>
-              <th class="n">Uncov.</th><th class="n">Share</th><th>Split</th><th>Test scan</th></tr>
+          <tr><th class="sortable" data-key="repo">Repository</th>
+              <th class="n sortable" data-key="tools">Tools</th>
+              <th class="n sortable" data-key="covered">Covered</th>
+              <th class="n sortable" data-key="uncovered" aria-sort="descending">Uncov.</th>
+              <th class="n sortable" data-key="pct">Share</th>
+              <th>Split</th><th>Test scan</th></tr>
         </thead>
         <tbody>
 {repo_rows()}
@@ -168,17 +188,20 @@ def build() -> str:
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>By kind of write operation</h2>
-      <p class="lede sub">Each tool carries the categories that qualified it. Categories
+      <p class="lede">Each tool carries the categories that qualified it. Categories
       overlap — a tool may match several — so the counts do not sum to
       {a['tools_total']}.</p>
     </div>
     <div class="scroll">
-      <table class="data">
+      <table class="data" id="cat-table">
         <thead>
-          <tr><th>Kind of write operation</th><th class="n">Tools</th><th class="n">Uncov.</th>
-              <th class="n">Share</th><th class="n">95% CI</th><th>Split</th></tr>
+          <tr><th class="sortable" data-key="label">Kind of write operation</th>
+              <th class="n sortable" data-key="tools">Tools</th>
+              <th class="n sortable" data-key="uncovered">Uncov.</th>
+              <th class="n sortable" data-key="pct" aria-sort="descending">Share</th>
+              <th class="n">95% CI</th><th>Split</th></tr>
         </thead>
         <tbody>
 {category_rows()}
@@ -205,7 +228,7 @@ def build() -> str:
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>What screened out, and why it matters</h2>
     </div>
     <p>A repository enters the analysed set only if the detectors find at least one
@@ -224,7 +247,7 @@ def build() -> str:
 
 <section>
   <div class="wrap">
-    <div class="section-head"><h2>Reproduce it</h2></div>
+    <div class="head"><h2>Reproduce it</h2></div>
 <pre><code>git clone https://github.com/RithikSatarla/agentcage.git
 cd agentcage &amp;&amp; pip install -e ".[dev]"
 
@@ -244,10 +267,99 @@ pytest tests/                 # full suite, no network</code></pre>
   <div class="wrap">
     <p>MIT licensed ·
     <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a><br>
-    Generated by <code>website/make_data_page.py</code>. Part A is exploratory; Part B is
+    Generated by <code>tools/make_data_page.py</code>. Part A is exploratory; Part B is
     pre-registered and has not been run.</p>
   </div>
 </footer>
+
+<script>
+(function () {{
+  "use strict";
+
+  // Sorting reads data-* attributes rather than cell text: the rendered cells carry
+  // percent signs, meters and pills, none of which sort correctly as strings.
+  function sortable(tableId, numericKeys) {{
+    var table = document.getElementById(tableId);
+    if (!table) {{ return; }}
+    var body = table.tBodies[0];
+
+    Array.prototype.forEach.call(table.querySelectorAll("th.sortable"), function (th) {{
+      th.setAttribute("tabindex", "0");
+      th.setAttribute("role", "button");
+
+      function activate() {{
+        var key = th.getAttribute("data-key");
+        var desc = th.getAttribute("aria-sort") !== "descending";
+        Array.prototype.forEach.call(table.querySelectorAll("th.sortable"), function (o) {{
+          o.removeAttribute("aria-sort");
+        }});
+        th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+        var rows = Array.prototype.slice.call(body.rows);
+        rows.sort(function (a, b) {{
+          var av = a.getAttribute("data-" + key), bv = b.getAttribute("data-" + key);
+          var cmp = numericKeys.indexOf(key) >= 0
+            ? parseFloat(av) - parseFloat(bv)
+            : String(av).localeCompare(String(bv));
+          return desc ? -cmp : cmp;
+        }});
+        rows.forEach(function (r) {{ body.appendChild(r); }});
+      }}
+
+      th.addEventListener("click", activate);
+      th.addEventListener("keydown", function (e) {{
+        if (e.key === "Enter" || e.key === " ") {{ e.preventDefault(); activate(); }}
+      }});
+    }});
+  }}
+
+  sortable("repo-table", ["tools", "covered", "uncovered", "pct"]);
+  sortable("cat-table", ["tools", "uncovered", "pct"]);
+
+  // Repository filters: free-text search plus two mutually independent toggles.
+  var search = document.getElementById("repo-search");
+  var chips = document.querySelectorAll(".filters .chip");
+  var repoBody = document.getElementById("repo-table").tBodies[0];
+  var count = document.getElementById("repo-count");
+  var scanFilter = "all", untestedOnly = false;
+
+  function applyFilters() {{
+    var q = (search.value || "").trim().toLowerCase();
+    var shown = 0, total = repoBody.rows.length;
+    Array.prototype.forEach.call(repoBody.rows, function (row) {{
+      var okName = !q || row.getAttribute("data-repo").indexOf(q) >= 0;
+      var okScan = scanFilter === "all" || row.getAttribute("data-scan") === scanFilter;
+      var okUnt = !untestedOnly || parseInt(row.getAttribute("data-uncovered"), 10) > 0;
+      var visible = okName && okScan && okUnt;
+      row.style.display = visible ? "" : "none";
+      if (visible) {{ shown += 1; }}
+    }});
+    count.textContent = shown === total
+      ? total + " repositories"
+      : shown + " of " + total + " repositories";
+  }}
+
+  Array.prototype.forEach.call(chips, function (chip) {{
+    chip.addEventListener("click", function () {{
+      if (chip.hasAttribute("data-scan")) {{
+        scanFilter = chip.getAttribute("data-scan");
+        Array.prototype.forEach.call(chips, function (c) {{
+          if (c.hasAttribute("data-scan")) {{
+            c.setAttribute("aria-pressed", String(c === chip));
+          }}
+        }});
+      }} else {{
+        untestedOnly = chip.getAttribute("aria-pressed") !== "true";
+        chip.setAttribute("aria-pressed", String(untestedOnly));
+      }}
+      applyFilters();
+    }});
+  }});
+
+  search.addEventListener("input", applyFilters);
+  applyFilters();
+}})();
+</script>
 
 </body>
 </html>

@@ -31,3 +31,4 @@ paper/*.fdb_latexmk
 paper/*.synctex.gz
 paper/*.pdf
 paper/*.tar.gz
+.gstack/

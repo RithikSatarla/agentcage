@@ -25,7 +25,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Study run 2026-08-04</p>
+    <p class="label">Study run 2026-08-04</p>
     <h1>Every number, and<br>where it came from.</h1>
     <p class="lede">158 write-capable tool definitions across
     13 repositories, screened from 45
@@ -59,31 +59,43 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>By repository</h2>
-      <p class="lede sub">A tool counts as covered if its identifier appears anywhere in
+      <p class="lede">A tool counts as covered if its identifier appears anywhere in
       that repository's test sources — no assertion, no execution required.</p>
     </div>
+    <div class="filters">
+      <input type="search" id="repo-search" placeholder="filter repositories…"
+             aria-label="Filter repositories by name">
+      <button class="chip" type="button" data-scan="all" aria-pressed="true">all scans</button>
+      <button class="chip" type="button" data-scan="full" aria-pressed="false">exhaustive only</button>
+      <button class="chip" type="button" data-untested="1" aria-pressed="false">has untested tools</button>
+      <span class="rowcount" id="repo-count"></span>
+    </div>
     <div class="scroll">
-      <table class="data">
+      <table class="data" id="repo-table">
         <thead>
-          <tr><th>Repository</th><th class="n">Tools</th><th class="n">Covered</th>
-              <th class="n">Uncov.</th><th class="n">Share</th><th>Split</th><th>Test scan</th></tr>
+          <tr><th class="sortable" data-key="repo">Repository</th>
+              <th class="n sortable" data-key="tools">Tools</th>
+              <th class="n sortable" data-key="covered">Covered</th>
+              <th class="n sortable" data-key="uncovered" aria-sort="descending">Uncov.</th>
+              <th class="n sortable" data-key="pct">Share</th>
+              <th>Split</th><th>Test scan</th></tr>
         </thead>
         <tbody>
-    <tr><td class="name">crewAIInc/crewAI</td><td class="n">32</td><td class="n">19</td><td class="n">13</td><td class="n">40.6%</td><td><span class="meter" role="img" aria-label="19 covered, 13 uncovered"><span class="cov" style="width:59.4%"></span><span class="unc" style="width:40.6%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">agno-agi/agno</td><td class="n">34</td><td class="n">23</td><td class="n">11</td><td class="n">32.4%</td><td><span class="meter" role="img" aria-label="23 covered, 11 uncovered"><span class="cov" style="width:67.6%"></span><span class="unc" style="width:32.4%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">TransformerOptimus/SuperAGI</td><td class="n">9</td><td class="n">6</td><td class="n">3</td><td class="n">33.3%</td><td><span class="meter" role="img" aria-label="6 covered, 3 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">Upsonic/Upsonic</td><td class="n">6</td><td class="n">4</td><td class="n">2</td><td class="n">33.3%</td><td><span class="meter" role="img" aria-label="4 covered, 2 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">camel-ai/camel</td><td class="n">30</td><td class="n">29</td><td class="n">1</td><td class="n">3.3%</td><td><span class="meter" role="img" aria-label="29 covered, 1 uncovered"><span class="cov" style="width:96.7%"></span><span class="unc" style="width:3.3%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">langchain-ai/langchain-community</td><td class="n">12</td><td class="n">11</td><td class="n">1</td><td class="n">8.3%</td><td><span class="meter" role="img" aria-label="11 covered, 1 uncovered"><span class="cov" style="width:91.7%"></span><span class="unc" style="width:8.3%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">aiwaves-cn/agents</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">100.0%</td><td><span class="meter" role="img" aria-label="0 covered, 1 uncovered"><span class="cov" style="width:0.0%"></span><span class="unc" style="width:100.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">run-llama/llama_index</td><td class="n">13</td><td class="n">13</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="13 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">geekan/MetaGPT</td><td class="n">13</td><td class="n">13</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="13 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">Significant-Gravitas/AutoGPT</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="3 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">griptape-ai/griptape</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="3 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
-    <tr><td class="name">microsoft/autogen</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="1 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
-    <tr><td class="name">openai/openai-agents-python</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="1 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="crewaiinc/crewai" data-scan="full" data-tools="32" data-covered="19" data-uncovered="13" data-pct="40.6"><td class="name">crewAIInc/crewAI</td><td class="n">32</td><td class="n">19</td><td class="n">13</td><td class="n">40.6%</td><td><span class="meter" role="img" aria-label="19 covered, 13 uncovered"><span class="cov" style="width:59.4%"></span><span class="unc" style="width:40.6%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="agno-agi/agno" data-scan="capped" data-tools="34" data-covered="23" data-uncovered="11" data-pct="32.4"><td class="name">agno-agi/agno</td><td class="n">34</td><td class="n">23</td><td class="n">11</td><td class="n">32.4%</td><td><span class="meter" role="img" aria-label="23 covered, 11 uncovered"><span class="cov" style="width:67.6%"></span><span class="unc" style="width:32.4%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="transformeroptimus/superagi" data-scan="full" data-tools="9" data-covered="6" data-uncovered="3" data-pct="33.3"><td class="name">TransformerOptimus/SuperAGI</td><td class="n">9</td><td class="n">6</td><td class="n">3</td><td class="n">33.3%</td><td><span class="meter" role="img" aria-label="6 covered, 3 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="upsonic/upsonic" data-scan="capped" data-tools="6" data-covered="4" data-uncovered="2" data-pct="33.3"><td class="name">Upsonic/Upsonic</td><td class="n">6</td><td class="n">4</td><td class="n">2</td><td class="n">33.3%</td><td><span class="meter" role="img" aria-label="4 covered, 2 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="camel-ai/camel" data-scan="full" data-tools="30" data-covered="29" data-uncovered="1" data-pct="3.3"><td class="name">camel-ai/camel</td><td class="n">30</td><td class="n">29</td><td class="n">1</td><td class="n">3.3%</td><td><span class="meter" role="img" aria-label="29 covered, 1 uncovered"><span class="cov" style="width:96.7%"></span><span class="unc" style="width:3.3%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="langchain-ai/langchain-community" data-scan="capped" data-tools="12" data-covered="11" data-uncovered="1" data-pct="8.3"><td class="name">langchain-ai/langchain-community</td><td class="n">12</td><td class="n">11</td><td class="n">1</td><td class="n">8.3%</td><td><span class="meter" role="img" aria-label="11 covered, 1 uncovered"><span class="cov" style="width:91.7%"></span><span class="unc" style="width:8.3%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="aiwaves-cn/agents" data-scan="full" data-tools="1" data-covered="0" data-uncovered="1" data-pct="100.0"><td class="name">aiwaves-cn/agents</td><td class="n">1</td><td class="n">0</td><td class="n">1</td><td class="n">100.0%</td><td><span class="meter" role="img" aria-label="0 covered, 1 uncovered"><span class="cov" style="width:0.0%"></span><span class="unc" style="width:100.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="run-llama/llama_index" data-scan="capped" data-tools="13" data-covered="13" data-uncovered="0" data-pct="0.0"><td class="name">run-llama/llama_index</td><td class="n">13</td><td class="n">13</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="13 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="geekan/metagpt" data-scan="full" data-tools="13" data-covered="13" data-uncovered="0" data-pct="0.0"><td class="name">geekan/MetaGPT</td><td class="n">13</td><td class="n">13</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="13 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="significant-gravitas/autogpt" data-scan="capped" data-tools="3" data-covered="3" data-uncovered="0" data-pct="0.0"><td class="name">Significant-Gravitas/AutoGPT</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="3 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="griptape-ai/griptape" data-scan="capped" data-tools="3" data-covered="3" data-uncovered="0" data-pct="0.0"><td class="name">griptape-ai/griptape</td><td class="n">3</td><td class="n">3</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="3 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill pending">capped</span></td></tr>
+    <tr data-repo="microsoft/autogen" data-scan="full" data-tools="1" data-covered="1" data-uncovered="0" data-pct="0.0"><td class="name">microsoft/autogen</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="1 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
+    <tr data-repo="openai/openai-agents-python" data-scan="full" data-tools="1" data-covered="1" data-uncovered="0" data-pct="0.0"><td class="name">openai/openai-agents-python</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">0.0%</td><td><span class="meter" role="img" aria-label="1 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td><td><span class="pill live">full</span></td></tr>
         </tbody>
         <tfoot>
           <tr><td>Total</td><td class="n">158</td>
@@ -103,27 +115,30 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>By kind of write operation</h2>
-      <p class="lede sub">Each tool carries the categories that qualified it. Categories
+      <p class="lede">Each tool carries the categories that qualified it. Categories
       overlap — a tool may match several — so the counts do not sum to
       158.</p>
     </div>
     <div class="scroll">
-      <table class="data">
+      <table class="data" id="cat-table">
         <thead>
-          <tr><th>Kind of write operation</th><th class="n">Tools</th><th class="n">Uncov.</th>
-              <th class="n">Share</th><th class="n">95% CI</th><th>Split</th></tr>
+          <tr><th class="sortable" data-key="label">Kind of write operation</th>
+              <th class="n sortable" data-key="tools">Tools</th>
+              <th class="n sortable" data-key="uncovered">Uncov.</th>
+              <th class="n sortable" data-key="pct" aria-sort="descending">Share</th>
+              <th class="n">95% CI</th><th>Split</th></tr>
         </thead>
         <tbody>
-    <tr><td>Version-control writes</td><td class="n">15</td><td class="n">7</td><td class="n">46.7%</td><td class="n">24.8–69.9%</td><td><span class="meter" role="img" aria-label="8 covered, 7 uncovered"><span class="cov" style="width:53.3%"></span><span class="unc" style="width:46.7%"></span></span></td></tr>
-    <tr><td>Cloud SDK writes</td><td class="n">5</td><td class="n">2</td><td class="n">40.0%</td><td class="n">11.8–76.9%</td><td><span class="meter" role="img" aria-label="3 covered, 2 uncovered"><span class="cov" style="width:60.0%"></span><span class="unc" style="width:40.0%"></span></span></td></tr>
-    <tr><td>Shell execution</td><td class="n">36</td><td class="n">12</td><td class="n">33.3%</td><td class="n">20.2–49.7%</td><td><span class="meter" role="img" aria-label="24 covered, 12 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td></tr>
-    <tr><td>Outbound messaging</td><td class="n">23</td><td class="n">7</td><td class="n">30.4%</td><td class="n">15.6–50.9%</td><td><span class="meter" role="img" aria-label="16 covered, 7 uncovered"><span class="cov" style="width:69.6%"></span><span class="unc" style="width:30.4%"></span></span></td></tr>
-    <tr><td>File open (write mode)</td><td class="n">32</td><td class="n">4</td><td class="n">12.5%</td><td class="n">5.0–28.1%</td><td><span class="meter" role="img" aria-label="28 covered, 4 uncovered"><span class="cov" style="width:87.5%"></span><span class="unc" style="width:12.5%"></span></span></td></tr>
-    <tr><td>Filesystem mutation</td><td class="n">57</td><td class="n">7</td><td class="n">12.3%</td><td class="n">6.1–23.2%</td><td><span class="meter" role="img" aria-label="50 covered, 7 uncovered"><span class="cov" style="width:87.7%"></span><span class="unc" style="width:12.3%"></span></span></td></tr>
-    <tr><td>Database / ORM writes</td><td class="n">18</td><td class="n">1</td><td class="n">5.6%</td><td class="n">1.0–25.8%</td><td><span class="meter" role="img" aria-label="17 covered, 1 uncovered"><span class="cov" style="width:94.4%"></span><span class="unc" style="width:5.6%"></span></span></td></tr>
-    <tr><td>HTTP PUT/PATCH/DELETE</td><td class="n">4</td><td class="n">0</td><td class="n">0.0%</td><td class="n">0.0–49.0%</td><td><span class="meter" role="img" aria-label="4 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td></tr>
+    <tr data-label="version-control writes" data-tools="15" data-uncovered="7" data-pct="46.7"><td>Version-control writes</td><td class="n">15</td><td class="n">7</td><td class="n">46.7%</td><td class="n">24.8–69.9%</td><td><span class="meter" role="img" aria-label="8 covered, 7 uncovered"><span class="cov" style="width:53.3%"></span><span class="unc" style="width:46.7%"></span></span></td></tr>
+    <tr data-label="cloud sdk writes" data-tools="5" data-uncovered="2" data-pct="40.0"><td>Cloud SDK writes</td><td class="n">5</td><td class="n">2</td><td class="n">40.0%</td><td class="n">11.8–76.9%</td><td><span class="meter" role="img" aria-label="3 covered, 2 uncovered"><span class="cov" style="width:60.0%"></span><span class="unc" style="width:40.0%"></span></span></td></tr>
+    <tr data-label="shell execution" data-tools="36" data-uncovered="12" data-pct="33.3"><td>Shell execution</td><td class="n">36</td><td class="n">12</td><td class="n">33.3%</td><td class="n">20.2–49.7%</td><td><span class="meter" role="img" aria-label="24 covered, 12 uncovered"><span class="cov" style="width:66.7%"></span><span class="unc" style="width:33.3%"></span></span></td></tr>
+    <tr data-label="outbound messaging" data-tools="23" data-uncovered="7" data-pct="30.4"><td>Outbound messaging</td><td class="n">23</td><td class="n">7</td><td class="n">30.4%</td><td class="n">15.6–50.9%</td><td><span class="meter" role="img" aria-label="16 covered, 7 uncovered"><span class="cov" style="width:69.6%"></span><span class="unc" style="width:30.4%"></span></span></td></tr>
+    <tr data-label="file open (write mode)" data-tools="32" data-uncovered="4" data-pct="12.5"><td>File open (write mode)</td><td class="n">32</td><td class="n">4</td><td class="n">12.5%</td><td class="n">5.0–28.1%</td><td><span class="meter" role="img" aria-label="28 covered, 4 uncovered"><span class="cov" style="width:87.5%"></span><span class="unc" style="width:12.5%"></span></span></td></tr>
+    <tr data-label="filesystem mutation" data-tools="57" data-uncovered="7" data-pct="12.3"><td>Filesystem mutation</td><td class="n">57</td><td class="n">7</td><td class="n">12.3%</td><td class="n">6.1–23.2%</td><td><span class="meter" role="img" aria-label="50 covered, 7 uncovered"><span class="cov" style="width:87.7%"></span><span class="unc" style="width:12.3%"></span></span></td></tr>
+    <tr data-label="database / orm writes" data-tools="18" data-uncovered="1" data-pct="5.6"><td>Database / ORM writes</td><td class="n">18</td><td class="n">1</td><td class="n">5.6%</td><td class="n">1.0–25.8%</td><td><span class="meter" role="img" aria-label="17 covered, 1 uncovered"><span class="cov" style="width:94.4%"></span><span class="unc" style="width:5.6%"></span></span></td></tr>
+    <tr data-label="http put/patch/delete" data-tools="4" data-uncovered="0" data-pct="0.0"><td>HTTP PUT/PATCH/DELETE</td><td class="n">4</td><td class="n">0</td><td class="n">0.0%</td><td class="n">0.0–49.0%</td><td><span class="meter" role="img" aria-label="4 covered, 0 uncovered"><span class="cov" style="width:100.0%"></span><span class="unc" style="width:0.0%"></span></span></td></tr>
         </tbody>
       </table>
     </div>
@@ -147,7 +162,7 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>What screened out, and why it matters</h2>
     </div>
     <p>A repository enters the analysed set only if the detectors find at least one
@@ -166,7 +181,7 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head"><h2>Reproduce it</h2></div>
+    <div class="head"><h2>Reproduce it</h2></div>
 <pre><code>git clone https://github.com/RithikSatarla/agentcage.git
 cd agentcage &amp;&amp; pip install -e ".[dev]"
 
@@ -186,10 +201,99 @@ pytest tests/                 # full suite, no network</code></pre>
   <div class="wrap">
     <p>MIT licensed ·
     <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a><br>
-    Generated by <code>website/make_data_page.py</code>. Part A is exploratory; Part B is
+    Generated by <code>tools/make_data_page.py</code>. Part A is exploratory; Part B is
     pre-registered and has not been run.</p>
   </div>
 </footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Sorting reads data-* attributes rather than cell text: the rendered cells carry
+  // percent signs, meters and pills, none of which sort correctly as strings.
+  function sortable(tableId, numericKeys) {
+    var table = document.getElementById(tableId);
+    if (!table) { return; }
+    var body = table.tBodies[0];
+
+    Array.prototype.forEach.call(table.querySelectorAll("th.sortable"), function (th) {
+      th.setAttribute("tabindex", "0");
+      th.setAttribute("role", "button");
+
+      function activate() {
+        var key = th.getAttribute("data-key");
+        var desc = th.getAttribute("aria-sort") !== "descending";
+        Array.prototype.forEach.call(table.querySelectorAll("th.sortable"), function (o) {
+          o.removeAttribute("aria-sort");
+        });
+        th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+        var rows = Array.prototype.slice.call(body.rows);
+        rows.sort(function (a, b) {
+          var av = a.getAttribute("data-" + key), bv = b.getAttribute("data-" + key);
+          var cmp = numericKeys.indexOf(key) >= 0
+            ? parseFloat(av) - parseFloat(bv)
+            : String(av).localeCompare(String(bv));
+          return desc ? -cmp : cmp;
+        });
+        rows.forEach(function (r) { body.appendChild(r); });
+      }
+
+      th.addEventListener("click", activate);
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
+      });
+    });
+  }
+
+  sortable("repo-table", ["tools", "covered", "uncovered", "pct"]);
+  sortable("cat-table", ["tools", "uncovered", "pct"]);
+
+  // Repository filters: free-text search plus two mutually independent toggles.
+  var search = document.getElementById("repo-search");
+  var chips = document.querySelectorAll(".filters .chip");
+  var repoBody = document.getElementById("repo-table").tBodies[0];
+  var count = document.getElementById("repo-count");
+  var scanFilter = "all", untestedOnly = false;
+
+  function applyFilters() {
+    var q = (search.value || "").trim().toLowerCase();
+    var shown = 0, total = repoBody.rows.length;
+    Array.prototype.forEach.call(repoBody.rows, function (row) {
+      var okName = !q || row.getAttribute("data-repo").indexOf(q) >= 0;
+      var okScan = scanFilter === "all" || row.getAttribute("data-scan") === scanFilter;
+      var okUnt = !untestedOnly || parseInt(row.getAttribute("data-uncovered"), 10) > 0;
+      var visible = okName && okScan && okUnt;
+      row.style.display = visible ? "" : "none";
+      if (visible) { shown += 1; }
+    });
+    count.textContent = shown === total
+      ? total + " repositories"
+      : shown + " of " + total + " repositories";
+  }
+
+  Array.prototype.forEach.call(chips, function (chip) {
+    chip.addEventListener("click", function () {
+      if (chip.hasAttribute("data-scan")) {
+        scanFilter = chip.getAttribute("data-scan");
+        Array.prototype.forEach.call(chips, function (c) {
+          if (c.hasAttribute("data-scan")) {
+            c.setAttribute("aria-pressed", String(c === chip));
+          }
+        });
+      } else {
+        untestedOnly = chip.getAttribute("aria-pressed") !== "true";
+        chip.setAttribute("aria-pressed", String(untestedOnly));
+      }
+      applyFilters();
+    });
+  });
+
+  search.addEventListener("input", applyFilters);
+  applyFilters();
+})();
+</script>
 
 </body>
 </html>

@@ -22,7 +22,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Reference</p>
+    <p class="label">Reference</p>
     <h1>State, not recordings.</h1>
     <p class="lede">A model where writes mutate state and later reads observe the
     mutation. Deterministic identifiers, an injectable clock, and the real error codes —
@@ -36,15 +36,15 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>Two halves</h2>
-      <p class="lede sub">A passive capture layer, and a model to replay against.</p>
+      <p class="lede">A passive capture layer, and a model to replay against.</p>
     </div>
 
     <div class="split">
       <div class="panel">
         <div class="panel-head"><span>part_b/interceptor.py</span>
-          <span class="state"><span class="pill live">passive</span></span></div>
+          <span><span class="pill live">passive</span></span></div>
         <div class="panel-body">
           <p style="margin-top:0">Attaches through each HTTP library's own documented hook
           points — <code>httpx</code> event hooks, <code>requests</code> response hooks. It
@@ -52,7 +52,7 @@
           <p>It <strong>never</strong> rewrites a request, injects a response, or
           short-circuits the transport. A test asserts the caller receives exactly what the
           transport returned, byte for byte.</p>
-          <p class="sub" style="margin-bottom:0">Credential headers are replaced with
+          <p class="caption" style="margin-bottom:0">Credential headers are replaced with
           <code>&lt;redacted&gt;</code> at capture time, which is what makes traces safe to
           commit.</p>
         </div>
@@ -60,14 +60,14 @@
 
       <div class="panel">
         <div class="panel-head"><span>part_b/stripe_mock.py</span>
-          <span class="state"><span class="pill live">stateful</span></span></div>
+          <span><span class="pill live">stateful</span></span></div>
         <div class="panel-body">
           <p style="margin-top:0">An in-memory model of the money-moving subset of the
           Stripe API. Not a fixture: a refund increases
           <code>charge.amount_refunded</code>, and a later <code>GET</code> observes it.</p>
           <p>Identifiers come from a counter (<code>ch_00000001</code>) and the clock is
           injectable, so a run is byte-for-byte reproducible.</p>
-          <p class="sub" style="margin-bottom:0">Errors carry the real HTTP status, error
+          <p class="caption" style="margin-bottom:0">Errors carry the real HTTP status, error
           code and message, returned in Stripe's error envelope.</p>
         </div>
       </div>
@@ -77,9 +77,9 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>Entities</h2>
-      <p class="lede sub">Real field definitions, validated with pydantic — not stubs.</p>
+      <p class="lede">Real field definitions, validated with pydantic — not stubs.</p>
     </div>
 
     <div class="cols">
@@ -128,9 +128,9 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>Endpoints and rules</h2>
-      <p class="lede sub">Every rule below is enforced by the model and asserted by the
+      <p class="lede">Every rule below is enforced by the model and asserted by the
       test suite.</p>
     </div>
 
@@ -199,9 +199,9 @@ stripe.get_charge(c).amount_refunded   # 2000, not 4000
 
 <section>
   <div class="wrap">
-    <div class="section-head">
+    <div class="head">
       <h2>The fidelity boundary</h2>
-      <p class="lede sub">A mock's silent divergence from the real API is itself a source
+      <p class="lede">A mock's silent divergence from the real API is itself a source
       of false confidence, so the boundary is stated rather than discovered.</p>
     </div>
     <div class="note">
@@ -219,7 +219,7 @@ stripe.get_charge(c).amount_refunded   # 2000, not 4000
 
 <section>
   <div class="wrap">
-    <div class="section-head"><h2>Roadmap</h2></div>
+    <div class="head"><h2>Roadmap</h2></div>
     <div class="scroll">
       <table class="data">
         <thead><tr><th>Model</th><th>Status</th><th>Why it matters</th></tr></thead>

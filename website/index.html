@@ -7,14 +7,20 @@
 <meta name="description" content="Test AI agents without hitting real APIs. A stateful mock that remembers, so a double refund fails your test instead of your customer.">
 <meta property="og:title" content="AgentCage">
 <meta property="og:description" content="Test AI agents without hitting real APIs.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://agentcage.vercel.app/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e27'/%3E%3Cpath d='M9 10v12M16 10v12M23 10v12' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M6 16h20' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="home.css">
 </head>
 <body>
 
+<a class="skip" href="#main">Skip to content</a>
+
 <!-- Nav -->
 <nav class="nav">
   <div class="nav-inner">
-    <a class="brand" href="/">AgentCage</a>
+    <a class="brand" href="/" aria-current="page">AgentCage</a>
     <a class="link" href="/manifesto">Manifesto</a>
     <a class="link" href="/models">Models</a>
     <a class="link" href="/data">Data</a>
@@ -23,7 +29,7 @@
 </nav>
 
 <!-- Hero -->
-<header class="hero">
+<header class="hero" id="main">
   <div class="wrap">
     <h1>AgentCage</h1>
     <h2>Test AI agents without hitting real APIs.</h2>
@@ -110,8 +116,8 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
 <section>
   <div class="wrap">
     <div class="statbox">
-      <p class="stat">20.3% of write-capable agent tools have zero test
-      coverage.</p>
+      <p class="stat"><span class="figure">20.3%</span> of write-capable agent tools have
+      zero test coverage.</p>
       <p>That&rsquo;s 32 of 158 tools across 13 open-source projects with real API access
       and no safety tests.</p>
       <p>AgentCage fixes that.</p>

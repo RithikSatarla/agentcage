@@ -207,10 +207,33 @@ section.flush { border-top: 0; }
   transition: opacity .3s ease, transform .3s ease;
 }
 .steps li.in { opacity: 1; transform: none; }
+/* decimal-leading-zero, not a literal "0" prefix: step 10 must read 10, not 010. */
 .steps li::before {
-  content: "0" counter(s); position: absolute; left: 0; color: var(--line-2); font-size: .72rem;
+  content: counter(s, decimal-leading-zero);
+  position: absolute; left: 0; color: var(--line-2); font-size: .72rem;
 }
 .steps li.punch { color: var(--ink); font-weight: 600; }
+.steps li.verdict {
+  margin-top: .5rem; padding-top: .75rem; border-top: 1px solid var(--line);
+  color: var(--pass); font-weight: 600;
+}
+.steps li.verdict.fail { color: var(--fail); }
+.steps li.verdict::before { content: ""; }
+
+/* ---------- numbered explainer ---------- */
+.explain { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1px;
+  background: var(--line); border: 1px solid var(--line); }
+.explain > div { background: var(--bg); padding: 1.4rem 1.3rem; }
+.explain .num {
+  font-family: var(--sans); font-size: 1.5rem; font-weight: 700; letter-spacing: -.04em;
+  color: var(--line-2); line-height: 1; margin-bottom: .7rem;
+}
+.explain h3 { margin-bottom: .5rem; }
+.explain p { font-size: .82rem; color: var(--muted); margin: 0 0 .9rem; line-height: 1.75; }
+.explain .wire {
+  display: block; font-size: .72rem; color: var(--accent); background: var(--bg-2);
+  border: 1px solid var(--line); padding: .5rem .6rem; overflow-x: auto; white-space: pre;
+}
 @media (prefers-reduced-motion: reduce) {
   .steps li { opacity: 1; transform: none; transition: none; }
 }

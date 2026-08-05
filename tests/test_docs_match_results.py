@@ -186,14 +186,22 @@ def test_website_figures_exist_in_both_themes():
             assert f'src="figures/{name}_{mode}.svg"' in WEBSITE
 
 
-def test_every_page_shares_the_stylesheet_and_nav():
-    pages = sorted((ROOT / "website").glob("*.html"))
-    assert len(pages) == 4, [p.name for p in pages]
-    for page in pages:
-        text = page.read_text(encoding="utf-8")
-        assert '<link rel="stylesheet" href="styles.css">' in text, page.name
-        for target in ("/paper", "/models", "/data"):
-            assert f'href="{target}"' in text, f"{page.name} missing nav link {target}"
+#: Every page must exist and be reachable from every other page's nav.
+SITE_PAGES = {"index.html", "manifesto.html", "paper.html", "models.html", "data.html"}
+NAV_TARGETS = ("/", "/manifesto", "/paper", "/models", "/data")
+
+
+def test_site_has_exactly_the_expected_pages():
+    found = {p.name for p in (ROOT / "website").glob("*.html")}
+    assert found == SITE_PAGES, f"unexpected page set: {sorted(found)}"
+
+
+@pytest.mark.parametrize("page", sorted(SITE_PAGES))
+def test_every_page_shares_the_stylesheet_and_nav(page):
+    text = (ROOT / "website" / page).read_text(encoding="utf-8")
+    assert '<link rel="stylesheet" href="styles.css">' in text, page
+    for target in NAV_TARGETS:
+        assert f'href="{target}"' in text, f"{page} cannot reach {target}"
 
 
 def test_quoted_test_counts_agree_across_documents():

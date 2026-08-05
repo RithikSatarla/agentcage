@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manifesto — AgentCage</title>
+<meta name="description" content="We gave agents write credentials before we gave them tests. We measured it: 20.3% of write-capable agent tools are never referenced by any test.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">AgentCage</a>
+    <a class="link" href="/">Overview</a>
+    <a class="link" href="/manifesto" aria-current="page">Manifesto</a>
+    <a class="link" href="/paper">Paper</a>
+    <a class="link" href="/models">Models</a>
+    <a class="link" href="/data">Data</a>
+    <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="label">Manifesto</p>
+    <h1>We handed agents the<br>credit card first.<br>
+    <span class="soft">The tests came never.</span></h1>
+    <p class="lede">An agent with tool access is a program that spends money, deletes
+    records and pushes code. The industry tests those programs by recording one reply and
+    playing it back forever. That is not a gap in coverage. It is a category error.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <h2>A fixture cannot hold a consequence</h2>
+        <p>Read paths and write paths fail differently. A read that returns the wrong
+        document is wrong once. A write applied twice is wrong forever, and no amount of
+        asserting on the response body will find it — because both responses are
+        identical.</p>
+        <p>Every agent framework now ships tools that commit to git, delete cloud objects,
+        run shell commands, execute SQL and move money. The testing practice they inherited
+        came from HTTP clients that mostly fetched things.</p>
+      </div>
+      <div>
+        <h2>So we went and counted</h2>
+        <p>Rather than assert that this is a problem, we measured it. We read 45
+        open-source agent repositories, mechanically extracted every framework-idiomatic
+        tool definition, and kept the ones whose bodies actually mutate something.</p>
+        <p>Then we checked, tool by tool, whether any test in that project so much as names
+        it. Not exercises it. <em>Names</em> it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="label">The evidence</p>
+    <h2 style="margin-bottom:1.2rem">We measured the problem first.</h2>
+    <p class="lede">158 write-capable tool definitions across 13 repositories, screened
+    from 45 candidates. Wilson intervals throughout. The study runs on your machine in four
+    minutes with no credentials, and re-runs itself weekly in CI.</p>
+    <div class="actions" style="margin-bottom:3rem">
+      <a class="btn solid" href="/paper">Read the paper</a>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/part_a/results.json">results.json</a>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Method</a>
+    </div>
+
+    <div class="explain">
+      <div>
+        <div class="num" style="color:var(--fail)">20.3%</div>
+        <h3>never referenced by any test</h3>
+        <p>32 of 158 write-capable tool definitions. 95% Wilson interval 14.7–27.2%.
+        Restricted to repositories whose entire suite we read, 20.7%.</p>
+      </div>
+      <div>
+        <div class="num" style="color:var(--fail)">46.7%</div>
+        <h3>of version-control writes</h3>
+        <p>Tools that open pull requests, push commits and write files into a repository.
+        The least covered category we found. 15 tools, CI 24.8–69.9%.</p>
+      </div>
+      <div>
+        <div class="num" style="color:var(--fail)">33.3%</div>
+        <h3>of shell execution tools</h3>
+        <p>36 tools. The category with the least bounded blast radius — a shell tool can
+        produce every other category's effects — and a third go untested.</p>
+      </div>
+      <div>
+        <div class="num">84.4%</div>
+        <h3>of untested tools sit in 3 repos</h3>
+        <p>The gap concentrates in large tool catalogues rather than spreading evenly. We
+        report this because it qualifies the headline rather than flattering it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="label">From the paper</p>
+    <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1.4rem">
+      <h2 style="margin:0">Coverage is not uniform</h2>
+      <span class="dim" id="fig-counter" style="font-size:.78rem">1 / 2</span>
+      <span class="controls" style="margin-left:auto">
+        <button type="button" id="fig-prev" aria-label="Previous figure">←</button>
+        <button type="button" id="fig-next" aria-label="Next figure">→</button>
+      </span>
+    </div>
+
+    <figure class="chart" id="fig-0">
+      <img class="fig-light" src="figures/fig_category_light.svg"
+           alt="Test coverage by kind of write operation. Version-control writes 47% uncovered of 15 tools; cloud SDK writes 40% of 5; shell execution 33% of 36; outbound messaging 30% of 23; file open in write mode 12% of 32; filesystem mutation 12% of 57; database and ORM writes 6% of 18.">
+      <img class="fig-dark" src="figures/fig_category_dark.svg" alt="" aria-hidden="true">
+    </figure>
+    <figure class="chart" id="fig-1" hidden>
+      <img class="fig-light" src="figures/fig_repos_light.svg"
+           alt="Write-capable tool definitions per repository, split by whether each is referenced by a test.">
+      <img class="fig-dark" src="figures/fig_repos_dark.svg" alt="" aria-hidden="true">
+    </figure>
+
+    <p class="caption" id="fig-caption">Figure 1: coverage by kind of write operation. The
+    categories with the least bounded consequences are the least covered. Intervals are
+    wide and overlap; the claim is only that the extremes separate.</p>
+
+    <p class="caption">Both figures are generated from
+    <code>part_a/results.json</code> by <code>part_a/analyze.py</code>. Full method in the
+    <a href="/paper">paper</a>; every row behind them is on the <a href="/data">data
+    page</a>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <h2>AgentCage is the harness the data calls for</h2>
+        <p>Not another recording. A model that holds state, so a second refund meets the
+        first one, and a test can finally fail on it.</p>
+        <p>Passive capture that never alters a request. Real error codes and messages.
+        Deterministic identifiers and an injectable clock, so a failure is a failure every
+        time. MIT licensed, so it keeps working if we disappear.</p>
+        <div class="actions">
+          <a class="btn solid" href="/#demo">Watch the demo</a>
+          <a class="btn" href="/models">What it models</a>
+        </div>
+      </div>
+      <div>
+        <div class="note"><strong>What we have not shown.</strong> The follow-up study —
+        whether this catches defects in real agents that pass their own suites — is
+        pre-registered with a hypothesis, four defect classes, a 20% falsification
+        threshold and a 50% kill criterion. It <strong>has not been run</strong>. We claim
+        no number for it, and this page will not carry one until there is a result to
+        report, including if that result kills the idea.</div>
+        <div class="note"><strong>And the honest limit of the study.</strong> 32 of 45
+        candidates screened out because our detectors only find framework-idiomatic tool
+        definitions. Agents with bespoke architectures write to disk constantly and are
+        invisible to us. The denominator of 13 says as much about our detectors as about
+        the ecosystem.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <p class="label">Design partners</p>
+      <h2>Which API scares you?</h2>
+      <p class="lede">Stripe is the first one modelled. The next one should be chosen by a
+      team with a real agent in production, not guessed at by us.</p>
+    </div>
+    <div class="actions">
+      <a class="btn solid" href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Get in touch</a>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>MIT licensed ·
+    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
+    · <a href="/data">Data</a> · <a href="/paper">Paper</a> · <a href="/models">Models</a><br>
+    Part A is exploratory; Part B is pre-registered and has not been run.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var CAPTIONS = [
+    "Figure 1: coverage by kind of write operation. The categories with the least bounded " +
+    "consequences are the least covered. Intervals are wide and overlap; the claim is only " +
+    "that the extremes separate.",
+    "Figure 2: write-capable tools per repository, split by coverage. 84.4% of untested " +
+    "tools sit in three repositories, each shipping a large tool catalogue."
+  ];
+  var i = 0, n = CAPTIONS.length;
+
+  function show(next) {
+    i = (next + n) % n;
+    for (var k = 0; k < n; k++) {
+      document.getElementById("fig-" + k).hidden = (k !== i);
+    }
+    document.getElementById("fig-caption").textContent = CAPTIONS[i];
+    document.getElementById("fig-counter").textContent = (i + 1) + " / " + n;
+  }
+
+  document.getElementById("fig-prev").addEventListener("click", function () { show(i - 1); });
+  document.getElementById("fig-next").addEventListener("click", function () { show(i + 1); });
+  show(0);
+})();
+</script>
+</body>
+</html>

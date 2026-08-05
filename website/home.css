@@ -13,9 +13,15 @@
   --warning: #ff6b6b;
   --border:  #333333;
 
-  --sans: Inter, Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+  /* Space Grotesk over Inter: the audit flags Inter as the default AI choice, and a
+     geometric grotesque carries more character at display sizes. JetBrains Mono for
+     code because it was drawn for terminals. Both load with display=swap and fall back
+     to the system stack, so the page is readable before the webfont arrives — and stays
+     readable anywhere the font request is blocked. */
+  --sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
           Helvetica, Arial, sans-serif;
-  --mono: Monaco, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          Monaco, monospace;
 }
 
 * { box-sizing: border-box; }

@@ -196,6 +196,27 @@ talking to a model that keeps state, with every write attempt on the record. Tha
 in [tests/test_interceptor.py](tests/test_interceptor.py) — the agent tries the refund
 twice, is refused the second time, and the customer is paid once.
 
+## See it fail
+
+```bash
+python -m part_b.demo_fixture_vs_model
+```
+
+One agent, handed an `httpx.Client` and unable to tell what is behind it, run twice: once
+against a fixture recorded from a correct run, once against the stateful model. It
+charges, refunds, loses the response, retries the refund, and reads the charge back.
+
+The fixture accepts both refunds. The model refuses the second. The part worth noticing
+is what happens next: **both runs read the charge back as `amount_refunded=5000`**,
+because the fixture replays state recorded before the retry existed. A test asserting the
+final amount passes against both. Only an assertion on how many refunds were *accepted*
+separates them.
+
+[part_b/replay_fixture.py](part_b/replay_fixture.py) is deliberately a fair opponent. It
+records real responses, replays multiple recordings of a route in order, and raises on a
+route it never saw, which is what `responses`, `vcrpy` and `betamax` do. It still loses,
+because a recording is a photograph of one moment.
+
 ## Waiting list
 
 The site has a signup form backed by [api/waitlist.py](api/waitlist.py), a Vercel

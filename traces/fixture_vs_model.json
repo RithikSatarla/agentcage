@@ -1,0 +1,73 @@
+{
+  "kind": "demonstration",
+  "not_a_measurement": "This exercises code written in this repository against a scenario chosen in this repository. It shows a mechanism; it does not estimate how often real agents hit it. The measured study is part_b/partb_results.json.",
+  "scenario": "refund, lose the response, retry the refund, read the charge back",
+  "finding": "Both backends return the same amount_refunded on the read-back, because the fixture replays state recorded before the retry existed. An assertion on final state passes against both; only an assertion on how many refunds were accepted separates them.",
+  "against_recorded_fixture": {
+    "steps": [
+      {
+        "step": "create charge",
+        "method": "POST",
+        "path": "/v1/charges",
+        "status": 200
+      },
+      {
+        "step": "refund",
+        "method": "POST",
+        "path": "/v1/refunds",
+        "status": 200
+      },
+      {
+        "step": "refund again",
+        "method": "POST",
+        "path": "/v1/refunds",
+        "status": 200
+      },
+      {
+        "step": "read the charge back",
+        "method": "GET",
+        "path": "/v1/charges/ch_00000001",
+        "status": 200
+      }
+    ],
+    "refunds_the_agent_believes_succeeded": 2,
+    "amount_refunded_the_agent_reads_back": 5000,
+    "charge_amount": 5000
+  },
+  "against_stateful_model": {
+    "steps": [
+      {
+        "step": "create charge",
+        "method": "POST",
+        "path": "/v1/charges",
+        "status": 200
+      },
+      {
+        "step": "refund",
+        "method": "POST",
+        "path": "/v1/refunds",
+        "status": 200
+      },
+      {
+        "step": "refund again",
+        "method": "POST",
+        "path": "/v1/refunds",
+        "status": 400
+      },
+      {
+        "step": "read the charge back",
+        "method": "GET",
+        "path": "/v1/charges/ch_00000001",
+        "status": 200
+      }
+    ],
+    "refunds_the_agent_believes_succeeded": 1,
+    "amount_refunded_the_agent_reads_back": 5000,
+    "charge_amount": 5000
+  },
+  "model_final_state": {
+    "charge": "ch_00000001",
+    "amount": 5000,
+    "amount_refunded": 5000
+  }
+}

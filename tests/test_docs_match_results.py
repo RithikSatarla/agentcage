@@ -196,6 +196,59 @@ def test_site_has_exactly_the_expected_pages():
     assert found == SITE_PAGES, f"unexpected page set: {sorted(found)}"
 
 
+def _site_links():
+    """(source page, href) for every non-external, non-mailto link on the site."""
+    for page in sorted(SITE_PAGES):
+        text = (ROOT / "website" / page).read_text(encoding="utf-8")
+        for href in re.findall(r'href="([^"]+)"', text):
+            if href.startswith(("http://", "https://", "mailto:")):
+                continue
+            yield page, href
+
+
+def _route_to_file(route: str) -> str:
+    """Map a cleanUrls route to the file Vercel serves for it."""
+    route = route.split("#")[0]
+    if route in ("", "/"):
+        return "index.html"
+    return route.lstrip("/") + ("" if route.endswith(".html") else ".html")
+
+
+def test_no_internal_link_is_dead():
+    """Catches routes that point at a page which does not exist."""
+    for page, href in _site_links():
+        if href.startswith("#") or not href.startswith("/"):
+            continue
+        target = _route_to_file(href)
+        assert (ROOT / "website" / target).exists(), f"{page} links to missing {href}"
+
+
+def test_no_anchor_link_is_dead():
+    """Catches #fragments pointing at an id that no longer exists.
+
+    This is how /models ended up linking to /#try after the landing page's demo
+    section was renamed to #demo.
+    """
+    for page, href in _site_links():
+        if "#" not in href:
+            continue
+        target_file = "index.html" if href.startswith("#") else _route_to_file(href)
+        anchor = href.split("#", 1)[1]
+        if not anchor:
+            continue
+        text = (ROOT / "website" / target_file).read_text(encoding="utf-8")
+        assert f'id="{anchor}"' in text, f"{page} links to #{anchor}, absent from {target_file}"
+
+
+def test_every_asset_reference_exists():
+    for page in sorted(SITE_PAGES):
+        text = (ROOT / "website" / page).read_text(encoding="utf-8")
+        for src in re.findall(r'(?:src|data)="([^"]+)"', text):
+            if src.startswith(("http://", "https://", "data:")):
+                continue
+            assert (ROOT / "website" / src).exists(), f"{page} references missing {src}"
+
+
 @pytest.mark.parametrize("page", sorted(SITE_PAGES))
 def test_every_page_shares_the_stylesheet_and_nav(page):
     text = (ROOT / "website" / page).read_text(encoding="utf-8")

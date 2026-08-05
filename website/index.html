@@ -217,15 +217,23 @@
     var target = parseFloat(el.getAttribute("data-count"));
     var suffix = el.getAttribute("data-suffix") || "";
     var decimals = (el.getAttribute("data-count").split(".")[1] || "").length;
-    if (reduce) { el.textContent = target.toFixed(decimals) + suffix; return; }
-    var start = null;
+    var exact = target.toFixed(decimals) + suffix;
+    if (reduce) { el.textContent = exact; return; }
+
+    var DUR = 700, start = null;
     function frame(ts) {
       if (start === null) { start = ts; }
-      var t = Math.min(1, (ts - start) / 900);
+      var t = Math.min(1, (ts - start) / DUR);
       el.textContent = (target * (1 - Math.pow(1 - t, 3))).toFixed(decimals) + suffix;
       if (t < 1) { window.requestAnimationFrame(frame); }
+      else { el.textContent = exact; }
     }
     window.requestAnimationFrame(frame);
+
+    // These numbers are the page's whole credibility, and a mid-flight frame reads
+    // 20.2% instead of 20.3%. rAF stalls in background tabs, so snap to the exact
+    // value unconditionally once the animation should have finished.
+    window.setTimeout(function () { el.textContent = exact; }, DUR + 120);
   }
   var counted = false, statsEl = document.querySelector(".stats");
   function maybeCount() {

@@ -19,8 +19,8 @@ import pytest
 
 requests = pytest.importorskip("requests")
 
-from part_b.redirect import Redirect, _origin, redirect      # noqa: E402
-from part_b.server import ModelServer                        # noqa: E402
+from part_b.redirect import Redirect, _origin, redirect  # noqa: E402
+from part_b.server import ModelServer  # noqa: E402
 
 
 class Recorder:

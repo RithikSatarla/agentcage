@@ -24,9 +24,9 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "part_b" / ".agents" / "camel"))
 
-from part_b.github_mock import GitHubMock      # noqa: E402
-from part_b.redirect import redirect           # noqa: E402
-from part_b.server import ModelServer          # noqa: E402
+from part_b.github_mock import GitHubMock  # noqa: E402
+from part_b.redirect import redirect  # noqa: E402
+from part_b.server import ModelServer  # noqa: E402
 
 AGENT = "camel-ai/camel"
 TOOL = "GithubToolkit"

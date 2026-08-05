@@ -390,7 +390,7 @@ def main(argv: List[str]) -> int:
           f"least one class-1-4 defect")
     print(f"  H1 {'supported' if p['h1_supported'] else 'NOT supported'} "
           f"(threshold {p['falsification_threshold']:.0%})")
-    print(f"tiers: " + "  ".join(f"{k}={v}" for k, v in s["tiers"].items()))
+    print("tiers: " + "  ".join(f"{k}={v}" for k, v in s["tiers"].items()))
     print(f"miss rate: {s['miss_rate']:.1%} of {s['requests_graded']} requests")
     print(f"  MODELABLE={s['miss_classes']['MODELABLE']}  "
           f"PRODUCTION-STATE-DEPENDENT="

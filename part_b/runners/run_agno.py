@@ -16,8 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-from part_b.jira_mock import JiraMock          # noqa: E402
-from part_b.server import ModelServer          # noqa: E402
+from part_b.jira_mock import JiraMock  # noqa: E402
+from part_b.server import ModelServer  # noqa: E402
 
 AGENT = "agno-agi/agno"
 TOOL = "JiraTools"

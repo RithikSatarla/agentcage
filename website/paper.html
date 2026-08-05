@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper — AgentCage</title>
+<meta name="description" content="Untested by Construction: Test Coverage of Write-Capable Tools in Open-Source LLM Agents. Twelve pages, readable in the browser.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">AgentCage</a>
+    <a class="link" href="/">Overview</a>
+    <a class="link" href="/paper" aria-current="page">Paper</a>
+    <a class="link" href="/models">Models</a>
+    <a class="link" href="/data">Data</a>
+    <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+  </div>
+</nav>
+
+<div class="page wide">
+
+<header class="hero">
+  <p class="eyebrow">Preprint · not yet submitted</p>
+  <h1>Untested by Construction</h1>
+  <p class="lede">Test Coverage of Write-Capable Tools in Open-Source LLM Agents.<br>
+  Rithik Satarla · 12 pages</p>
+  <div class="actions">
+    <a class="btn solid" href="agentcage-paper.pdf">Download PDF</a>
+    <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/paper/agentcage_arxiv.tex">LaTeX source</a>
+    <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Full protocol</a>
+  </div>
+</header>
+
+<section>
+  <h2>Abstract</h2>
+  <p>Large language model agents increasingly hold credentials for systems that change
+  state: they issue refunds, delete records, push branches, and send mail. The dominant
+  way to test such an agent is to record an HTTP response and replay it. A replay
+  fixture, however, has no state, and so it cannot express the failure mode specific to
+  write operations — an operation applied twice, or applied when it should have been
+  refused. An agent that retries a refund it already completed passes a fixture-based
+  suite and double-refunds in production.</p>
+
+  <p>We ask how much of the open-source agent ecosystem tests its write paths at all. We
+  screened 45 Python-primary agent repositories, mechanically extracted
+  framework-idiomatic tool definitions, and retained the 158 definitions whose bodies
+  perform a detectable state mutation across the 13 repositories that had any. Using a
+  deliberately generous coverage criterion — a tool is covered if its identifier appears
+  anywhere in the repository's test sources, with no assertion or execution required — we
+  find that <strong>20.3% of write-capable tool definitions (32 of 158) are never
+  referenced by any test</strong>. Restricting to the 7 repositories whose entire test
+  suite was read gives 20.7%, so the estimate does not depend on sampling. Because the
+  criterion is an upper bound on real coverage, 20.3% is a lower bound on what goes
+  untested.</p>
+
+  <p>We then describe AgentCage, a stateful alternative: a passive HTTP interceptor plus
+  an in-memory API model in which writes mutate state and subsequent reads observe the
+  mutation. We pre-register an evaluation of whether this surfaces defects that replay
+  fixtures cannot. All code, data, and the detector revision history are public.</p>
+</section>
+
+<section>
+  <h2>Read it here</h2>
+  <object class="pdf-frame" data="agentcage-paper.pdf" type="application/pdf">
+    <p style="padding:1.2rem">Your browser will not display the PDF inline.
+    <a href="agentcage-paper.pdf">Download it instead</a>.</p>
+  </object>
+  <p class="caption">Compiled from
+  <a href="https://github.com/RithikSatarla/agentcage/blob/main/paper/agentcage_arxiv.tex"><code>paper/agentcage_arxiv.tex</code></a>.
+  Every statistic in it is generated from <code>part_a/results.json</code> by
+  <code>paper/make_tables.py</code> rather than typed, so the paper cannot drift from the
+  data.</p>
+</section>
+
+<section>
+  <h2>What's in it</h2>
+  <div class="cols">
+    <div>
+      <h3>Part A — the measurement</h3>
+      <ul>
+        <li>Sampling frame and mechanical screening</li>
+        <li>Detector definitions: three tool-definition styles, ten write categories</li>
+        <li>Coverage by kind of write operation, with Wilson intervals</li>
+        <li>All seven detector revisions and their effect on the headline</li>
+        <li>Threats to validity, led by the screening rate</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Part B — pre-registered, not run</h3>
+      <ul>
+        <li>Hypothesis fixed before any data collection</li>
+        <li>Resolution tiers T1 / T2 / T3 / MISS, with precedence</li>
+        <li>Miss classification: modelable vs production-state-dependent</li>
+        <li>Four closed defect classes</li>
+        <li>20% falsification threshold, 50% kill criterion</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Two things to read before citing it</h2>
+  <p class="caveat"><strong>Part A is exploratory, not pre-registered.</strong> The
+  detectors were developed against the corpus: the implementation was run, its output
+  inspected, and specific false positives traced to specific patterns which were then
+  changed. Section 3.7 lists every revision and what it did to the number — including two
+  that made the finding weaker. Only Part B's evaluation is pre-registered.</p>
+
+  <p class="caveat" style="margin-top:1rem"><strong>32 of 45 candidates screened
+  out.</strong> The study detects framework-idiomatic tool definitions — <code>@tool</code>,
+  <code>BaseTool</code>, JSON tool schemas. Agents with bespoke architectures like
+  <code>aider</code> and <code>OpenHands</code> write to disk and shell out constantly but
+  expose no such surface. The denominator of 13 reflects detector coverage as much as it
+  reflects the ecosystem.</p>
+</section>
+
+<section>
+  <h2>Status</h2>
+  <p>The paper compiles clean — 12 pages, zero undefined references, zero overfull boxes —
+  and is <strong>not yet submitted to arXiv</strong>. This page will carry the listing
+  link when it exists, and not before. The
+  <a href="https://github.com/RithikSatarla/agentcage/blob/main/paper/ARXIV_SUBMISSION_GUIDE.md">submission
+  guide</a> in the repository covers citation verification and the endorsement step.</p>
+</section>
+
+<footer>
+  <p>MIT licensed ·
+  <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a></p>
+</footer>
+
+</div>
+</body>
+</html>

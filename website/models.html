@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Models — AgentCage</title>
+<meta name="description" content="What a stateful API model contains: entities, endpoints, mutation rules, error semantics, and the fidelity boundary.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/"><span class="dot"></span>AgentCage</a>
+    <a class="link" href="/">Overview</a>
+    <a class="link" href="/paper">Paper</a>
+    <a class="link" href="/models" aria-current="page">Models</a>
+    <a class="link" href="/data">Data</a>
+    <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Reference</p>
+    <h1>State, not recordings.</h1>
+    <p class="lede">A model where writes mutate state and later reads observe the
+    mutation. Deterministic identifiers, an injectable clock, and the real error codes —
+    so a failure is a failure every time.</p>
+    <div class="actions">
+      <a class="btn solid" href="https://github.com/RithikSatarla/agentcage/blob/main/part_b/stripe_mock.py">stripe_mock.py</a>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/part_b/interceptor.py">interceptor.py</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Two halves</h2>
+      <p class="lede sub">A passive capture layer, and a model to replay against.</p>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head"><span>part_b/interceptor.py</span>
+          <span class="state"><span class="pill live">passive</span></span></div>
+        <div class="panel-body">
+          <p style="margin-top:0">Attaches through each HTTP library's own documented hook
+          points — <code>httpx</code> event hooks, <code>requests</code> response hooks. It
+          records method, URL, path, query, headers, body and response status.</p>
+          <p>It <strong>never</strong> rewrites a request, injects a response, or
+          short-circuits the transport. A test asserts the caller receives exactly what the
+          transport returned, byte for byte.</p>
+          <p class="sub" style="margin-bottom:0">Credential headers are replaced with
+          <code>&lt;redacted&gt;</code> at capture time, which is what makes traces safe to
+          commit.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>part_b/stripe_mock.py</span>
+          <span class="state"><span class="pill live">stateful</span></span></div>
+        <div class="panel-body">
+          <p style="margin-top:0">An in-memory model of the money-moving subset of the
+          Stripe API. Not a fixture: a refund increases
+          <code>charge.amount_refunded</code>, and a later <code>GET</code> observes it.</p>
+          <p>Identifiers come from a counter (<code>ch_00000001</code>) and the clock is
+          injectable, so a run is byte-for-byte reproducible.</p>
+          <p class="sub" style="margin-bottom:0">Errors carry the real HTTP status, error
+          code and message, returned in Stripe's error envelope.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Entities</h2>
+      <p class="lede sub">Real field definitions, validated with pydantic — not stubs.</p>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-head"><span>Charge</span></div>
+        <div class="panel-body">
+          <dl class="fields">
+            <dt>id · object · created</dt><dd>counter-derived <code>ch_00000001</code></dd>
+            <dt>amount · amount_captured</dt><dd>minor units, positive integer</dd>
+            <dt>amount_refunded</dt><dd>accumulates across refunds</dd>
+            <dt>refunded</dt><dd>true at parity with <code>amount_captured</code></dd>
+            <dt>captured · paid · status</dt><dd>uncaptured charges cannot be refunded</dd>
+            <dt>currency · customer · description</dt><dd>3-letter currency, optional customer</dd>
+            <dt>metadata · livemode</dt><dd>string map</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>Refund</span></div>
+        <div class="panel-body">
+          <dl class="fields">
+            <dt>id · object · created</dt><dd><code>re_00000001</code></dd>
+            <dt>amount</dt><dd>defaults to the full unrefunded remainder</dd>
+            <dt>charge</dt><dd>the charge it mutates</dd>
+            <dt>reason</dt><dd>duplicate · fraudulent · requested_by_customer</dd>
+            <dt>status · currency · metadata</dt><dd>inherits the charge's currency</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>Customer</span></div>
+        <div class="panel-body">
+          <dl class="fields">
+            <dt>id · object · created</dt><dd><code>cus_00000001</code></dd>
+            <dt>email · name · description</dt><dd>optional</dd>
+            <dt>currency · delinquent</dt><dd></dd>
+            <dt>metadata · livemode</dt><dd>string map</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Endpoints and rules</h2>
+      <p class="lede sub">Every rule below is enforced by the model and asserted by the
+      test suite.</p>
+    </div>
+
+    <div class="scroll">
+      <table class="data">
+        <thead>
+          <tr><th>Endpoint</th><th>Behaviour</th><th>Failure</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">POST /v1/charges</td>
+            <td>Creates a charge. <code>capture=false</code> leaves <code>amount_captured</code> at 0.</td>
+            <td><code>parameter_invalid_integer</code> for amount ≤ 0; 404 <code>resource_missing</code> for an unknown customer</td>
+          </tr>
+          <tr>
+            <td class="name">GET /v1/charges/{id}</td>
+            <td>Returns the charge <strong>with every mutation applied so far</strong>.</td>
+            <td>404 <code>resource_missing</code></td>
+          </tr>
+          <tr>
+            <td class="name">POST /v1/refunds</td>
+            <td>Increases <code>amount_refunded</code>; sets <code>refunded</code> at parity. Amount defaults to the unrefunded remainder.</td>
+            <td>400 <code>amount_too_large</code> · 400 <code>charge_already_refunded</code> · 400 <code>charge_not_captured</code></td>
+          </tr>
+          <tr>
+            <td class="name">POST /v1/charges/{id}/refunds</td>
+            <td>The nested route, same semantics.</td>
+            <td>as above</td>
+          </tr>
+          <tr>
+            <td class="name">GET /v1/refunds</td>
+            <td>Lists refunds, filterable by charge.</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td class="name">POST /v1/customers</td>
+            <td>Creates a customer.</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="split" style="margin-top:2rem">
+      <div>
+        <h3>Over-refund carries the real message</h3>
+<pre><code>stripe.post_charge(amount=5000)
+stripe.post_refund(charge="ch_00000001", amount=9999)
+
+StripeError: Refund amount ($99.99) is greater than
+unrefunded amount on charge ($50.00)
+  http_status 400 · code amount_too_large</code></pre>
+      </div>
+      <div>
+        <h3>Idempotency keys replay, they don&rsquo;t re-execute</h3>
+<pre><code>stripe.post_refund(charge=c, amount=2000, idempotency_key="k1")
+stripe.post_refund(charge=c, amount=2000, idempotency_key="k1")
+stripe.get_charge(c).amount_refunded   # 2000, not 4000
+
+# reuse with different parameters is refused
+#   code idempotency_key_in_use</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>The fidelity boundary</h2>
+      <p class="lede sub">A mock's silent divergence from the real API is itself a source
+      of false confidence, so the boundary is stated rather than discovered.</p>
+    </div>
+    <div class="note">
+      <strong>Not modelled:</strong> payment-method validation, 3-D Secure, disputes,
+      payouts, balance transactions, webhooks, connected accounts, field expansion
+      (<code>expand[]</code>), pagination cursors, rate limits, and Stripe's real
+      identifier format. Refunding an uncaptured charge is rejected rather than releasing
+      the authorisation as Stripe does.
+      <br><br>
+      The model is sufficient to exercise double-refund, over-refund, refund-after-refund
+      and read-after-write. Nothing more is claimed.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head"><h2>Roadmap</h2></div>
+    <div class="scroll">
+      <table class="data">
+        <thead><tr><th>Model</th><th>Status</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Stripe</td><td><span class="pill live">working</span></td>
+              <td>Charges, refunds, customers, idempotency</td></tr>
+          <tr><td class="name">GitHub</td><td><span class="pill none">not built</span></td>
+              <td>Destructive, widely used, easy to reason about — the natural second model</td></tr>
+          <tr><td class="name">S3</td><td><span class="pill none">not built</span></td>
+              <td>Object deletion and overwrite, versioning semantics</td></tr>
+          <tr><td class="name">Postgres</td><td><span class="pill none">not built</span></td>
+              <td>Transactional writes, constraint violations</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Which one is built next should be decided by a team with a real
+    agent in production. <a href="/#try">That's what a design partner is for →</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>MIT licensed ·
+    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

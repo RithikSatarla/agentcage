@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentCage — catch what your AI agent does twice</title>
-<meta name="description" content="Your agent retries. Your tests replay a recording that says 200 OK every time. Flip Without / With to see a green test that ships a double refund, or a red one that stops it.">
+<title>AgentCage — your agent refunds twice, CI catches it</title>
+<meta name="description" content="Add AgentCage to your test suite. When your agent retries a refund, the test fails and the PR is blocked instead of shipping.">
 <meta property="og:title" content="AgentCage">
-<meta property="og:description" content="Your agent will do it twice. Your tests will never know.">
+<meta property="og:description" content="Your agent refunds twice. Your tests don't notice. AgentCage makes CI notice.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,108 +16,86 @@
     <a class="brand" href="/">AgentCage</a>
     <a class="link" href="/" aria-current="page">Overview</a>
     <a class="link" href="/manifesto">Manifesto</a>
-    <a class="link" href="/paper">Paper</a>
     <a class="link" href="/models">Models</a>
     <a class="link" href="/data">Data</a>
     <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero hero-compact">
   <div class="wrap">
-    <div class="hero-grid">
-      <div>
-        <p class="label"><span class="dot"></span>Open source · MIT</p>
-        <h1>Your agent will<br><span class="soft" id="rotator">refund</span> it twice.</h1>
-        <p class="lede">Agents retry. Your tests replay a recording that says
-        <strong style="color:var(--ink)">200 OK</strong> every single time — so nothing
-        ever catches the second one.</p>
-        <div class="actions">
-          <a class="btn solid" href="#demo">See it happen</a>
-          <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
-        </div>
-      </div>
+    <p class="label"><span class="dot"></span>Open source · MIT · Python 3.9+</p>
+    <h1>Your agent refunds twice.<br>Your tests don&rsquo;t notice.</h1>
+    <p class="lede">Add AgentCage to your suite and CI blocks the PR instead of shipping
+    it.</p>
+    <div class="install">
+      <code id="install-cmd"><span class="sigil">$</span>pip install -e ".[dev]"</code>
+      <button type="button" id="install-copy" aria-label="Copy install command">copy</button>
+    </div>
 
-      <div>
-        <p class="label" style="margin-bottom:.9rem">Live · one $50.00 charge</p>
-        <svg class="schematic" viewBox="0 0 560 250" role="img"
-             aria-label="The request path: your agent sends requests through AgentCage into a model that remembers the charge state.">
-          <path class="rail" d="M92 70 C 160 70, 200 70, 268 70"></path>
-          <path class="rail" d="M292 70 C 360 70, 400 70, 468 70"></path>
-          <circle class="node" id="node-agent" cx="80" cy="70" r="12"></circle>
-          <circle class="node" id="node-cage" cx="280" cy="70" r="12"></circle>
-          <circle class="node" id="node-model" cx="480" cy="70" r="12"></circle>
-          <text class="name" x="46" y="40">your agent</text>
-          <text x="46" y="54" id="agent-mode">retrying</text>
-          <text class="name" x="243" y="40">agentcage</text>
-          <text x="243" y="54">watching</text>
-          <text class="name" x="428" y="40">the money</text>
-          <text x="428" y="54">remembers</text>
-          <line x1="0" y1="120" x2="560" y2="120" stroke="var(--line)" stroke-width="1"></line>
-          <text x="0" y="150">order</text>
-          <text class="val" x="150" y="150">$50.00</text>
-          <text x="0" y="176">refunds applied</text>
-          <text class="val" id="sch-refunded" x="150" y="176">$0.00</text>
-          <text x="0" y="202">last answer</text>
-          <text class="val" id="sch-status" x="150" y="202">—</text>
-          <text x="0" y="228">customer is out</text>
-          <text class="val" id="sch-loss" x="150" y="228">$0.00</text>
-        </svg>
-      </div>
+    <div class="actions" style="margin-top:1.4rem">
+      <a class="btn solid" href="#use">How you use it</a>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
     </div>
   </div>
 </header>
 
-<section class="flush">
+<section id="use" class="flush">
   <div class="wrap">
-    <div class="stats">
-      <div class="stat"><div class="v hot" data-count="20.3" data-suffix="%">0%</div>
-        <span class="k">of agent write tools have no test</span></div>
-      <div class="stat"><div class="v" data-count="158">0</div>
-        <span class="k">write tools we found</span></div>
-      <div class="stat"><div class="v" data-count="45">0</div>
-        <span class="k">repositories we read</span></div>
-      <div class="stat"><div class="v">4 min</div>
-        <span class="k">to reproduce it yourself</span></div>
+    <p class="label">How you use it</p>
+    <div class="usage">
+      <div class="use">
+        <div class="n">Step 1</div>
+        <h3>Install it</h3>
+        <p>One dependency. No account, no key, no service to run.</p>
+<pre><code>pip install -e ".[dev]"</code></pre>
+      </div>
+
+      <div class="use">
+        <div class="n">Step 2</div>
+        <h3>Point your agent at it</h3>
+        <p>Swap the recorded mock for AgentCage. Your agent code does not change.</p>
+<pre><code><span class="del">- client = httpx.Client(
+-     transport=RecordedMock())</span>
+<span class="add">+ cage = Interceptor()
++ client = httpx.Client(
++     event_hooks=cage.httpx_event_hooks())</span></code></pre>
+      </div>
+
+      <div class="use">
+        <div class="n">Step 3</div>
+        <h3>Push the PR</h3>
+        <p>Your existing workflow runs it. Nothing else to wire up.</p>
+<pre><code>- run: pytest tests/
+  git push origin fix/refunds</code></pre>
+      </div>
     </div>
-    <p class="caption">32 of 158 tools across 13 repositories are never named by a single
-    test. <a href="/data">See every one →</a></p>
   </div>
 </section>
 
 <section id="demo">
   <div class="wrap">
-    <p class="label">Demo</p>
-    <h2 id="demo-title">Same charge, two refunds</h2>
-    <p class="lede" id="demo-sub">Your agent refunds an order and never sees the reply.
-    Flip Without / With to see a green test that ships it, or a red one that stops it.</p>
+    <p class="label">Step 4 · run it</p>
+    <h2 id="demo-title">Same test. Two answers.</h2>
+    <p class="lede" id="demo-sub">Your agent retries a refund. Flip the switch to see the
+    same test with and without AgentCage.</p>
 
-    <div class="tabs" role="tablist" aria-label="What the agent does wrong"
-         style="margin:2rem 0 1.8rem">
-      <button role="tab" data-scenario="duplicate" aria-selected="true">it retries</button>
-      <button role="tab" data-scenario="over_refund" aria-selected="false">it miscounts</button>
-      <button role="tab" data-scenario="unchecked" aria-selected="false">it ignores errors</button>
-      <button role="tab" data-scenario="stale" aria-selected="false">it reads stale data</button>
-    </div>
-
-    <div class="toggle" role="group" aria-label="Compare without and with AgentCage">
+    <div class="toggle" role="group" aria-label="Compare without and with AgentCage"
+         style="margin-top:1.8rem">
       <button type="button" id="btn-without" aria-pressed="true">Without</button>
       <span class="vs">vs</span>
       <button type="button" id="btn-with" aria-pressed="false">With AgentCage</button>
     </div>
 
-    <p class="result" id="result"></p>
-
     <div class="panes">
       <div class="term">
-        <div class="term-head"><span class="bulb" id="bulb-a"></span>
-          <span id="pane-a-title">your test suite</span></div>
-        <div class="term-body" id="pane-a"></div>
+        <div class="term-head"><span class="bulb ok"></span><span>tests/test_refunds.py</span></div>
+        <div class="term-body" id="pane-code"></div>
       </div>
       <div class="term">
-        <div class="term-head"><span class="bulb" id="bulb-b"></span>
-          <span>your customer</span></div>
-        <div class="term-body" id="pane-b"></div>
+        <div class="term-head"><span class="bulb" id="bulb-out"></span>
+          <span id="pane-out-title">$ pytest</span></div>
+        <div class="term-body" id="pane-out"></div>
       </div>
     </div>
 
@@ -132,39 +110,30 @@
 
 <section>
   <div class="wrap">
-    <div class="head"><h2>What just happened</h2></div>
+    <div class="head"><h2>Why the recorded mock missed it</h2></div>
     <div class="explain">
       <div>
         <div class="num">1</div>
-        <h3>Watch</h3>
-        <p>AgentCage attaches to the HTTP client your agent already uses. It records every
-        request and never alters one — a test asserts the reply comes back byte for byte.</p>
-        <span class="wire">client = httpx.Client(event_hooks=cage.httpx_event_hooks())</span>
+        <h3>It has no memory</h3>
+        <p>A recording answers the second refund exactly like the first, because it was
+        captured once and never updated.</p>
+        <span class="wire">POST /v1/refunds → 200 · every time</span>
       </div>
       <div>
         <div class="num">2</div>
-        <h3>Apply</h3>
-        <p>A refund is not a recorded reply. It changes the order, and every later read
-        sees the change — the way the real API behaves.</p>
-        <span class="wire">POST /v1/refunds → 200 · refunded 0 → 5000</span>
-      </div>
-      <div>
-        <div class="num">3</div>
-        <h3>Refuse</h3>
-        <p>The second attempt meets the state the first one left behind, and gets the error
-        the real API would send — same status, same code, same message.</p>
+        <h3>AgentCage keeps state</h3>
+        <p>The first refund changes the order. The second one meets that change and gets
+        the error the real API sends.</p>
         <span class="wire">POST /v1/refunds → 400 charge_already_refunded</span>
       </div>
       <div>
-        <div class="num">4</div>
-        <h3>Prove</h3>
-        <p>Every attempt is written to a trace with API keys stripped out, so it is safe to
-        commit. This exact run is in the repo, and a test checks it still holds.</p>
-        <span class="wire">traces/example_double_refund.json · 4 requests, 3 writes</span>
+        <div class="num">3</div>
+        <h3>It never touches traffic</h3>
+        <p>Capture is passive. A test asserts your agent gets the reply back byte for byte,
+        with API keys stripped from the trace.</p>
+        <span class="wire">traces/example_double_refund.json · 4 requests</span>
       </div>
     </div>
-    <p class="caption">Run it yourself: <code>python -m part_b.demo_double_refund</code> —
-    no keys, no account, no network. <a href="/models">What else it models →</a></p>
   </div>
 </section>
 
@@ -172,19 +141,17 @@
   <div class="wrap">
     <div class="head">
       <p class="label">Design partners</p>
-      <h2>Running agents that touch real money?</h2>
-      <p class="lede">Stripe is the first one we modelled. Tell us which API scares you and
-      it's next. No pricing, no contract, no waitlist.</p>
+      <h2>Which API scares you?</h2>
+      <p class="lede">Stripe is modelled. Tell us the next one.</p>
     </div>
     <div class="actions">
       <a class="btn solid" href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Get in touch</a>
       <a class="btn" href="https://github.com/RithikSatarla/agentcage/issues">Open an issue</a>
     </div>
-    <p class="caption" style="margin-top:2rem">Straight with you: the interceptor, the
-    Stripe model and the study all work today and are covered by tests. The follow-up study
-    measuring how many real agents this catches is written up but
-    <strong style="color:var(--ink)">has not been run</strong>, so we claim no number for
-    it. <a href="/paper">The plan is public.</a></p>
+    <p class="caption" style="margin-top:1.8rem">The interceptor, the Stripe model and the
+    study all work today and are covered by tests. The study measuring how many real agents
+    this catches is written up but <strong style="color:var(--ink)">has not been
+    run</strong>. <a href="/manifesto">What we have and haven&rsquo;t shown →</a></p>
   </div>
 </section>
 
@@ -192,7 +159,8 @@
   <div class="wrap">
     <p>MIT licensed ·
     <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
-    · <a href="/data">Data</a> · <a href="/paper">Paper</a> · <a href="/models">Models</a></p>
+    · <a href="/manifesto">Manifesto</a> · <a href="/models">Models</a> ·
+    <a href="/data">Data</a> · <a href="agentcage-paper.pdf">Paper (PDF)</a></p>
   </div>
 </footer>
 
@@ -201,350 +169,161 @@
   "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- rotating hero verb ---- */
-  var VERBS = ["refund", "delete", "email", "deploy", "charge"];
-  var vi = 0, rot = document.getElementById("rotator");
-  if (rot && !reduce) {
-    window.setInterval(function () {
-      vi = (vi + 1) % VERBS.length;
-      rot.style.opacity = "0";
-      window.setTimeout(function () { rot.textContent = VERBS[vi]; rot.style.opacity = "1"; }, 180);
-    }, 2200);
-  }
-
-  /* ---- count-up stats ---- */
-  function countUp(el) {
-    var target = parseFloat(el.getAttribute("data-count"));
-    var suffix = el.getAttribute("data-suffix") || "";
-    var decimals = (el.getAttribute("data-count").split(".")[1] || "").length;
-    var exact = target.toFixed(decimals) + suffix;
-    if (reduce) { el.textContent = exact; return; }
-
-    var DUR = 700, start = null;
-    function frame(ts) {
-      if (start === null) { start = ts; }
-      var t = Math.min(1, (ts - start) / DUR);
-      el.textContent = (target * (1 - Math.pow(1 - t, 3))).toFixed(decimals) + suffix;
-      if (t < 1) { window.requestAnimationFrame(frame); }
-      else { el.textContent = exact; }
-    }
-    window.requestAnimationFrame(frame);
-
-    // These numbers are the page's whole credibility, and a mid-flight frame reads
-    // 20.2% instead of 20.3%. rAF stalls in background tabs, so snap to the exact
-    // value unconditionally once the animation should have finished.
-    window.setTimeout(function () { el.textContent = exact; }, DUR + 120);
-  }
-  var counted = false, statsEl = document.querySelector(".stats");
-  function maybeCount() {
-    if (counted || !statsEl) { return; }
-    if (statsEl.getBoundingClientRect().top < window.innerHeight) {
-      counted = true;
-      Array.prototype.forEach.call(document.querySelectorAll("[data-count]"), countUp);
-    }
-  }
-  window.addEventListener("scroll", maybeCount, { passive: true });
-  maybeCount();
-
-  /* ---- the demo ----
-     Both sides run the same agent code. The refusals mirror part_b/stripe_mock.py, which
-     is canonical and covered by the test suite; the With side of the first scenario
-     matches the trace committed at traces/example_double_refund.json. */
-
-  var SCEN = {
-    duplicate: {
-      title: "Same charge, two refunds",
-      sub: "Your agent refunds an order and never sees the reply. Flip Without / With to " +
-           "see a green test that ships it, or a red one that stops it.",
-      evidence: "The With run is captured in the repo at traces/example_double_refund.json " +
-                "— 4 requests, 3 of them writes, API keys stripped. A test asserts the two " +
-                "refund requests are byte-identical and that the second one is refused.",
-      without: {
-        result: ["Two refunds. One charge. ", "$100.00 gone.", "out"],
-        a: [["$ pytest tests/test_refunds.py", "hi"],
-            ["test_refund_order PASSED", "ok"], ["", ""],
-            ["1 passed in 0.41s", "ok"], ["", ""],
-            ["→ merged, shipped", "dim"]],
-        b: [["refund", "dim"], ["  -$50.00", "bad"],
-            ["refund", "dim"], ["  -$50.00", "bad"],
-            ["────────────────", "rule"],
-            ["order was      $50.00", "dim"],
-            ["they received  $100.00", "bad"]],
-        steps: [
-          ["Your test starts. The agent is told to refund order #1041.", 0],
-          ["A recorded reply is loaded from a fixture file.", 0],
-          ["The agent sends POST /v1/refunds for $50.00.", 0],
-          ["The fixture replies 200 OK. It was recorded once, months ago.", 0],
-          ["The agent never reads the reply — a timeout, a dropped await, a parse bug.", 0],
-          ["The agent sends the identical request again.", 0],
-          ["The fixture replies 200 OK. It has no memory of the first call.", 0],
-          ["Nothing in the suite can tell the two calls apart.", 0],
-          ["Your test goes green. The change merges.", 1],
-          ["In production both refunds land. The customer receives $100.00.", 1]
-        ],
-        verdict: ["✗ 2 attempts · 2 applied · 0 refused · customer paid twice", "fail"]
-      },
-      with: {
-        result: ["Two refunds. One charge. ", "Caught before ship.", "safe"],
-        a: [["$ pytest tests/test_refunds.py", "hi"],
-            ["test_refund_order FAILED", "bad"], ["", ""],
-            ["StripeError: charge already refunded", "bad"],
-            ["  refund_order() line 42", "dim"],
-            ["1 failed in 0.44s", "bad"]],
-        b: [["refund", "dim"], ["  -$50.00", "ok"],
-            ["refund", "dim"], ["  REFUSED", "ok"],
-            ["────────────────", "rule"],
-            ["order was      $50.00", "dim"],
-            ["they received  $50.00", "ok"]],
-        steps: [
-          ["Your test starts. The agent is told to refund order #1041.", 0],
-          ["AgentCage attaches to the HTTP client the agent already uses.", 0],
-          ["The agent sends POST /v1/refunds for $50.00.", 0],
-          ["AgentCage records it, stripping the API key before writing it down.", 0],
-          ["It applies the refund. This order is now $50.00 refunded.", 0],
-          ["The agent never reads the reply — a timeout, a dropped await, a parse bug.", 0],
-          ["The agent sends the identical request again.", 0],
-          ["AgentCage checks the order it holds. $50.00 of $50.00 is already back.", 0],
-          ["It refuses: 400 charge_already_refunded — the real code, the real message.", 1],
-          ["The agent raises. Your test goes red on line 42, before review.", 1]
-        ],
-        verdict: ["✓ 2 attempts · 1 applied · 1 refused · customer made whole exactly once", ""]
-      }
+  // Refusals mirror part_b/stripe_mock.py, which is canonical and covered by the test
+  // suite. The With side matches traces/example_double_refund.json in the repo.
+  var SIDES = {
+    without: {
+      code: [
+        ["def test_refund_order():", "hi"],
+        ["    client = httpx.Client(", ""],
+        ["        transport=RecordedMock())", "del"],
+        ["", ""],
+        ["    agent.refund(order)   # retries once", ""],
+        ["", ""],
+        ["    assert order.refunded == 5000", ""]
+      ],
+      out: [
+        ["test_refund_order PASSED", "ok"],
+        ["1 passed in 0.41s", "ok"],
+        ["", ""],
+        ["the mock said 200 OK to both refunds", "dim"],
+        ["in production the customer gets $100.00", "bad"],
+        ["on a $50.00 order", "bad"]
+      ],
+      bulb: "ok",
+      title: "$ pytest — passes",
+      steps: [
+        ["The agent refunds the order.", 0],
+        ["The reply is never read — a timeout, a dropped await.", 0],
+        ["The agent sends the identical refund again.", 0],
+        ["The recorded mock answers 200 OK both times. It has no memory.", 0],
+        ["The test passes. The change ships.", 1]
+      ],
+      verdict: ["✗ 2 refunds applied · customer paid $100.00 on a $50.00 order", "fail"]
     },
-
-    over_refund: {
-      title: "Refund the rest — wrongly",
-      sub: "The agent does the arithmetic wrong and hands back more than was ever taken.",
-      evidence: "The refusal carries the real numbers, so the failing test names the amount " +
-                "the agent got wrong instead of just going red.",
-      without: {
-        result: ["Handed back $70.00 on a ", "$50.00 order.", "out"],
-        a: [["$ pytest tests/test_partial.py", "hi"],
-            ["test_partial_refund PASSED", "ok"], ["", ""],
-            ["1 passed in 0.38s", "ok"]],
-        b: [["refund", "dim"], ["  -$30.00", "dim"],
-            ["refund", "dim"], ["  -$40.00", "bad"],
-            ["────────────────", "rule"],
-            ["order was      $50.00", "dim"],
-            ["they received  $70.00", "bad"]],
-        steps: [
-          ["The agent refunds $30.00 of a $50.00 order.", 0],
-          ["The fixture replies 200 OK and forgets.", 0],
-          ["The agent computes the rest from the order total, not from what is left.", 0],
-          ["It asks for $40.00 more.", 0],
-          ["The fixture replies 200 OK again — it never tracked the first refund.", 0],
-          ["Tests pass. You are $20.00 down on every order that takes this path.", 1]
-        ],
-        verdict: ["✗ $70.00 returned on a $50.00 order · $20.00 lost per run", "fail"]
-      },
-      with: {
-        result: ["Refused. ", "Only $20.00 was left.", "safe"],
-        a: [["$ pytest tests/test_partial.py", "hi"],
-            ["test_partial_refund FAILED", "bad"], ["", ""],
-            ["StripeError: amount_too_large", "bad"],
-            ["  $20.00 left to refund", "dim"]],
-        b: [["refund", "dim"], ["  -$30.00", "ok"],
-            ["refund", "dim"], ["  REFUSED", "ok"],
-            ["────────────────", "rule"],
-            ["order was      $50.00", "dim"],
-            ["they received  $30.00", "ok"]],
-        steps: [
-          ["The agent refunds $30.00 of a $50.00 order.", 0],
-          ["AgentCage applies it and keeps the remainder: $20.00.", 0],
-          ["The agent computes the rest from the order total, not from what is left.", 0],
-          ["It asks for $40.00 more.", 0],
-          ["AgentCage refuses — there is only $20.00 left to give back.", 1],
-          ["Your test fails with the exact number the agent got wrong.", 1]
-        ],
-        verdict: ["✓ $30.00 returned · second attempt refused · remainder intact", ""]
-      }
-    },
-
-    unchecked: {
-      title: "It failed. The agent didn't look.",
-      sub: "The refund is rejected and the agent carries on as though it worked.",
-      evidence: "A mock that always answers 200 can never exercise the branch where a write " +
-                "fails, so this bug is invisible to a fixture-based suite by construction.",
-      without: {
-        result: ["Refund failed. Order closed ", "as refunded.", "out"],
-        a: [["$ pytest tests/test_flow.py", "hi"],
-            ["test_refund_and_close PASSED", "ok"], ["", ""],
-            ["1 passed in 0.52s", "ok"]],
-        b: [["refund $75.00", "dim"], ["  fixture says ok", "bad"],
-            ["order status", "dim"], ["  CLOSED · refunded", "bad"],
-            ["────────────────", "rule"],
-            ["they received  $0.00", "bad"],
-            ["they were told $75.00", "bad"]],
-        steps: [
-          ["The agent asks to refund $75.00 on a $50.00 order.", 0],
-          ["The fixture says 200 OK, because that is all it knows how to say.", 0],
-          ["The agent never checks the status code.", 0],
-          ["It closes the order and emails the customer a refund confirmation.", 0],
-          ["Tests pass. The customer is told about money they never received.", 1]
-        ],
-        verdict: ["✗ refund never happened · order closed · customer misinformed", "fail"]
-      },
-      with: {
-        result: ["The failure ", "shows up in your test.", "safe"],
-        a: [["$ pytest tests/test_flow.py", "hi"],
-            ["test_refund_and_close FAILED", "bad"], ["", ""],
-            ["StripeError: amount_too_large", "bad"],
-            ["  agent ignored a 400 and continued", "dim"]],
-        b: [["refund $75.00", "dim"], ["  REFUSED", "ok"],
-            ["order status", "dim"], ["  still open", "ok"],
-            ["────────────────", "rule"],
-            ["they received  $0.00", "dim"],
-            ["they were told nothing", "ok"]],
-        steps: [
-          ["The agent asks to refund $75.00 on a $50.00 order.", 0],
-          ["AgentCage refuses — that is more than was ever taken.", 0],
-          ["The agent ignores the refusal and closes the order anyway.", 0],
-          ["The next read shows the order unrefunded, and the assertion fails.", 1],
-          ["Your test points straight at the branch that never checks status.", 1]
-        ],
-        verdict: ["✓ refusal surfaced · order left open · nothing sent to the customer", ""]
-      }
-    },
-
-    stale: {
-      title: "It checked before it acted",
-      sub: "The agent decides using a number it looked up before its own refund landed.",
-      evidence: "Against a recording a stale read and a fresh one return identical bytes, so " +
-                "no assertion over responses can tell them apart.",
-      without: {
-        result: ["Refunded twice from ", "one stale lookup.", "out"],
-        a: [["$ pytest tests/test_reconcile.py", "hi"],
-            ["test_reconcile PASSED", "ok"], ["", ""],
-            ["1 passed in 0.61s", "ok"]],
-        b: [["checked: refunded so far", "dim"], ["  $0.00", "dim"],
-            ["refund", "dim"], ["  -$50.00", "dim"],
-            ["refund", "dim"], ["  -$50.00", "bad"],
-            ["────────────────", "rule"],
-            ["they received  $100.00", "bad"]],
-        steps: [
-          ["The agent reads how much has been refunded. Nothing yet.", 0],
-          ["It caches that answer and refunds $50.00.", 0],
-          ["Later in the run it re-checks its cached copy, which still says $0.00.", 0],
-          ["Believing nothing was refunded, it refunds again.", 0],
-          ["The fixture accepts both, because stale and fresh look identical to it.", 0],
-          ["Tests pass. The customer receives $100.00.", 1]
-        ],
-        verdict: ["✗ decided on a read that predates the write · paid twice", "fail"]
-      },
-      with: {
-        result: ["The second one is ", "refused.", "safe"],
-        a: [["$ pytest tests/test_reconcile.py", "hi"],
-            ["test_reconcile FAILED", "bad"], ["", ""],
-            ["StripeError: charge already refunded", "bad"],
-            ["  decided on a read taken before the write", "dim"]],
-        b: [["checked: refunded so far", "dim"], ["  $0.00", "dim"],
-            ["refund", "dim"], ["  -$50.00", "ok"],
-            ["refund", "dim"], ["  REFUSED", "ok"],
-            ["────────────────", "rule"],
-            ["they received  $50.00", "ok"]],
-        steps: [
-          ["The agent reads how much has been refunded. Nothing yet.", 0],
-          ["It caches that answer and refunds $50.00. AgentCage records it.", 0],
-          ["Later in the run it re-checks its cached copy, which still says $0.00.", 0],
-          ["Believing nothing was refunded, it refunds again.", 0],
-          ["AgentCage refuses — it holds the write the agent forgot about.", 1],
-          ["Your test fails on the stale read, in CI, not in production.", 1]
-        ],
-        verdict: ["✓ stale decision caught · one refund applied · one refused", ""]
-      }
+    with: {
+      code: [
+        ["def test_refund_order():", "hi"],
+        ["    cage = Interceptor()", "add"],
+        ["    client = httpx.Client(", ""],
+        ["        event_hooks=cage.httpx_event_hooks())", "add"],
+        ["", ""],
+        ["    agent.refund(order)   # retries once", ""],
+        ["", ""],
+        ["    assert order.refunded == 5000", ""]
+      ],
+      out: [
+        ["test_refund_order FAILED", "bad"],
+        ["", ""],
+        ["StripeError: charge already refunded (400)", "bad"],
+        ["  refund_order() line 42", "dim"],
+        ["1 failed in 0.44s", "bad"],
+        ["", ""],
+        ["the customer gets $50.00. once.", "ok"]
+      ],
+      bulb: "bad",
+      title: "$ pytest — fails",
+      steps: [
+        ["The agent refunds the order.", 0],
+        ["AgentCage applies it — the order is now $50.00 refunded.", 0],
+        ["The reply is never read — a timeout, a dropped await.", 0],
+        ["The agent sends the identical refund again.", 0],
+        ["AgentCage refuses: 400 charge_already_refunded.", 0],
+        ["The test fails, so the change never ships.", 1]
+      ],
+      verdict: ["✓ 1 refund applied · caught in your suite, before anyone was paid twice", ""]
     }
   };
 
-  var scenario = "duplicate", mode = "without", stepTimers = [];
+  var EVIDENCE = "This run is captured in the repo at traces/example_double_refund.json — " +
+                 "4 requests, 3 of them writes, API keys stripped. A test asserts the two " +
+                 "refund requests are byte-identical and that the second one is refused.";
 
-  function money(c) { return "$" + (c / 100).toFixed(2); }
+  var mode = "without", timers = [];
   function $(id) { return document.getElementById(id); }
 
-  function paneHTML(lines) {
-    return lines.map(function (l) {
+  /* ---- copy-to-clipboard on the install command ---- */
+  (function () {
+    var btn = $("install-copy");
+    if (!btn) { return; }
+    btn.addEventListener("click", function () {
+      // strip the "$" sigil so what lands on the clipboard is runnable
+      var cmd = $("install-cmd").textContent.replace(/^\s*\$\s*/, "");
+      var done = function () {
+        btn.textContent = "copied";
+        btn.classList.add("done");
+        window.setTimeout(function () {
+          btn.textContent = "copy";
+          btn.classList.remove("done");
+        }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(done, function () { done(); });
+      } else {
+        done();
+      }
+    });
+  })();
+
+  function lines(rows) {
+    return rows.map(function (l) {
       return '<span class="l ' + (l[1] || "") + '">' + (l[0] || "&nbsp;") + "</span>";
     }).join("");
   }
 
-  function renderDemo() {
-    var sc = SCEN[scenario], side = sc[mode];
-    $("demo-title").textContent = sc.title;
-    $("demo-sub").textContent = sc.sub;
-    $("evidence").textContent = sc.evidence;
+  function render() {
+    var s = SIDES[mode];
 
-    $("result").innerHTML =
-      side.result[0] + '<span class="' + side.result[2] + '">' + side.result[1] + "</span>";
-    $("pane-a").innerHTML = paneHTML(side.a);
-    $("pane-b").innerHTML = paneHTML(side.b);
-    $("bulb-a").className = "bulb " + (mode === "with" ? "bad" : "ok");
-    $("bulb-b").className = "bulb " + (mode === "with" ? "ok" : "bad");
-    $("pane-a-title").textContent =
-      mode === "with" ? "your test suite — fails" : "your test suite — passes";
+    $("pane-code").innerHTML = lines(s.code);
+    $("pane-out").innerHTML = lines(s.out);
+    $("bulb-out").className = "bulb " + s.bulb;
+    $("pane-out-title").textContent = s.title;
+    $("evidence").textContent = mode === "with" ? EVIDENCE : "";
 
     var ol = $("steps");
     ol.innerHTML = "";
-    stepTimers.forEach(window.clearTimeout);
-    stepTimers = [];
+    timers.forEach(window.clearTimeout);
+    timers = [];
 
-    side.steps.forEach(function (s, i) {
+    s.steps.forEach(function (st, i) {
       var li = document.createElement("li");
-      li.textContent = s[0];
-      if (s[1]) { li.className = "punch"; }
+      li.textContent = st[0];
+      if (st[1]) { li.className = "punch"; }
       ol.appendChild(li);
       if (reduce) { li.classList.add("in"); return; }
-      stepTimers.push(window.setTimeout(function () { li.classList.add("in"); }, 80 + i * 230));
+      timers.push(window.setTimeout(function () { li.classList.add("in"); }, 70 + i * 220));
     });
 
     var v = document.createElement("li");
-    v.className = "verdict " + (side.verdict[1] || "");
-    v.textContent = side.verdict[0];
+    v.className = "verdict " + (s.verdict[1] || "");
+    v.textContent = s.verdict[0];
     ol.appendChild(v);
     if (reduce) { v.classList.add("in"); }
     else {
-      stepTimers.push(window.setTimeout(function () { v.classList.add("in"); },
-                                        160 + side.steps.length * 230));
+      timers.push(window.setTimeout(function () { v.classList.add("in"); },
+                                    150 + s.steps.length * 220));
     }
-
-    var loss = mode === "without" ? 5000 : 0;
-    $("sch-refunded").textContent = mode === "without" ? "$100.00" : "$50.00";
-    $("sch-status").textContent = mode === "without" ? "ok" : "refused";
-    $("sch-status").className = "val " + (mode === "without" ? "bad" : "ok");
-    $("sch-loss").textContent = money(loss);
-    $("sch-loss").className = "val " + (loss ? "bad" : "ok");
-    $("agent-mode").textContent = mode === "without" ? "unchecked" : "caged";
-    $("node-model").className = "node " + (mode === "without" ? "bad" : "on");
   }
 
   function setMode(next) {
     mode = next;
     $("btn-without").setAttribute("aria-pressed", String(next === "without"));
     $("btn-with").setAttribute("aria-pressed", String(next === "with"));
-    renderDemo();
+    render();
   }
 
   $("btn-without").addEventListener("click", function () { setMode("without"); });
   $("btn-with").addEventListener("click", function () { setMode("with"); });
+  render();
 
-  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
-    b.addEventListener("click", function () {
-      scenario = b.getAttribute("data-scenario");
-      Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (o) {
-        o.setAttribute("aria-selected", String(o === b));
-      });
-      renderDemo();
-    });
-  });
-
-  renderDemo();
-
-  // Flip to With on its own the first time the demo scrolls into view.
+  // Flip to With once, on its own, the first time the demo scrolls into view.
   var teased = false;
   function maybeTease() {
     if (teased) { return; }
     var box = $("demo").getBoundingClientRect();
     if (box.top < window.innerHeight * 0.6 && box.bottom > 0) {
       teased = true;
-      window.setTimeout(function () { setMode("with"); }, 3400);
+      window.setTimeout(function () { setMode("with"); }, 3000);
     }
   }
   window.addEventListener("scroll", maybeTease, { passive: true });

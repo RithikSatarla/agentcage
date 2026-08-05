@@ -186,9 +186,10 @@ def test_website_figures_exist_in_both_themes():
             assert f'src="figures/{name}_{mode}.svg"' in WEBSITE
 
 
-#: Every page must exist and be reachable from every other page's nav.
-SITE_PAGES = {"index.html", "manifesto.html", "paper.html", "models.html", "data.html"}
-NAV_TARGETS = ("/", "/manifesto", "/paper", "/models", "/data")
+#: Every page must exist and be reachable from every other page's nav. The paper has no
+#: page of its own: the PDF ships and is linked, but the site does not host a reader.
+SITE_PAGES = {"index.html", "manifesto.html", "models.html", "data.html"}
+NAV_TARGETS = ("/", "/manifesto", "/models", "/data")
 
 
 def test_site_has_exactly_the_expected_pages():

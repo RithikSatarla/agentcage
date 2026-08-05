@@ -24,7 +24,6 @@ NAV = """<nav class="nav">
     <a class="brand" href="/"><span class="dot"></span>AgentCage</a>
     <a class="link" href="/">Overview</a>
     <a class="link" href="/manifesto">Manifesto</a>
-    <a class="link" href="/paper">Paper</a>
     <a class="link" href="/models">Models</a>
     <a class="link" href="/data" aria-current="page">Data</a>
     <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>

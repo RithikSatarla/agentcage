@@ -6,7 +6,9 @@
   --text:    #ffffff;
   --body:    #e0e0e0;
   --subtle:  #999999;
-  --small:   #666666;
+  /* Spec said #666, which measures 3.31:1 on this background - below the WCAG AA
+     minimum of 4.5:1 for text under 18pt. Raised to the nearest value that passes. */
+  --small:   #8a8a8a;
   --success: #00d9ff;
   --warning: #ff6b6b;
   --border:  #333333;

@@ -127,6 +127,82 @@ def test_paper_source_carries_no_unreproducible_figures():
         assert bad not in tex, f"paper contains unreproducible claim {bad!r}"
 
 
+# --- the paper reports Part B as it actually ran ------------------------------
+
+PAPER = (ROOT / "paper" / "agentcage_arxiv.tex").read_text(encoding="utf-8")
+#: LaTeX wraps source lines wherever it likes, so a phrase check against the raw text
+#: fails on nothing more than a newline. Match against a whitespace-flattened copy.
+PAPER_FLAT = re.sub(r"\s+", " ", PAPER)
+PARTB_RESULTS = json.loads(
+    (ROOT / "part_b" / "partb_results.json").read_text(encoding="utf-8"))
+
+
+def test_paper_no_longer_says_part_b_is_unrun():
+    """It said so in three places. Part B has run; none of them may survive.
+
+    "none existed" is deliberately not on this list: the checklist still records, in
+    the past tense, that no results existed when the protocol was fixed. That is the
+    claim pre-registration rests on and it stays true.
+    """
+    for stale in ("has not been run", "no results are reported for it",
+                  "none exist}", "and has not been run"):
+        assert stale not in PAPER_FLAT, f"paper still claims Part B is unrun: {stale!r}"
+
+
+def test_paper_part_b_numbers_come_from_macros_not_typed():
+    """Same discipline as Part A: the figures are generated, never transcribed."""
+    macros = (ROOT / "paper" / "generated_macros.tex").read_text(encoding="utf-8")
+    for name in ("BbAgentsRun", "BbAgentsDefective", "BbRequests", "BbTOne", "BbTTwo"):
+        assert f"\\newcommand{{\\{name}}}" in macros, f"macro {name} not generated"
+        assert f"\\{name}{{}}" in PAPER, f"paper does not use \\{name}"
+
+
+@pytest.mark.parametrize("name,expected", [
+    ("BbAgentsRun", str(PARTB_RESULTS["primary_outcome"]["denominator"])),
+    ("BbAgentsDefective", str(PARTB_RESULTS["primary_outcome"]["numerator"])),
+    ("BbRequests", str(PARTB_RESULTS["secondary_outcomes"]["requests_graded"])),
+    ("BbTOne", str(PARTB_RESULTS["secondary_outcomes"]["tiers"]["T1"])),
+    ("BbTTwo", str(PARTB_RESULTS["secondary_outcomes"]["tiers"]["T2"])),
+    ("BbMiss", str(PARTB_RESULTS["secondary_outcomes"]["tiers"]["MISS"])),
+])
+def test_part_b_macro_matches_the_run(name, expected):
+    macros = (ROOT / "paper" / "generated_macros.tex").read_text(encoding="utf-8")
+    match = re.search(r"\\newcommand\{\\" + name + r"\}\{(.+?)\}\n", macros)
+    assert match and match.group(1) == expected
+
+
+def test_paper_discloses_the_development_order_bias():
+    """MISS=0 must never appear in the paper without the reason it is zero."""
+    if PARTB_RESULTS["secondary_outcomes"]["tiers"]["MISS"] == 0:
+        assert "iteratively against these three clients" in PAPER_FLAT
+        assert "not a held-out evaluation" in PAPER_FLAT
+
+
+def test_paper_does_not_claim_the_kill_criterion_passed():
+    if not PARTB_RESULTS["secondary_outcomes"]["kill_criterion_evaluable"]:
+        assert "not evaluable" in PAPER_FLAT
+        assert "not the same as passed" in PAPER_FLAT
+
+
+def test_paper_does_not_invent_a_resolution_rate():
+    """There is no such metric. It kept reappearing in drafts; keep it out."""
+    for phrase in ("resolution rate", "92\\%", "100\\% of tool calls"):
+        assert phrase not in PAPER_FLAT, f"paper claims {phrase!r}, not measured"
+
+
+def test_paper_does_not_mislabel_the_tiers():
+    """T2 is not a cache and T3 is not an LLM. Neither exists in the codebase."""
+    for wrong in ("cached model", "LLM fallback", "T2 (cached", "T3 (LLM"):
+        assert wrong not in PAPER_FLAT, f"paper mislabels a tier: {wrong!r}"
+
+
+def test_paper_reports_both_pre_registration_failures():
+    """The empty frame and the three-API category. Both are load-bearing."""
+    assert "the pre-registered frame was" in PAPER_FLAT
+    assert "payment\\_write" in PAPER_FLAT
+    assert "not to be a single API" in PAPER_FLAT
+
+
 # --- the secondary analysis is derived from the study, not authored ------------
 
 

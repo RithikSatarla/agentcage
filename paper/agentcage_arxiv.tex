@@ -116,8 +116,13 @@ on real coverage, \AcUncoveredPct{} is a lower bound on what goes untested.
 
 We then describe AgentCage, a stateful alternative: a passive HTTP interceptor plus an
 in-memory API model in which writes mutate state and subsequent reads observe the
-mutation. We pre-register an evaluation of whether this surfaces defects that replay
-fixtures cannot. All code, data, and the detector revision history are public.
+mutation. In a pre-registered evaluation, \BbAgentsDefective{} of \BbAgentsRun{} agents
+drawn from the least-covered category exhibited a write-path defect---one stale read and
+\BbDuplicateWrites{} duplicate writes---while all three of their own test suites passed.
+The pre-registration also caught two errors in its own scope, both reported here. The
+resolution tiers we observed reflect models developed against these same agents and are
+not evidence of coverage on unseen ones. All code, data, traces, and the detector
+revision history are public.
 \end{abstract}
 
 \vspace{0.6em}
@@ -162,7 +167,9 @@ two of which removed false positives that would have made the finding look worse
 \textbf{An artefact and a pre-registered evaluation (Section~\ref{sec:partb}).} We
 describe AgentCage: passive HTTP capture plus a stateful API model. We state in advance
 what would count as evidence that it surfaces defects fixtures cannot, and what would
-falsify that claim. The evaluation has not been run; no results are reported for it.
+falsify that claim, then run it: \BbAgentsDefective{} of \BbAgentsRun{} agents drawn from
+the frame exhibit a pre-registered defect class while their own test suites pass. Two
+scoping errors the pre-registration caught in itself are reported alongside the result.
 
 \paragraph{Scope.} This is a study of \emph{test coverage}, not of agent safety in
 deployment. We do not claim the uncovered tools are buggy, nor that any agent has
@@ -370,7 +377,8 @@ Repository-level binary coverage too weak, and after the above rested on one rep
 pre-registered. The detectors were revised in response to inspecting their output, as
 Table~\ref{tab:revisions} records. It should be read as a measurement with a documented
 derivation rather than a confirmatory test of a hypothesis fixed in advance. The Part B
-evaluation in Section~\ref{sec:partb} \emph{is} pre-registered and has not been run.
+evaluation in Section~\ref{sec:partb} \emph{is} pre-registered; its results and the two
+scoping errors it caught are in Section~\ref{sec:partb-results}.
 
 \subsection{Threats to validity}
 \label{sec:threats}
@@ -522,7 +530,71 @@ reframed.
 \paragraph{Kill criterion.} If more than \textbf{50\%} of MISSes are
 PRODUCTION-STATE-DEPENDENT, the stateful-mock approach cannot be made general by further
 engineering, and the project pivots rather than continuing to build API models. Both
-thresholds are fixed now, before any data exists, so that they cannot be moved later.
+thresholds were fixed before any data existed, so that they could not be moved later.
+
+\subsection{Results}
+\label{sec:partb-results}
+
+\paragraph{What ran.} The frame was drawn mechanically from the Part A output. Of
+\BbFrameAgents{} repositories holding tools in it, \BbAgentsRun{} were run and
+\BbExcluded{} excluded under criteria fixed in advance: one whose test suite does not
+collect, two whose tools mutate only local filesystem state, and one requiring
+credentials we could not substitute. Each agent ran its published code unmodified.
+
+\paragraph{Primary outcome.} \textbf{\BbAgentsDefective{} of \BbAgentsRun{}} agents
+exhibited at least one class-1--4 defect, against a falsification threshold of
+\BbThresholdPct{}. H1 is supported on this sample. Table~\ref{tab:partb} gives the three
+cases: \BbStaleReads{} stale read and \BbDuplicateWrites{} duplicate writes, with
+\BbUncheckedErrors{} unchecked errors observed. All three test suites pass. The
+\texttt{camel} suite passes with the entire \texttt{github} module replaced by a
+\texttt{MagicMock} in \texttt{sys.modules}, so no status code, version identifier or
+error path is exercised by it at all---which is precisely what ``covered'' meant for that
+tool in Part A.
+
+\input{generated_partb_table}
+
+\paragraph{Secondary outcomes.} Of \BbRequests{} graded requests, \BbTOne{}
+(\BbTOnePct{}) were T1 and \BbTTwo{} (\BbTTwoPct{}) were T2, with \BbTThree{} T3 and
+\BbMiss{} MISS. Both T1 and T2 are answers from the same stateful model: the tiers grade
+\emph{fidelity to the documented API}, not which mechanism replied, and there is no cache
+and no generative fallback anywhere in the implementation.
+
+\paragraph{These tiers do not measure generality.}
+\label{sec:devorder}
+The GitHub and Jira models were built iteratively against these three clients: whenever a
+run reached an endpoint the model did not implement, that endpoint was added.
+MISS${}=0$ and T3${}=0$ therefore measure how well the model fits the sample it was
+developed against, and must not be read as coverage of unseen agents. Running real
+clients exposed four fidelity gaps the models' own unit tests had not: the repository
+read every client issues first was unrouted; the contents endpoint returned a bare file
+rather than the \texttt{\{content, commit\}} envelope; file bodies are base64 on the
+wire; and file storage had to be keyed by branch, without which the \texttt{camel} defect
+is invisible. This is a validation on a development sample, not a held-out evaluation,
+and any generalisation claim needs agents not seen while the models were written.
+
+\paragraph{The kill criterion was not tested.} It is a proportion of MISSes, and there
+were none, so it has no denominator. We report it as \textbf{not evaluable}, which is not
+the same as passed.
+
+\paragraph{Two of the three findings share a cause.} \texttt{agno} and
+\texttt{llama\_index} both drive \texttt{python-jira}, and in both the duplicate issue
+was created by an automatic retry inside \texttt{urllib3}, below the level either tool
+can observe. They are two instances of one mechanism rather than two independent
+observations, and with a denominator of \BbAgentsRun{} the primary outcome should be read
+as descriptive, not as an estimate of a rate in any wider population.
+
+\paragraph{Where the pre-registration failed.} Two scoping errors were caught by the
+protocol and are recorded rather than repaired. First, the pre-registered frame was
+\textbf{empty}: no tool among the \AcTools{} performs a payment operation
+(\texttt{payment\_write}${}={}$\AcPaymentN{}), so the Stripe model the evaluation had
+been designed around had no target in the measured population. The frame moved to
+\texttt{vcs\_write}, the least-covered category at \AcVcsPct{}. Second, that substituted
+category turned out not to be a single API. Its detector matches generic verbs such as
+\texttt{create\_issue(} and \texttt{delete\_file(}, and of its \AcVcsN{} tools only three
+call the GitHub API; five call issue trackers and seven write to a local filesystem or
+sandbox. A Jira model was needed that the design had not anticipated. Neither failure
+would have been visible had the frame not been fixed in advance: a protocol written
+afterwards would have selected whichever category the existing model happened to fit.
 
 \section{Discussion}
 
@@ -542,11 +614,19 @@ remains unmeasured.
 
 \section{Availability}
 
-Code, the sampling frame, complete per-repository results, and the detector revision
-history are at \url{https://github.com/RithikSatarla/agentcage}. The study reproduces
-with \texttt{python -m part\_a.run}, requires no credentials, and is re-run weekly in
-continuous integration. Every statistic in this paper is generated from
-\texttt{part\_a/results.json} rather than transcribed.
+Code, the sampling frame, complete per-repository results, the detector revision history
+and every Part B trace are at \url{https://github.com/RithikSatarla/agentcage}. Part A
+reproduces with \texttt{python -m part\_a.run} and requires no credentials; Part B
+reproduces with \texttt{python -m part\_b.setup\_agents} followed by
+\texttt{python -m part\_b.experiment}, and runs entirely against models on a localhost
+socket, so no request leaves the machine. Both are re-run in continuous integration.
+
+Every statistic in this paper is generated from \texttt{part\_a/results.json},
+\texttt{part\_a/analysis.json} and \texttt{part\_b/partb\_results.json} rather than
+transcribed, and the Part B traces are byte-identical between runs: the clock is injected
+and the model server's ephemeral port is normalised out, so a re-run that changes a trace
+means a behaviour changed. \texttt{python -m part\_b.experiment --grade} re-derives every
+Part B figure from the committed traces without running an agent.
 
 \appendix
 
@@ -574,7 +654,8 @@ Kill criterion numeric & Yes (50\% of MISSes) \\
 Analysis plan fixed & Yes \\
 Raw evidence published & Yes (all traces committed) \\
 Deviations to be logged with date and reason & Yes \\
-\textbf{Results known at time of writing} & \textbf{No --- none exist} \\
+\textbf{Results known when the protocol was fixed} & \textbf{No --- none existed} \\
+Deviations recorded once the run began & Yes --- four, in \S\ref{sec:partb-results} \\
 \bottomrule
 \end{tabular}
 \caption{Pre-registration checklist for Part B.}

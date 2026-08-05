@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Models — AgentCage</title>
-<meta name="description" content="What a stateful API model contains: entities, endpoints, mutation rules, error semantics, and the fidelity boundary.">
+<meta name="description" content="Click the endpoints and watch the state change. A stateful model of the money-moving part of Stripe.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
-    <a class="brand" href="/"><span class="dot"></span>AgentCage</a>
+    <a class="brand" href="/">AgentCage</a>
     <a class="link" href="/">Overview</a>
     <a class="link" href="/manifesto">Manifesto</a>
     <a class="link" href="/models" aria-current="page">Models</a>
@@ -20,232 +20,272 @@
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero hero-compact">
   <div class="wrap">
-    <p class="label">Reference</p>
-    <h1>State, not recordings.</h1>
-    <p class="lede">A model where writes mutate state and later reads observe the
-    mutation. Deterministic identifiers, an injectable clock, and the real error codes —
-    so a failure is a failure every time.</p>
-    <div class="actions">
-      <a class="btn solid" href="https://github.com/RithikSatarla/agentcage/blob/main/part_b/stripe_mock.py">stripe_mock.py</a>
-      <a class="btn" href="https://github.com/RithikSatarla/agentcage/blob/main/part_b/interceptor.py">interceptor.py</a>
-    </div>
+    <p class="label">Stripe · working today</p>
+    <h1>Click it. Watch the<br>state change.</h1>
+    <p class="lede">A recorded mock answers the same way forever. This one remembers.</p>
   </div>
 </header>
 
-<section>
+<section class="flush">
   <div class="wrap">
-    <div class="head">
-      <h2>Two halves</h2>
-      <p class="lede">A passive capture layer, and a model to replay against.</p>
+    <div class="controls" style="margin-bottom:1.4rem">
+      <button type="button" class="primary" data-op="charge">POST /v1/charges&nbsp;&nbsp;$50.00</button>
+      <button type="button" data-op="refund50">POST /v1/refunds&nbsp;&nbsp;$50.00</button>
+      <button type="button" data-op="refund30">POST /v1/refunds&nbsp;&nbsp;$30.00</button>
+      <button type="button" data-op="get">GET /v1/charges/{id}</button>
+      <button type="button" id="op-reset">Reset</button>
     </div>
 
-    <div class="split">
-      <div class="panel">
-        <div class="panel-head"><span>part_b/interceptor.py</span>
-          <span><span class="pill live">passive</span></span></div>
-        <div class="panel-body">
-          <p style="margin-top:0">Attaches through each HTTP library's own documented hook
-          points — <code>httpx</code> event hooks, <code>requests</code> response hooks. It
-          records method, URL, path, query, headers, body and response status.</p>
-          <p>It <strong>never</strong> rewrites a request, injects a response, or
-          short-circuits the transport. A test asserts the caller receives exactly what the
-          transport returned, byte for byte.</p>
-          <p class="caption" style="margin-bottom:0">Credential headers are replaced with
-          <code>&lt;redacted&gt;</code> at capture time, which is what makes traces safe to
-          commit.</p>
-        </div>
+    <div class="panes">
+      <div class="term">
+        <div class="term-head"><span class="bulb" id="wire-bulb"></span>
+          <span id="wire-title">the wire</span></div>
+        <div class="term-body" id="wire"></div>
       </div>
-
-      <div class="panel">
-        <div class="panel-head"><span>part_b/stripe_mock.py</span>
-          <span><span class="pill live">stateful</span></span></div>
-        <div class="panel-body">
-          <p style="margin-top:0">An in-memory model of the money-moving subset of the
-          Stripe API. Not a fixture: a refund increases
-          <code>charge.amount_refunded</code>, and a later <code>GET</code> observes it.</p>
-          <p>Identifiers come from a counter (<code>ch_00000001</code>) and the clock is
-          injectable, so a run is byte-for-byte reproducible.</p>
-          <p class="caption" style="margin-bottom:0">Errors carry the real HTTP status, error
-          code and message, returned in Stripe's error envelope.</p>
-        </div>
+      <div class="term">
+        <div class="term-head"><span class="bulb ok"></span><span>what it remembers</span></div>
+        <div class="term-body" id="state"></div>
       </div>
     </div>
+
+    <p class="caption">Every rule here is enforced by
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/part_b/stripe_mock.py"><code>part_b/stripe_mock.py</code></a>
+    and asserted by the test suite. Refund more than is left, or refund twice, and it
+    refuses with the error the real API sends.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="head">
-      <h2>Entities</h2>
-      <p class="lede">Real field definitions, validated with pydantic — not stubs.</p>
+    <div class="head"><h2>Two pieces</h2></div>
+    <div class="explain">
+      <div>
+        <div class="num">1</div>
+        <h3>It watches</h3>
+        <p>Attaches to your existing <code>httpx</code> or <code>requests</code> client and
+        records every call. It never rewrites a request or fakes a reply — a test asserts
+        your agent gets the response back byte for byte.</p>
+        <span class="wire">API keys stripped before anything is written down</span>
+      </div>
+      <div>
+        <div class="num">2</div>
+        <h3>It remembers</h3>
+        <p>A refund changes the charge, and every later read sees the change. Identifiers
+        come from a counter and the clock is injectable, so the same run gives the same
+        result every time.</p>
+        <span class="wire">ch_00000001 · deterministic, reproducible</span>
+      </div>
     </div>
 
-    <div class="cols">
-      <div class="panel">
-        <div class="panel-head"><span>Charge</span></div>
-        <div class="panel-body">
+    <details class="more">
+      <summary>All endpoints and their failure modes<span class="n">6</span></summary>
+      <div class="inner scroll">
+        <table>
+          <thead><tr><th>Endpoint</th><th>What it does</th><th>How it refuses</th></tr></thead>
+          <tbody>
+            <tr><td class="name">POST /v1/charges</td>
+                <td>Creates a charge. <code>capture=false</code> leaves it uncaptured.</td>
+                <td><code>parameter_invalid_integer</code> · 404 <code>resource_missing</code></td></tr>
+            <tr><td class="name">GET /v1/charges/{id}</td>
+                <td>Returns the charge with every mutation applied so far.</td>
+                <td>404 <code>resource_missing</code></td></tr>
+            <tr><td class="name">POST /v1/refunds</td>
+                <td>Increases <code>amount_refunded</code>. Defaults to the remainder.</td>
+                <td>400 <code>amount_too_large</code> · <code>charge_already_refunded</code> · <code>charge_not_captured</code></td></tr>
+            <tr><td class="name">POST /v1/charges/{id}/refunds</td>
+                <td>The nested route, same semantics.</td><td>as above</td></tr>
+            <tr><td class="name">GET /v1/refunds</td>
+                <td>Lists refunds, filterable by charge.</td><td>—</td></tr>
+            <tr><td class="name">POST /v1/customers</td>
+                <td>Creates a customer.</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="more">
+      <summary>Entity fields<span class="n">3</span></summary>
+      <div class="inner cols">
+        <div>
+          <h3>Charge</h3>
           <dl class="fields">
-            <dt>id · object · created</dt><dd>counter-derived <code>ch_00000001</code></dd>
-            <dt>amount · amount_captured</dt><dd>minor units, positive integer</dd>
+            <dt>amount · amount_captured</dt><dd>minor units</dd>
             <dt>amount_refunded</dt><dd>accumulates across refunds</dd>
-            <dt>refunded</dt><dd>true at parity with <code>amount_captured</code></dd>
-            <dt>captured · paid · status</dt><dd>uncaptured charges cannot be refunded</dd>
-            <dt>currency · customer · description</dt><dd>3-letter currency, optional customer</dd>
-            <dt>metadata · livemode</dt><dd>string map</dd>
+            <dt>refunded</dt><dd>true at parity with captured</dd>
+            <dt>captured · paid · status</dt><dd>uncaptured cannot be refunded</dd>
+            <dt>currency · customer · metadata</dt><dd></dd>
           </dl>
         </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><span>Refund</span></div>
-        <div class="panel-body">
+        <div>
+          <h3>Refund</h3>
           <dl class="fields">
-            <dt>id · object · created</dt><dd><code>re_00000001</code></dd>
-            <dt>amount</dt><dd>defaults to the full unrefunded remainder</dd>
+            <dt>amount</dt><dd>defaults to the unrefunded remainder</dd>
             <dt>charge</dt><dd>the charge it mutates</dd>
             <dt>reason</dt><dd>duplicate · fraudulent · requested_by_customer</dd>
-            <dt>status · currency · metadata</dt><dd>inherits the charge's currency</dd>
+            <dt>status · currency · metadata</dt><dd></dd>
           </dl>
         </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><span>Customer</span></div>
-        <div class="panel-body">
+        <div>
+          <h3>Customer</h3>
           <dl class="fields">
-            <dt>id · object · created</dt><dd><code>cus_00000001</code></dd>
             <dt>email · name · description</dt><dd>optional</dd>
             <dt>currency · delinquent</dt><dd></dd>
-            <dt>metadata · livemode</dt><dd>string map</dd>
+            <dt>metadata · livemode</dt><dd></dd>
           </dl>
         </div>
       </div>
-    </div>
+    </details>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="head">
-      <h2>Endpoints and rules</h2>
-      <p class="lede">Every rule below is enforced by the model and asserted by the
-      test suite.</p>
-    </div>
-
+    <div class="head"><h2>What&rsquo;s next</h2></div>
     <div class="scroll">
-      <table class="data">
-        <thead>
-          <tr><th>Endpoint</th><th>Behaviour</th><th>Failure</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="name">POST /v1/charges</td>
-            <td>Creates a charge. <code>capture=false</code> leaves <code>amount_captured</code> at 0.</td>
-            <td><code>parameter_invalid_integer</code> for amount ≤ 0; 404 <code>resource_missing</code> for an unknown customer</td>
-          </tr>
-          <tr>
-            <td class="name">GET /v1/charges/{id}</td>
-            <td>Returns the charge <strong>with every mutation applied so far</strong>.</td>
-            <td>404 <code>resource_missing</code></td>
-          </tr>
-          <tr>
-            <td class="name">POST /v1/refunds</td>
-            <td>Increases <code>amount_refunded</code>; sets <code>refunded</code> at parity. Amount defaults to the unrefunded remainder.</td>
-            <td>400 <code>amount_too_large</code> · 400 <code>charge_already_refunded</code> · 400 <code>charge_not_captured</code></td>
-          </tr>
-          <tr>
-            <td class="name">POST /v1/charges/{id}/refunds</td>
-            <td>The nested route, same semantics.</td>
-            <td>as above</td>
-          </tr>
-          <tr>
-            <td class="name">GET /v1/refunds</td>
-            <td>Lists refunds, filterable by charge.</td>
-            <td>—</td>
-          </tr>
-          <tr>
-            <td class="name">POST /v1/customers</td>
-            <td>Creates a customer.</td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="split" style="margin-top:2rem">
-      <div>
-        <h3>Over-refund carries the real message</h3>
-<pre><code>stripe.post_charge(amount=5000)
-stripe.post_refund(charge="ch_00000001", amount=9999)
-
-StripeError: Refund amount ($99.99) is greater than
-unrefunded amount on charge ($50.00)
-  http_status 400 · code amount_too_large</code></pre>
-      </div>
-      <div>
-        <h3>Idempotency keys replay, they don&rsquo;t re-execute</h3>
-<pre><code>stripe.post_refund(charge=c, amount=2000, idempotency_key="k1")
-stripe.post_refund(charge=c, amount=2000, idempotency_key="k1")
-stripe.get_charge(c).amount_refunded   # 2000, not 4000
-
-# reuse with different parameters is refused
-#   code idempotency_key_in_use</code></pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="head">
-      <h2>The fidelity boundary</h2>
-      <p class="lede">A mock's silent divergence from the real API is itself a source
-      of false confidence, so the boundary is stated rather than discovered.</p>
-    </div>
-    <div class="note">
-      <strong>Not modelled:</strong> payment-method validation, 3-D Secure, disputes,
-      payouts, balance transactions, webhooks, connected accounts, field expansion
-      (<code>expand[]</code>), pagination cursors, rate limits, and Stripe's real
-      identifier format. Refunding an uncaptured charge is rejected rather than releasing
-      the authorisation as Stripe does.
-      <br><br>
-      The model is sufficient to exercise double-refund, over-refund, refund-after-refund
-      and read-after-write. Nothing more is claimed.
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="head"><h2>Roadmap</h2></div>
-    <div class="scroll">
-      <table class="data">
-        <thead><tr><th>Model</th><th>Status</th><th>Why it matters</th></tr></thead>
+      <table>
+        <thead><tr><th>Model</th><th>Status</th><th>Why</th></tr></thead>
         <tbody>
           <tr><td class="name">Stripe</td><td><span class="pill live">working</span></td>
               <td>Charges, refunds, customers, idempotency</td></tr>
           <tr><td class="name">GitHub</td><td><span class="pill none">not built</span></td>
-              <td>Destructive, widely used, easy to reason about — the natural second model</td></tr>
+              <td>Destructive, widely used — the natural second one</td></tr>
           <tr><td class="name">S3</td><td><span class="pill none">not built</span></td>
-              <td>Object deletion and overwrite, versioning semantics</td></tr>
+              <td>Deletes and overwrites</td></tr>
           <tr><td class="name">Postgres</td><td><span class="pill none">not built</span></td>
-              <td>Transactional writes, constraint violations</td></tr>
+              <td>Transactional writes</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Which one is built next should be decided by a team with a real
-    agent in production. <a href="/#demo">That's what a design partner is for →</a></p>
+    <p class="caption"><strong style="color:var(--ink)">Not modelled:</strong> disputes,
+    payouts, webhooks, 3-D Secure, connected accounts, pagination, rate limits. The model
+    does double-refund, over-refund and read-after-write, and claims nothing else.
+    <a href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Tell us
+    which one you need →</a></p>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <p>MIT licensed ·
-    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a></p>
+    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
+    · <a href="/manifesto">Manifesto</a> · <a href="/data">Data</a> ·
+    <a href="agentcage-paper.pdf">Paper (PDF)</a></p>
   </div>
 </footer>
 
+<script>
+(function () {
+  "use strict";
+  // Mirrors part_b/stripe_mock.py, which is canonical and covered by the test suite.
+  var CAPTURED = 5000;
+  var s;
+
+  function money(c) { return "$" + (c / 100).toFixed(2); }
+  function $(id) { return document.getElementById(id); }
+
+  function reset() {
+    s = { created: false, refunded: 0, lastId: null };
+    paint([["click an endpoint above", "dim"]], "", "");
+  }
+
+  function paint(wire, title, bulb) {
+    $("wire").innerHTML = wire.map(function (l) {
+      return '<span class="l ' + (l[1] || "") + '">' + (l[0] || "&nbsp;") + "</span>";
+    }).join("");
+    $("wire-title").textContent = title || "the wire";
+    $("wire-bulb").className = "bulb " + (bulb || "");
+
+    var rows = s.created
+      ? [["ch_00000001", "hi"],
+         ["  amount           " + money(CAPTURED), "dim"],
+         ["  amount_refunded  " + money(s.refunded), s.refunded ? "ok" : "dim"],
+         ["  refunded         " + (s.refunded >= CAPTURED), s.refunded >= CAPTURED ? "ok" : "dim"],
+         ["", ""],
+         ["  still refundable " + money(CAPTURED - s.refunded),
+          CAPTURED - s.refunded > 0 ? "" : "bad"]]
+      : [["no charge yet", "dim"], ["", ""], ["create one to begin", "dim"]];
+    $("state").innerHTML = rows.map(function (l) {
+      return '<span class="l ' + (l[1] || "") + '">' + (l[0] || "&nbsp;") + "</span>";
+    }).join("");
+  }
+
+  function run(op) {
+    if (op === "charge") {
+      if (s.created) {
+        paint([["POST /v1/charges", "hi"], ["", ""],
+               ["a charge already exists in this demo", "dim"],
+               ["press Reset to start over", "dim"]], "already created", "");
+        return;
+      }
+      s.created = true;
+      paint([["POST /v1/charges", "hi"],
+             ['{ "amount": 5000, "currency": "usd" }', "dim"], ["", ""],
+             ["200 OK", "ok"],
+             ['{ "id": "ch_00000001", "amount": 5000,', "ok"],
+             ['  "amount_refunded": 0 }', "ok"]], "200 · created", "ok");
+      return;
+    }
+
+    if (!s.created) {
+      paint([[op === "get" ? "GET /v1/charges/ch_00000001" : "POST /v1/refunds", "hi"], ["", ""],
+             ["404 resource_missing", "bad"],
+             ["no such charge — create one first", "dim"]], "404 · no charge", "bad");
+      return;
+    }
+
+    if (op === "get") {
+      paint([["GET /v1/charges/ch_00000001", "hi"], ["", ""],
+             ["200 OK", "ok"],
+             ['{ "amount": 5000,', "ok"],
+             ['  "amount_refunded": ' + s.refunded + ",", "ok"],
+             ['  "refunded": ' + (s.refunded >= CAPTURED) + " }", "ok"], ["", ""],
+             ["the read sees every write so far", "dim"]], "200 · read", "ok");
+      return;
+    }
+
+    var amount = op === "refund50" ? 5000 : 3000;
+    var left = CAPTURED - s.refunded;
+
+    if (left <= 0) {
+      paint([["POST /v1/refunds", "hi"],
+             ['{ "charge": "ch_00000001", "amount": ' + amount + " }", "dim"], ["", ""],
+             ["400 Bad Request", "bad"],
+             ['{ "error": { "code": "charge_already_refunded",', "bad"],
+             ['    "message": "Charge ch_00000001 has already', "bad"],
+             ['     been refunded." } }', "bad"]], "400 · refused", "bad");
+      return;
+    }
+    if (amount > left) {
+      paint([["POST /v1/refunds", "hi"],
+             ['{ "charge": "ch_00000001", "amount": ' + amount + " }", "dim"], ["", ""],
+             ["400 Bad Request", "bad"],
+             ['{ "error": { "code": "amount_too_large",', "bad"],
+             ['    "message": "Refund amount (' + money(amount) + ') is', "bad"],
+             ["     greater than unrefunded amount on", "bad"],
+             ["     charge (" + money(left) + ')." } }', "bad"]], "400 · refused", "bad");
+      return;
+    }
+
+    var before = s.refunded;
+    s.refunded += amount;
+    paint([["POST /v1/refunds", "hi"],
+           ['{ "charge": "ch_00000001", "amount": ' + amount + " }", "dim"], ["", ""],
+           ["200 OK", "ok"],
+           ['{ "id": "re_0000000' + (before ? 2 : 1) + '", "amount": ' + amount + " }", "ok"],
+           ["", ""],
+           ["charge.amount_refunded  " + before + " → " + s.refunded, "dim"]],
+          "200 · applied", "ok");
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".controls button[data-op]"),
+    function (b) {
+      b.addEventListener("click", function () { run(b.getAttribute("data-op")); });
+    });
+  $("op-reset").addEventListener("click", reset);
+  reset();
+})();
+</script>
 </body>
 </html>

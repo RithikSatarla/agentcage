@@ -1,0 +1,166 @@
+/* AgentCage landing page. Locked spec: exact palette, type scale and spacing.
+   Scoped to index.html so the reference pages keep their own stylesheet. */
+
+:root {
+  --bg:      #0a0e27;
+  --text:    #ffffff;
+  --body:    #e0e0e0;
+  --subtle:  #999999;
+  --small:   #666666;
+  --success: #00d9ff;
+  --warning: #ff6b6b;
+  --border:  #333333;
+
+  --sans: Inter, Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+  --mono: Monaco, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--body);
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+a { color: var(--success); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:visited { color: #00b4d4; }
+a:focus-visible, button:focus-visible { outline: 1px solid var(--success); outline-offset: 3px; }
+
+/* ---------- nav ---------- */
+.nav { border-bottom: 1px solid var(--border); }
+.nav-inner {
+  max-width: 960px; margin: 0 auto; padding: 20px 24px;
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
+.nav .brand {
+  font-size: 16px; font-weight: 600; color: var(--text); margin-right: auto;
+}
+.nav .brand:hover { text-decoration: none; }
+.nav a.link { font-size: 14px; color: var(--subtle); }
+.nav a.link:hover { color: var(--text); text-decoration: underline; }
+
+/* ---------- hero ---------- */
+.hero { padding: 120px 0; text-align: center; }
+.hero h1 {
+  font-size: 64px; font-weight: 700; color: var(--text);
+  margin: 0 0 20px; line-height: 1.1; letter-spacing: 0;
+}
+.hero h2 {
+  font-size: 20px; font-weight: 400; color: var(--subtle);
+  margin: 0 0 40px; line-height: 1.6;
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-block; font-family: var(--sans); font-size: 16px; font-weight: 400;
+  padding: 12px 28px; border: 1px solid var(--border); background: transparent;
+  color: var(--text); cursor: pointer; transition: color .15s ease, border-color .15s ease;
+}
+.btn:hover { color: var(--success); border-color: var(--success); text-decoration: underline; }
+.btn:active { color: #00b4d4; }
+
+/* ---------- sections ---------- */
+section { padding: 80px 0; }
+h3.section {
+  font-size: 24px; font-weight: 600; color: var(--text);
+  margin: 0 0 40px; line-height: 1.3;
+}
+
+/* ---------- demo ---------- */
+.toggle { display: inline-flex; border: 1px solid var(--border); margin-bottom: 40px; }
+.toggle button {
+  font-family: var(--sans); font-size: 14px; padding: 10px 24px;
+  background: transparent; border: 0; color: var(--subtle); cursor: pointer;
+  transition: color .15s ease, background .15s ease;
+}
+.toggle button:hover { color: var(--text); }
+.toggle button[aria-pressed="true"] { color: var(--bg); background: var(--text); }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.side {
+  border: 1px solid var(--border); padding: 40px;
+  transition: opacity .15s ease, border-color .15s ease;
+}
+.side h4 {
+  font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 1px;
+  margin: 0 0 20px; text-transform: uppercase;
+}
+.side.bad h4 { color: var(--warning); }
+.side.good h4 { color: var(--success); }
+.side .flow { font-family: var(--mono); font-size: 14px; color: var(--body); margin: 0 0 20px; }
+.side .flow .arrow { color: var(--small); display: block; margin: 4px 0; }
+.side .call { font-weight: 600; }
+.side.bad .call { color: var(--warning); }
+.side.good .call { color: var(--success); }
+.side ul { list-style: none; margin: 0; padding: 0; }
+.side li { font-size: 16px; color: var(--body); padding: 6px 0; }
+.side.dim { opacity: .45; }
+
+/* ---------- code ---------- */
+.code { position: relative; border: 1px solid var(--border); }
+.code pre {
+  margin: 0; padding: 40px; overflow-x: auto;
+  font-family: var(--mono); font-size: 14px; line-height: 1.6; color: var(--text);
+}
+.code .str { color: var(--subtle); }
+.code .cmt { color: var(--warning); }
+.code .kw { color: var(--success); }
+.code button {
+  position: absolute; top: 12px; right: 12px;
+  font-family: var(--mono); font-size: 12px; padding: 6px 12px;
+  background: var(--bg); border: 1px solid var(--border); color: var(--subtle);
+  cursor: pointer; transition: color .15s ease, border-color .15s ease;
+}
+.code button:hover { color: var(--success); border-color: var(--success); }
+
+/* ---------- what's happening ---------- */
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { font-size: 16px; color: var(--subtle); line-height: 1.6; }
+.steps li .num { font-family: var(--mono); color: var(--text); margin-right: 12px; }
+.steps .arrow { color: var(--small); font-family: var(--mono); margin: 8px 0 8px 4px; }
+
+/* ---------- stat ---------- */
+.statbox { border: 1px solid var(--success); padding: 40px; }
+.statbox .stat {
+  font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.4; margin: 0 0 20px;
+}
+.statbox p { font-size: 16px; color: var(--subtle); margin: 0 0 20px; }
+.statbox .cta { display: flex; gap: 20px; flex-wrap: wrap; }
+
+/* ---------- footer ---------- */
+footer { padding: 80px 0; text-align: center; border-top: 1px solid var(--border); }
+footer .links { font-family: var(--mono); font-size: 12px; color: var(--small); }
+footer .links a { color: var(--small); }
+footer .links a:hover { color: var(--success); text-decoration: underline; }
+footer .sep { color: var(--border); margin: 0 12px; }
+footer .copy { font-size: 12px; color: var(--small); margin: 20px 0 0; }
+
+/* ---------- mobile ---------- */
+@media (max-width: 720px) {
+  .hero { padding: 40px 0; }
+  .hero h1 { font-size: 40px; }
+  .hero h2 { font-size: 18px; }
+  section { padding: 40px 0; }
+  .compare { grid-template-columns: 1fr; }
+  .side { padding: 24px; }
+  .side.dim { display: none; }
+  .code pre { padding: 24px; }
+  .btn { display: block; width: 100%; text-align: center; }
+  .statbox .cta { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

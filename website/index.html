@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentCage — your agent refunds twice, CI catches it</title>
-<meta name="description" content="Add AgentCage to your test suite. When your agent retries a refund, the test fails and the PR is blocked instead of shipping.">
+<title>AgentCage — test AI agents without hitting real APIs</title>
+<meta name="description" content="Test AI agents without hitting real APIs. A stateful mock that remembers, so a double refund fails your test instead of your customer.">
 <meta property="og:title" content="AgentCage">
-<meta property="og:description" content="Your agent refunds twice. Your tests don't notice. AgentCage makes CI notice.">
-<link rel="stylesheet" href="styles.css">
+<meta property="og:description" content="Test AI agents without hitting real APIs.">
+<link rel="stylesheet" href="home.css">
 </head>
 <body>
 
+<!-- Nav -->
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="/">AgentCage</a>
-    <a class="link" href="/" aria-current="page">Overview</a>
     <a class="link" href="/manifesto">Manifesto</a>
     <a class="link" href="/models">Models</a>
     <a class="link" href="/data">Data</a>
@@ -22,317 +22,158 @@
   </div>
 </nav>
 
-<header class="hero hero-compact">
+<!-- Hero -->
+<header class="hero">
   <div class="wrap">
-    <p class="label"><span class="dot"></span>Open source · MIT · Python 3.9+</p>
-    <h1>Your agent refunds twice.<br>Your tests don&rsquo;t notice.</h1>
-    <p class="lede">Add AgentCage to your suite and CI blocks the PR instead of shipping
-    it.</p>
-    <div class="install">
-      <code id="install-cmd"><span class="sigil">$</span>pip install -e ".[dev]"</code>
-      <button type="button" id="install-copy" aria-label="Copy install command">copy</button>
-    </div>
-
-    <div class="actions" style="margin-top:1.4rem">
-      <a class="btn solid" href="#use">How you use it</a>
-      <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
-    </div>
-
-    <p class="caption" style="margin-top:2rem">We read 45 open-source agent projects:
-    <strong style="color:var(--fail)">20.3%</strong> of the 158 tools that can move money,
-    delete data or push code are never named by a single test.
-    <a href="/data">See the data →</a></p>
+    <h1>AgentCage</h1>
+    <h2>Test AI agents without hitting real APIs.</h2>
+    <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
   </div>
 </header>
 
-<section id="use" class="flush">
-  <div class="wrap">
-    <p class="label">How you use it</p>
-    <div class="usage">
-      <div class="use">
-        <div class="n">Step 1</div>
-        <h3>Install it</h3>
-        <p>One dependency. No account, no key, no service to run.</p>
-<pre><code>pip install -e ".[dev]"</code></pre>
-      </div>
-
-      <div class="use">
-        <div class="n">Step 2</div>
-        <h3>Point your agent at it</h3>
-        <p>Swap the recorded mock for AgentCage. Your agent code does not change.</p>
-<pre><code><span class="del">- client = httpx.Client(
--     transport=RecordedMock())</span>
-<span class="add">+ cage = Interceptor()
-+ client = httpx.Client(
-+     event_hooks=cage.httpx_event_hooks())</span></code></pre>
-      </div>
-
-      <div class="use">
-        <div class="n">Step 3</div>
-        <h3>Push the PR</h3>
-        <p>Your existing workflow runs it. Nothing else to wire up.</p>
-<pre><code>- run: pytest tests/
-  git push origin fix/refunds</code></pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="demo">
-  <div class="wrap">
-    <p class="label">Step 4 · run it</p>
-    <h2 id="demo-title">Same test. Two answers.</h2>
-    <p class="lede" id="demo-sub">Your agent retries a refund. Flip the switch to see the
-    same test with and without AgentCage.</p>
-
-    <div class="toggle" role="group" aria-label="Compare without and with AgentCage"
-         style="margin-top:1.8rem">
-      <button type="button" id="btn-without" aria-pressed="true">Without</button>
-      <span class="vs">vs</span>
-      <button type="button" id="btn-with" aria-pressed="false">With AgentCage</button>
-    </div>
-
-    <div class="panes">
-      <div class="term">
-        <div class="term-head"><span class="bulb ok"></span><span>tests/test_refunds.py</span></div>
-        <div class="term-body" id="pane-code"></div>
-      </div>
-      <div class="term">
-        <div class="term-head"><span class="bulb" id="bulb-out"></span>
-          <span id="pane-out-title">$ pytest</span></div>
-        <div class="term-body" id="pane-out"></div>
-      </div>
-    </div>
-
-    <div class="steps">
-      <div class="steps-head">What&rsquo;s happening</div>
-      <ol id="steps"></ol>
-    </div>
-
-    <p class="caption" id="evidence"></p>
-  </div>
-</section>
-
+<!-- DemoToggle -->
 <section>
   <div class="wrap">
-    <div class="head"><h2>Why the recorded mock missed it</h2></div>
-    <div class="explain">
-      <div>
-        <div class="num">1</div>
-        <h3>It has no memory</h3>
-        <p>A recording answers the second refund exactly like the first, because it was
-        captured once and never updated.</p>
-        <span class="wire">POST /v1/refunds → 200 · every time</span>
+    <div class="toggle" role="group" aria-label="Compare without and with AgentCage">
+      <button type="button" id="t-without" aria-pressed="true">WITHOUT</button>
+      <button type="button" id="t-with" aria-pressed="false">WITH</button>
+    </div>
+
+    <div class="compare">
+      <div class="side bad" id="side-without">
+        <h4>Without AgentCage</h4>
+        <p class="flow">Agent writes to Stripe
+          <span class="arrow">↓</span>
+          <span class="call">REAL API CALL</span>
+        </p>
+        <ul>
+          <li>Real money moves</li>
+          <li>Untestable paths</li>
+          <li>You ship it broken</li>
+        </ul>
       </div>
-      <div>
-        <div class="num">2</div>
-        <h3>AgentCage keeps state</h3>
-        <p>The first refund changes the order. The second one meets that change and gets
-        the error the real API sends.</p>
-        <span class="wire">POST /v1/refunds → 400 charge_already_refunded</span>
-      </div>
-      <div>
-        <div class="num">3</div>
-        <h3>It never touches traffic</h3>
-        <p>Capture is passive. A test asserts your agent gets the reply back byte for byte,
-        with API keys stripped from the trace.</p>
-        <span class="wire">traces/example_double_refund.json · 4 requests</span>
+
+      <div class="side good" id="side-with">
+        <h4>With AgentCage</h4>
+        <p class="flow">Agent writes to Stripe
+          <span class="arrow">↓</span>
+          <span class="call">MOCK API CALL</span>
+        </p>
+        <ul>
+          <li>No money moves</li>
+          <li>All paths testable</li>
+          <li>You ship it working</li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
+<!-- CodeSnippet -->
 <section>
   <div class="wrap">
-    <div class="head">
-      <p class="label">Design partners</p>
-      <h2>Which API scares you?</h2>
-      <p class="lede">Stripe is modelled. Tell us the next one.</p>
+    <div class="code">
+      <button type="button" id="copy">Copy</button>
+<pre id="snippet"><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
+
+stripe = StripeMock()
+charge = stripe.post_charge(amount=<span class="str">5000</span>)
+
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
+<span class="cmt"># StripeError: charge already refunded (400)</span></pre>
     </div>
-    <div class="actions">
-      <a class="btn solid" href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Get in touch</a>
-      <a class="btn" href="https://github.com/RithikSatarla/agentcage/issues">Open an issue</a>
-    </div>
-    <p class="caption" style="margin-top:1.8rem">The interceptor, the Stripe model and the
-    study all work today and are covered by tests. The study measuring how many real agents
-    this catches is written up but <strong style="color:var(--ink)">has not been
-    run</strong>. <a href="/manifesto">What we have and haven&rsquo;t shown →</a></p>
   </div>
 </section>
 
+<!-- WhatHappening -->
+<section>
+  <div class="wrap">
+    <h3 class="section">What&rsquo;s happening</h3>
+    <ol class="steps">
+      <li><span class="num">①</span>Agent writes to Stripe</li>
+      <li class="arrow">↓</li>
+      <li><span class="num">②</span>AgentCage intercepts</li>
+      <li class="arrow">↓</li>
+      <li><span class="num">③</span>Fake Stripe responds</li>
+      <li class="arrow">↓</li>
+      <li><span class="num">④</span>Agent continues</li>
+      <li class="arrow">↓</li>
+      <li><span class="num">⑤</span>Your code passes</li>
+      <li class="arrow">↓</li>
+      <li><span class="num">⑥</span>You ship safely</li>
+    </ol>
+  </div>
+</section>
+
+<!-- StatBox -->
+<section>
+  <div class="wrap">
+    <div class="statbox">
+      <p class="stat">20.3% of write-capable agent tools have zero test
+      coverage.</p>
+      <p>That&rsquo;s 32 of 158 tools across 13 open-source projects with real API access
+      and no safety tests.</p>
+      <p>AgentCage fixes that.</p>
+      <div class="cta">
+        <a class="btn" href="agentcage-paper.pdf">Read the Research</a>
+        <a class="btn" href="https://github.com/RithikSatarla/agentcage">Start</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
 <footer>
   <div class="wrap">
-    <p>MIT licensed ·
-    <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
-    · <a href="/manifesto">Manifesto</a> · <a href="/models">Models</a> ·
-    <a href="/data">Data</a> · <a href="agentcage-paper.pdf">Paper (PDF)</a></p>
+    <p class="links">
+      <a href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <span class="sep">|</span>
+      <a href="agentcage-paper.pdf">Paper</a>
+      <span class="sep">|</span>
+      <a href="mailto:rithiksatarla@gmail.com">Email</a>
+    </p>
+    <p class="copy">&copy; 2026 AgentCage</p>
   </div>
 </footer>
 
 <script>
 (function () {
   "use strict";
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Refusals mirror part_b/stripe_mock.py, which is canonical and covered by the test
-  // suite. The With side matches traces/example_double_refund.json in the repo.
-  var SIDES = {
-    without: {
-      code: [
-        ["def test_refund_order():", "hi"],
-        ["    client = httpx.Client(", ""],
-        ["        transport=RecordedMock())", "del"],
-        ["", ""],
-        ["    agent.refund(order)   # retries once", ""],
-        ["", ""],
-        ["    assert order.refunded == 5000", ""]
-      ],
-      out: [
-        ["test_refund_order PASSED", "ok"],
-        ["1 passed in 0.41s", "ok"],
-        ["", ""],
-        ["the mock said 200 OK to both refunds", "dim"],
-        ["in production the customer gets $100.00", "bad"],
-        ["on a $50.00 order", "bad"]
-      ],
-      bulb: "ok",
-      title: "$ pytest — passes",
-      steps: [
-        ["The agent refunds the order.", 0],
-        ["The reply is never read — a timeout, a dropped await.", 0],
-        ["The agent sends the identical refund again.", 0],
-        ["The recorded mock answers 200 OK both times. It has no memory.", 0],
-        ["The test passes. The change ships.", 1]
-      ],
-      verdict: ["✗ 2 refunds applied · customer paid $100.00 on a $50.00 order", "fail"]
-    },
-    with: {
-      code: [
-        ["def test_refund_order():", "hi"],
-        ["    cage = Interceptor()", "add"],
-        ["    client = httpx.Client(", ""],
-        ["        event_hooks=cage.httpx_event_hooks())", "add"],
-        ["", ""],
-        ["    agent.refund(order)   # retries once", ""],
-        ["", ""],
-        ["    assert order.refunded == 5000", ""]
-      ],
-      out: [
-        ["test_refund_order FAILED", "bad"],
-        ["", ""],
-        ["StripeError: charge already refunded (400)", "bad"],
-        ["  refund_order() line 42", "dim"],
-        ["1 failed in 0.44s", "bad"],
-        ["", ""],
-        ["the customer gets $50.00. once.", "ok"]
-      ],
-      bulb: "bad",
-      title: "$ pytest — fails",
-      steps: [
-        ["The agent refunds the order.", 0],
-        ["AgentCage applies it — the order is now $50.00 refunded.", 0],
-        ["The reply is never read — a timeout, a dropped await.", 0],
-        ["The agent sends the identical refund again.", 0],
-        ["AgentCage refuses: 400 charge_already_refunded.", 0],
-        ["The test fails, so the change never ships.", 1]
-      ],
-      verdict: ["✓ 1 refund applied · caught in your suite, before anyone was paid twice", ""]
+  /* DemoToggle — fade out, switch emphasis, fade in. Both panels stay side by side on
+     desktop because the contrast is the point; on mobile the inactive one is hidden. */
+  var without = document.getElementById("side-without");
+  var wit = document.getElementById("side-with");
+  var bWithout = document.getElementById("t-without");
+  var bWith = document.getElementById("t-with");
+
+  function select(mode) {
+    var showWithout = mode === "without";
+    bWithout.setAttribute("aria-pressed", String(showWithout));
+    bWith.setAttribute("aria-pressed", String(!showWithout));
+    without.classList.toggle("dim", !showWithout);
+    wit.classList.toggle("dim", showWithout);
+  }
+
+  bWithout.addEventListener("click", function () { select("without"); });
+  bWith.addEventListener("click", function () { select("with"); });
+  select("without");
+
+  /* CodeSnippet — copy button */
+  var copy = document.getElementById("copy");
+  copy.addEventListener("click", function () {
+    var text = document.getElementById("snippet").innerText;
+    var done = function () {
+      copy.textContent = "Copied!";
+      window.setTimeout(function () { copy.textContent = "Copy"; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      done();
     }
-  };
-
-  var EVIDENCE = "This run is captured in the repo at traces/example_double_refund.json — " +
-                 "4 requests, 3 of them writes, API keys stripped. A test asserts the two " +
-                 "refund requests are byte-identical and that the second one is refused.";
-
-  var mode = "without", timers = [];
-  function $(id) { return document.getElementById(id); }
-
-  /* ---- copy-to-clipboard on the install command ---- */
-  (function () {
-    var btn = $("install-copy");
-    if (!btn) { return; }
-    btn.addEventListener("click", function () {
-      // strip the "$" sigil so what lands on the clipboard is runnable
-      var cmd = $("install-cmd").textContent.replace(/^\s*\$\s*/, "");
-      var done = function () {
-        btn.textContent = "copied";
-        btn.classList.add("done");
-        window.setTimeout(function () {
-          btn.textContent = "copy";
-          btn.classList.remove("done");
-        }, 1400);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(cmd).then(done, function () { done(); });
-      } else {
-        done();
-      }
-    });
-  })();
-
-  function lines(rows) {
-    return rows.map(function (l) {
-      return '<span class="l ' + (l[1] || "") + '">' + (l[0] || "&nbsp;") + "</span>";
-    }).join("");
-  }
-
-  function render() {
-    var s = SIDES[mode];
-
-    $("pane-code").innerHTML = lines(s.code);
-    $("pane-out").innerHTML = lines(s.out);
-    $("bulb-out").className = "bulb " + s.bulb;
-    $("pane-out-title").textContent = s.title;
-    $("evidence").textContent = mode === "with" ? EVIDENCE : "";
-
-    var ol = $("steps");
-    ol.innerHTML = "";
-    timers.forEach(window.clearTimeout);
-    timers = [];
-
-    s.steps.forEach(function (st, i) {
-      var li = document.createElement("li");
-      li.textContent = st[0];
-      if (st[1]) { li.className = "punch"; }
-      ol.appendChild(li);
-      if (reduce) { li.classList.add("in"); return; }
-      timers.push(window.setTimeout(function () { li.classList.add("in"); }, 70 + i * 220));
-    });
-
-    var v = document.createElement("li");
-    v.className = "verdict " + (s.verdict[1] || "");
-    v.textContent = s.verdict[0];
-    ol.appendChild(v);
-    if (reduce) { v.classList.add("in"); }
-    else {
-      timers.push(window.setTimeout(function () { v.classList.add("in"); },
-                                    150 + s.steps.length * 220));
-    }
-  }
-
-  function setMode(next) {
-    mode = next;
-    $("btn-without").setAttribute("aria-pressed", String(next === "without"));
-    $("btn-with").setAttribute("aria-pressed", String(next === "with"));
-    render();
-  }
-
-  $("btn-without").addEventListener("click", function () { setMode("without"); });
-  $("btn-with").addEventListener("click", function () { setMode("with"); });
-  render();
-
-  // Flip to With once, on its own, the first time the demo scrolls into view.
-  var teased = false;
-  function maybeTease() {
-    if (teased) { return; }
-    var box = $("demo").getBoundingClientRect();
-    if (box.top < window.innerHeight * 0.6 && box.bottom > 0) {
-      teased = true;
-      window.setTimeout(function () { setMode("with"); }, 3000);
-    }
-  }
-  window.addEventListener("scroll", maybeTease, { passive: true });
-  maybeTease();
+  });
 })();
 </script>
 </body>

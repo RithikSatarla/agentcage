@@ -250,10 +250,27 @@ def test_every_asset_reference_exists():
             assert (ROOT / "website" / src).exists(), f"{page} references missing {src}"
 
 
+#: The landing page is built to its own locked spec and carries its own stylesheet.
+#: The reference pages share styles.css.
+PAGE_STYLESHEET = {
+    "index.html": "home.css",
+    "manifesto.html": "styles.css",
+    "models.html": "styles.css",
+    "data.html": "styles.css",
+}
+
+
 @pytest.mark.parametrize("page", sorted(SITE_PAGES))
-def test_every_page_shares_the_stylesheet_and_nav(page):
+def test_every_page_links_its_stylesheet(page):
     text = (ROOT / "website" / page).read_text(encoding="utf-8")
-    assert '<link rel="stylesheet" href="styles.css">' in text, page
+    sheet = PAGE_STYLESHEET[page]
+    assert f'<link rel="stylesheet" href="{sheet}">' in text, f"{page} should load {sheet}"
+    assert (ROOT / "website" / sheet).exists(), f"{sheet} missing"
+
+
+@pytest.mark.parametrize("page", sorted(SITE_PAGES))
+def test_every_page_can_reach_every_other(page):
+    text = (ROOT / "website" / page).read_text(encoding="utf-8")
     for target in NAV_TARGETS:
         assert f'href="{target}"' in text, f"{page} cannot reach {target}"
 

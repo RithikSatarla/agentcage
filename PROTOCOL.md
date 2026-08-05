@@ -392,7 +392,49 @@ Any departure from §3A.1–§3A.9 once the experiment starts is recorded here, 
 date, what changed, and why. An empty log at publication means the protocol was followed
 exactly.
 
-*Currently empty — the experiment has not been run.*
+**2026-08-05 — the pre-registered sampling frame is empty.**
+
+§3A.2 restricts the sample to repositories "whose tools perform payment-like writes."
+Counting qualifying categories across all 158 write-capable tool definitions in the
+analysed set gives:
+
+| Category | Tools |
+|---|---:|
+| `filesystem_write` | 57 |
+| `shell_exec` | 36 |
+| `file_open_write` | 32 |
+| `messaging_write` | 23 |
+| `db_write` | 18 |
+| `vcs_write` | 15 |
+| `cloud_sdk_write` | 5 |
+| `http_destructive` | 4 |
+| **`payment_write`** | **0** |
+
+**No tool in the analysed set performs a payment operation.** Part B cannot run as
+written, because the only API model built — Stripe — has no target in the population the
+study measured.
+
+This is a scoping error in the pre-registration, and it is recorded rather than quietly
+repaired. It was caught only because §3A.2 fixed the frame in advance; a protocol written
+afterwards would have selected whichever category the existing model happened to fit.
+
+**What changes.** The frame moves to `vcs_write`: 15 tools, 7 uncovered, the
+least-covered category in the study at 46.7%. Nothing else in §3A.1–§3A.9 changes — the
+hypothesis, resolution tiers, miss classification, the four defect classes, the 20%
+falsification threshold and the 50% kill criterion all stand as written.
+
+**What this required.** A GitHub state model (`part_b/github_mock.py`), since the
+substituted frame needs one. It carries the version-control analogues of the payment
+defects the Stripe model was built for:
+
+| Defect class | Payment form | Version-control form |
+|---|---|---|
+| Duplicate write | second refund refused | a retried `POST /issues` creates **two** issues — GitHub has no idempotency key, so the duplicate is real |
+| Stale read | decision on a pre-write balance | `PUT /contents` carrying a `sha` read before the agent's own write → 409 |
+| Unchecked error | 4xx treated as success | merging an already-merged pull request → 405 |
+
+**Effect on the primary outcome.** None yet: no agent has been run against either model.
+The proportion in §3A.7 remains unmeasured, and no number is claimed for it.
 
 ---
 

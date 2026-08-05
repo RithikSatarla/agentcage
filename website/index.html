@@ -89,40 +89,43 @@
 
 <section id="demo">
   <div class="wrap">
-    <div class="head">
-      <h2>Press play. Watch the money leave twice.</h2>
-      <p class="lede">Four ways a real agent breaks a payment. Same code, same charge —
-      once against a recorded response, once against something that remembers.</p>
+    <p class="label">Demo</p>
+    <h2 id="demo-title">Same charge, two refunds</h2>
+    <p class="lede" id="demo-sub">Your agent retries a refund. Flip Without / With to see
+    a green test that ships the bug, or a red one that stops it.</p>
+
+    <div class="tabs" role="tablist" aria-label="What the agent does wrong"
+         style="margin:2rem 0 1.8rem">
+      <button role="tab" data-scenario="duplicate" aria-selected="true">it retries</button>
+      <button role="tab" data-scenario="over_refund" aria-selected="false">it miscounts</button>
+      <button role="tab" data-scenario="unchecked" aria-selected="false">it ignores errors</button>
+      <button role="tab" data-scenario="stale" aria-selected="false">it reads stale data</button>
     </div>
 
-    <div class="panel">
-      <div class="tabs" role="tablist" aria-label="What the agent does wrong">
-        <button role="tab" data-scenario="duplicate" aria-selected="true">it retries</button>
-        <button role="tab" data-scenario="over_refund" aria-selected="false">it miscounts</button>
-        <button role="tab" data-scenario="unchecked" aria-selected="false">it ignores errors</button>
-        <button role="tab" data-scenario="stale" aria-selected="false">it reads stale data</button>
-      </div>
+    <div class="toggle" role="group" aria-label="Compare without and with AgentCage">
+      <button type="button" id="btn-without" aria-pressed="true">Without</button>
+      <span class="vs">vs</span>
+      <button type="button" id="btn-with" aria-pressed="false">With AgentCage</button>
+    </div>
 
-      <div class="panel-head">
-        <span id="scenario-desc">The agent refunds, misses the reply, and refunds again.</span>
-        <span class="controls">
-          <button type="button" class="primary" id="btn-run">▶ Play</button>
-          <button type="button" id="btn-reset">Reset</button>
-        </span>
-      </div>
+    <p class="result" id="result"></p>
 
-      <div class="panel-body">
-        <div class="scroll">
-          <table>
-            <thead>
-              <tr><th style="width:2rem">#</th><th style="width:14rem">What the agent asks for</th>
-                  <th style="width:9rem">Recorded mock</th><th>AgentCage</th></tr>
-            </thead>
-            <tbody id="ledger"></tbody>
-          </table>
-        </div>
-        <div id="verdict" style="margin-top:1.3rem"></div>
+    <div class="panes">
+      <div class="term">
+        <div class="term-head"><span class="bulb" id="bulb-a"></span>
+          <span id="pane-a-title">your test suite</span></div>
+        <div class="term-body" id="pane-a"></div>
       </div>
+      <div class="term">
+        <div class="term-head"><span class="bulb" id="bulb-b"></span>
+          <span id="pane-b-title">your customer</span></div>
+        <div class="term-body" id="pane-b"></div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="steps-head">What&rsquo;s happening</div>
+      <ol id="steps"></ol>
     </div>
   </div>
 </section>
@@ -262,205 +265,255 @@ stripe.post_refund(charge=charge.id, amount=5000)
   window.addEventListener("scroll", maybeCount, { passive: true });
   maybeCount();
 
-  /* ---- the demo ---- */
-  // Refund rules mirror part_b/stripe_mock.py, which is canonical and covered by tests.
-  var CAPTURED = 5000;
+  /* ---- the demo ----
+     Each scenario is shown twice: the same agent code against a recorded response, and
+     against the stateful model. The refusals mirror part_b/stripe_mock.py, which is
+     canonical and covered by the test suite. */
 
-  var SCENARIOS = {
+  var SCEN = {
     duplicate: {
-      desc: "The agent refunds, misses the reply, and refunds again.",
-      mode: "retrying",
-      steps: [
-        { method: "POST", label: "refund $50.00", amount: 5000, note: "refund the order" },
-        { method: "POST", label: "refund $50.00", amount: 5000, note: "no reply seen — try again" }
-      ],
-      verdict: function (s) {
-        return "The recorded mock said yes both times, so the tests passed. In reality the " +
-               "customer was sent " + money(s.fixtureOut) + " back on a " + money(CAPTURED) +
-               " order.";
+      title: "Same charge, two refunds",
+      sub: "Your agent retries a refund. Flip Without / With to see a green test that " +
+           "ships the bug, or a red one that stops it.",
+      without: {
+        result: ['Two refunds. One charge. ', '$100.00 gone.', 'out'],
+        a: [["$ pytest tests/test_refunds.py", "hi"],
+            ["test_refund_order PASSED", "ok"],
+            ["", ""],
+            ["1 passed in 0.41s", "ok"],
+            ["", ""],
+            ["→ shipped to production", "dim"]],
+        b: [["refund", "dim"], ["  -$50.00", "bad"],
+            ["refund", "dim"], ["  -$50.00", "bad"],
+            ["────────────────", "rule"],
+            ["order was      $50.00", "dim"],
+            ["they received  $100.00", "bad"]],
+        steps: [["The agent refunds the order.", 0],
+                ["The recorded mock replies 200 OK.", 0],
+                ["The agent never sees the reply, so it tries again.", 0],
+                ["The mock replies 200 OK again — it remembers nothing.", 0],
+                ["Your tests pass. The bug ships.", 1]]
+      },
+      with: {
+        result: ['Two refunds. One charge. ', 'Caught before ship.', 'safe'],
+        a: [["$ pytest tests/test_refunds.py", "hi"],
+            ["test_refund_order FAILED", "bad"],
+            ["", ""],
+            ["StripeError: charge already refunded", "bad"],
+            ["  refund_order() line 42", "dim"],
+            ["1 failed in 0.44s", "bad"]],
+        b: [["refund", "dim"], ["  -$50.00", "ok"],
+            ["refund", "dim"], ["  REFUSED", "ok"],
+            ["────────────────", "rule"],
+            ["order was      $50.00", "dim"],
+            ["they received  $50.00", "ok"]],
+        steps: [["The agent refunds the order.", 0],
+                ["AgentCage applies it. $50.00 refunded.", 0],
+                ["The agent never sees the reply, so it tries again.", 0],
+                ["AgentCage refuses — this charge is already fully refunded.", 0],
+                ["Your test fails. You fix it before anyone is paid twice.", 1]]
       }
     },
+
     over_refund: {
-      desc: "The agent does the arithmetic wrong and gives back too much.",
-      mode: "miscounting",
-      steps: [
-        { method: "POST", label: "refund $30.00", amount: 3000, note: "refund part of it" },
-        { method: "POST", label: "refund $40.00", amount: 4000, note: "refund 'the rest'" }
-      ],
-      verdict: function () {
-        return "Only " + money(CAPTURED) + " was ever taken, so there is no way to give " +
-               "back $70.00. The recorded mock never checked.";
+      title: "Refund the rest — wrongly",
+      sub: "The agent does the arithmetic wrong and gives back more than was ever taken.",
+      without: {
+        result: ['Gave back $70.00 on a ', '$50.00 order.', 'out'],
+        a: [["$ pytest tests/test_partial.py", "hi"],
+            ["test_partial_refund PASSED", "ok"],
+            ["", ""],
+            ["1 passed in 0.38s", "ok"]],
+        b: [["refund", "dim"], ["  -$30.00", "dim"],
+            ["refund", "dim"], ["  -$40.00", "bad"],
+            ["────────────────", "rule"],
+            ["order was      $50.00", "dim"],
+            ["they received  $70.00", "bad"]],
+        steps: [["The agent refunds $30.00 of a $50.00 order.", 0],
+                ["It then refunds $40.00 as 'the rest'.", 0],
+                ["The mock accepts both — it never tracked the first one.", 0],
+                ["Tests pass. You are $20.00 down per order.", 1]]
+      },
+      with: {
+        result: ['Refused. ', 'Only $20.00 was left.', 'safe'],
+        a: [["$ pytest tests/test_partial.py", "hi"],
+            ["test_partial_refund FAILED", "bad"],
+            ["", ""],
+            ["StripeError: amount_too_large", "bad"],
+            ["  $20.00 left to refund", "dim"]],
+        b: [["refund", "dim"], ["  -$30.00", "ok"],
+            ["refund", "dim"], ["  REFUSED", "ok"],
+            ["────────────────", "rule"],
+            ["order was      $50.00", "dim"],
+            ["they received  $30.00", "ok"]],
+        steps: [["The agent refunds $30.00 of a $50.00 order.", 0],
+                ["AgentCage records it. $20.00 remains.", 0],
+                ["The agent asks for $40.00 more.", 0],
+                ["AgentCage refuses — there is only $20.00 left.", 0],
+                ["Your test fails with the exact number the agent got wrong.", 1]]
       }
     },
+
     unchecked: {
-      desc: "The refund fails and the agent carries on as if it worked.",
-      mode: "ignoring errors",
-      steps: [
-        { method: "POST", label: "refund $75.00", amount: 7500, note: "too much — this fails" },
-        { method: "POST", label: "refund $50.00", amount: 5000, note: "assumes it worked, continues" }
-      ],
-      verdict: function () {
-        return "The first refund failed, but the agent never looked at the answer. A mock " +
-               "that always says yes can never show you this.";
+      title: "It failed. The agent didn't look.",
+      sub: "The refund is rejected, and the agent carries on as though it worked.",
+      without: {
+        result: ['Refund failed. Order marked ', 'refunded anyway.', 'out'],
+        a: [["$ pytest tests/test_flow.py", "hi"],
+            ["test_refund_and_close PASSED", "ok"],
+            ["", ""],
+            ["1 passed in 0.52s", "ok"]],
+        b: [["refund $75.00", "dim"], ["  would fail — mock says ok", "bad"],
+            ["order status", "dim"], ["  CLOSED / refunded", "bad"],
+            ["────────────────", "rule"],
+            ["they received  $0.00", "bad"],
+            ["they were told $75.00", "bad"]],
+        steps: [["The agent asks to refund $75.00 on a $50.00 order.", 0],
+                ["The mock says 200 OK, because it always does.", 0],
+                ["The agent never checks the status and closes the order.", 0],
+                ["Tests pass. The customer is told they were refunded.", 1]]
+      },
+      with: {
+        result: ['The failure ', 'shows up in your test.', 'safe'],
+        a: [["$ pytest tests/test_flow.py", "hi"],
+            ["test_refund_and_close FAILED", "bad"],
+            ["", ""],
+            ["StripeError: amount_too_large", "bad"],
+            ["  agent ignored a 400 and continued", "dim"]],
+        b: [["refund $75.00", "dim"], ["  REFUSED", "ok"],
+            ["order status", "dim"], ["  still open", "ok"],
+            ["────────────────", "rule"],
+            ["they received  $0.00", "dim"],
+            ["they were told nothing", "ok"]],
+        steps: [["The agent asks to refund $75.00 on a $50.00 order.", 0],
+                ["AgentCage refuses — that is more than was taken.", 0],
+                ["The agent ignores the refusal and closes the order.", 0],
+                ["Your test fails, pointing at the branch that never checks status.", 1]]
       }
     },
+
     stale: {
-      desc: "The agent decides using a number it looked up before its own refund.",
-      mode: "stale data",
-      steps: [
-        { method: "GET", label: "check the order", amount: 0, note: "sees: nothing refunded yet" },
-        { method: "POST", label: "refund $50.00", amount: 5000, note: "refund the order" },
-        { method: "POST", label: "refund $50.00", amount: 5000, note: "old note still says $0.00" }
-      ],
-      verdict: function () {
-        return "It decided to refund again from a number it read before its own refund " +
-               "landed. Against a recording, stale and fresh look identical.";
+      title: "It checked before it acted",
+      sub: "The agent decides using a number it looked up before its own refund landed.",
+      without: {
+        result: ['Refunded twice from ', 'one stale lookup.', 'out'],
+        a: [["$ pytest tests/test_reconcile.py", "hi"],
+            ["test_reconcile PASSED", "ok"],
+            ["", ""],
+            ["1 passed in 0.61s", "ok"]],
+        b: [["checked: refunded so far", "dim"], ["  $0.00", "dim"],
+            ["refund", "dim"], ["  -$50.00", "dim"],
+            ["refund", "dim"], ["  -$50.00", "bad"],
+            ["────────────────", "rule"],
+            ["they received  $100.00", "bad"]],
+        steps: [["The agent checks how much has been refunded. Nothing yet.", 0],
+                ["It refunds $50.00.", 0],
+                ["It re-reads its own note, which still says $0.00.", 0],
+                ["So it refunds again. The mock accepts it.", 0],
+                ["Tests pass. Stale and fresh look identical to a recording.", 1]]
+      },
+      with: {
+        result: ['The second one is ', 'refused.', 'safe'],
+        a: [["$ pytest tests/test_reconcile.py", "hi"],
+            ["test_reconcile FAILED", "bad"],
+            ["", ""],
+            ["StripeError: charge already refunded", "bad"],
+            ["  decided on a read taken before the write", "dim"]],
+        b: [["checked: refunded so far", "dim"], ["  $0.00", "dim"],
+            ["refund", "dim"], ["  -$50.00", "ok"],
+            ["refund", "dim"], ["  REFUSED", "ok"],
+            ["────────────────", "rule"],
+            ["they received  $50.00", "ok"]],
+        steps: [["The agent checks how much has been refunded. Nothing yet.", 0],
+                ["It refunds $50.00. AgentCage records it.", 0],
+                ["It re-reads its own note, which still says $0.00.", 0],
+                ["It refunds again — AgentCage refuses.", 0],
+                ["Your test fails on the stale read, not in production.", 1]]
       }
     }
   };
 
-  var current = "duplicate", state, running, timer;
+  var scenario = "duplicate", mode = "without", stepTimer;
 
-  function money(c) { return "$" + (c / 100).toFixed(2); }
-  function $(id) { return document.getElementById(id); }
-
-  function paint(status, bad) {
-    $("sch-refunded").textContent = money(state.refunded);
-    $("sch-status").textContent = status || "—";
-    $("sch-status").setAttribute("class", "val" + (bad ? " bad" : status ? " ok" : ""));
-    var loss = Math.max(0, state.fixtureOut - CAPTURED);
-    $("sch-loss").textContent = money(loss);
-    $("sch-loss").setAttribute("class", "val" + (loss > 0 ? " bad" : ""));
-    $("node-model").setAttribute("class", "node" + (bad ? " bad" : status ? " on" : ""));
+  function paneHTML(lines) {
+    return lines.map(function (l) {
+      return '<span class="l ' + (l[1] || "") + '">' + (l[0] || "&nbsp;") + "</span>";
+    }).join("");
   }
 
-  function reset() {
-    window.clearTimeout(timer);
-    running = false;
-    state = { refunded: 0, fixtureOut: 0, steps: 0 };
-    $("ledger").innerHTML =
-      '<tr><td colspan="4" class="empty">Press Play.</td></tr>';
-    $("verdict").innerHTML = "";
-    $("btn-run").disabled = false;
-    $("agent-mode").textContent = SCENARIOS[current].mode;
-    paint();
-  }
+  function renderDemo() {
+    var sc = SCEN[scenario], side = sc[mode];
+    document.getElementById("demo-title").textContent = sc.title;
+    document.getElementById("demo-sub").textContent = sc.sub;
 
-  function apply(step) {
-    if (step.method === "GET") {
-      return { status: 200, text: "nothing refunded yet" };
-    }
-    var remaining = CAPTURED - state.refunded;
-    if (remaining <= 0) {
-      return { status: 400, bad: true, text: "refused — already refunded in full" };
-    }
-    if (step.amount > remaining) {
-      return { status: 400, bad: true,
-               text: "refused — only " + money(remaining) + " left to give back" };
-    }
-    state.refunded += step.amount;
-    return { status: 200, text: "ok — " + money(state.refunded) + " refunded so far" };
-  }
+    document.getElementById("result").innerHTML =
+      side.result[0] + '<span class="' + side.result[2] + '">' + side.result[1] + "</span>";
 
-  function cell(text, cls) {
-    var td = document.createElement("td");
-    if (cls) { td.className = cls; }
-    td.textContent = text;
-    return td;
-  }
+    document.getElementById("pane-a").innerHTML = paneHTML(side.a);
+    document.getElementById("pane-b").innerHTML = paneHTML(side.b);
+    document.getElementById("bulb-a").className = "bulb " + (mode === "with" ? "bad" : "ok");
+    document.getElementById("bulb-b").className = "bulb " + (mode === "with" ? "ok" : "bad");
+    document.getElementById("pane-a-title").textContent =
+      mode === "with" ? "your test suite — fails" : "your test suite — passes";
 
-  function flyPacket(then) {
-    if (reduce) { then(); return; }
-    var packet = $("packet"), start = null, dur = 460;
-    packet.setAttribute("opacity", "1");
-    function frame(ts) {
-      if (start === null) { start = ts; }
-      var t = Math.min(1, (ts - start) / dur);
-      packet.setAttribute("cx", String(80 + t * 400));
-      if (t < 1) { window.requestAnimationFrame(frame); }
-      else { packet.setAttribute("opacity", "0"); packet.setAttribute("cx", "80"); then(); }
-    }
-    window.requestAnimationFrame(frame);
-  }
-
-  function runStep(i) {
-    var sc = SCENARIOS[current];
-    if (i >= sc.steps.length) {
-      running = false;
-      $("btn-run").disabled = false;
-      $("verdict").innerHTML = '<div class="note"><strong>What your tests would have told you.</strong> ' +
-        sc.verdict(state) + "</div>";
-      return;
-    }
-    var step = sc.steps[i];
-    $("node-agent").setAttribute("class", "node on");
-    $("node-cage").setAttribute("class", "node on");
-
-    flyPacket(function () {
-      var result = apply(step);
-      if (step.method === "POST") { state.fixtureOut += step.amount; }
-      if (state.steps === 0) { $("ledger").innerHTML = ""; }
-      state.steps += 1;
-
-      var tr = document.createElement("tr");
-      tr.appendChild(cell(String(i + 1), "dim"));
-      tr.appendChild(cell(step.label, "name"));
-      tr.appendChild(cell("yes ✓", "ok"));
-      tr.appendChild(cell(result.text, result.bad ? "bad" : "ok"));
-      $("ledger").appendChild(tr);
-
-      var noteRow = document.createElement("tr");
-      noteRow.appendChild(document.createElement("td"));
-      var note = cell("↳ " + step.note, "dim");
-      note.colSpan = 3;
-      noteRow.appendChild(note);
-      $("ledger").appendChild(noteRow);
-
-      paint(result.status === 200 ? "ok" : "refused", result.bad);
-      $("node-agent").setAttribute("class", "node");
-      $("node-cage").setAttribute("class", "node");
-      timer = window.setTimeout(function () { runStep(i + 1); }, 560);
+    var ol = document.getElementById("steps");
+    ol.innerHTML = "";
+    window.clearTimeout(stepTimer);
+    side.steps.forEach(function (s, i) {
+      var li = document.createElement("li");
+      li.textContent = s[0];
+      if (s[1]) { li.className = "punch"; }
+      ol.appendChild(li);
+      if (reduce) { li.classList.add("in"); return; }
+      window.setTimeout(function () { li.classList.add("in"); }, 90 + i * 260);
     });
+
+    // Mirror the outcome in the hero schematic.
+    var loss = mode === "without" ? 5000 : 0;
+    document.getElementById("sch-refunded").textContent = mode === "without" ? "$100.00" : "$50.00";
+    document.getElementById("sch-status").textContent = mode === "without" ? "ok" : "refused";
+    document.getElementById("sch-status").className = "val " + (mode === "without" ? "bad" : "ok");
+    document.getElementById("sch-loss").textContent = money(loss);
+    document.getElementById("sch-loss").className = "val " + (loss ? "bad" : "ok");
+    document.getElementById("agent-mode").textContent = mode === "without" ? "unchecked" : "caged";
   }
 
-  function play() {
-    if (running) { return; }
-    reset();
-    running = true;
-    $("btn-run").disabled = true;
-    runStep(0);
+  function setMode(next) {
+    mode = next;
+    document.getElementById("btn-without").setAttribute("aria-pressed", String(next === "without"));
+    document.getElementById("btn-with").setAttribute("aria-pressed", String(next === "with"));
+    renderDemo();
   }
 
-  function selectScenario(id) {
-    current = id;
-    Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
-      b.setAttribute("aria-selected", String(b.getAttribute("data-scenario") === id));
-    });
-    $("scenario-desc").textContent = SCENARIOS[id].desc;
-    reset();
-    play();
-  }
+  document.getElementById("btn-without").addEventListener("click", function () { setMode("without"); });
+  document.getElementById("btn-with").addEventListener("click", function () { setMode("with"); });
 
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
-    b.addEventListener("click", function () { selectScenario(b.getAttribute("data-scenario")); });
+    b.addEventListener("click", function () {
+      scenario = b.getAttribute("data-scenario");
+      Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (o) {
+        o.setAttribute("aria-selected", String(o === b));
+      });
+      renderDemo();
+    });
   });
-  $("btn-run").addEventListener("click", play);
-  $("btn-reset").addEventListener("click", reset);
 
-  reset();
+  function money(c) { return "$" + (c / 100).toFixed(2); }
 
-  // Play once on its own the first time the demo scrolls into view.
-  var autoplayed = false;
-  function maybeAutoplay() {
-    if (autoplayed) { return; }
-    var box = $("demo").getBoundingClientRect();
-    if (box.top < window.innerHeight * 0.75 && box.bottom > 0) {
-      autoplayed = true;
-      play();
+  renderDemo();
+
+  // Flip to "With" once, on its own, the first time the demo scrolls into view.
+  var teased = false;
+  function maybeTease() {
+    if (teased) { return; }
+    var box = document.getElementById("demo").getBoundingClientRect();
+    if (box.top < window.innerHeight * 0.6 && box.bottom > 0) {
+      teased = true;
+      window.setTimeout(function () { setMode("with"); }, 2200);
     }
   }
-  window.addEventListener("scroll", maybeAutoplay, { passive: true });
-  maybeAutoplay();
+  window.addEventListener("scroll", maybeTease, { passive: true });
+  maybeTease();
 })();
 </script>
 </body>

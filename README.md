@@ -196,6 +196,24 @@ talking to a model that keeps state, with every write attempt on the record. Tha
 in [tests/test_interceptor.py](tests/test_interceptor.py) — the agent tries the refund
 twice, is refused the second time, and the customer is paid once.
 
+## Waiting list
+
+The site has a signup form backed by [api/waitlist.py](api/waitlist.py), a Vercel
+serverless function with no dependencies. It has one rule: it never reports success for
+an address it did not deliver. Until a destination is configured it answers 503 and the
+page tells the visitor to email instead, so no signup is silently lost.
+
+Set **one** of these in the Vercel dashboard under Settings, Environment Variables, then
+redeploy:
+
+| Variable | What it does |
+|---|---|
+| `WAITLIST_WEBHOOK_URL` | Every signup is POSTed as JSON. Works with Zapier, Make, a Google Apps Script, Buttondown, ConvertKit, or a Slack incoming webhook. |
+| `RESEND_API_KEY` | Emails each signup to you through Resend. Also needs `WAITLIST_TO` and `WAITLIST_FROM`. |
+
+`GET /api/waitlist` reports whether a destination is configured, which is the quickest
+way to check a deploy picked the variables up.
+
 ## Layout
 
 | Path | What it is |

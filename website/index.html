@@ -31,6 +31,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   <div class="nav-inner">
     <a class="brand" href="/" aria-current="page">AgentCage</a>
     <div class="nav-links">
+      <a class="link" href="/explained">Explained</a>
       <a class="link" href="/manifesto">Manifesto</a>
       <a class="link" href="/models">Models</a>
       <a class="link" href="/data">Data</a>
@@ -158,25 +159,91 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </div>
 </section>
 
-<!-- Code: full-width band. -->
-<section class="codeband">
+<!-- Demo: same agent, same two calls, two different verdicts. -->
+<section class="demo" id="demo">
   <div class="wrap">
-    <div class="code-panel">
-      <button type="button" id="copy">Copy</button>
-<pre id="snippet"><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
+    <h2 class="section">Same code. Two verdicts.</h2>
+    <p class="lede">An agent refunds a charge, then retries the refund. What your test
+    says about that depends entirely on what it is talking to.</p>
+
+    <div class="toggle" role="group" aria-label="Choose what the agent is tested against">
+      <button type="button" id="t-mock" aria-pressed="true" aria-controls="pane">Recorded mock</button>
+      <button type="button" id="t-cage" aria-pressed="false" aria-controls="pane">AgentCage</button>
+    </div>
+
+    <div class="panes" id="pane">
+      <!-- Recorded mock -->
+      <div class="pane" id="pane-mock">
+        <div class="pane-code">
+<pre><span class="cmt"># one response, recorded from the real API, replayed forever</span>
+stripe = ReplayMock(<span class="str">"responses.json"</span>)
+
+charge = stripe.post_charge(amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
+        </div>
+        <ol class="pane-out">
+          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
+          <li><span class="lbl">refund 2</span><span class="res ok">200 succeeded</span></li>
+          <li class="outcome pass"><span class="lbl">your test</span><span class="res">passes</span></li>
+        </ol>
+        <p class="pane-note bad">The fixture has no memory, so the retry looks exactly
+        like the original. The bug ships, and the customer is paid twice.</p>
+      </div>
+
+      <!-- AgentCage -->
+      <div class="pane" id="pane-cage" hidden>
+        <div class="pane-code">
+<pre><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
 
 stripe = StripeMock()
 charge = stripe.post_charge(amount=<span class="str">5000</span>)
 
 stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
-stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
-<span class="cmt"># StripeError: charge already refunded (400)</span></pre>
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
+        </div>
+        <ol class="pane-out">
+          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
+          <li><span class="lbl">refund 2</span><span class="res bad">400 charge_already_refunded</span></li>
+          <li class="outcome fail"><span class="lbl">your test</span><span class="res">fails</span></li>
+        </ol>
+        <p class="pane-note good">The model remembers the first refund, so the second is
+        refused exactly as the real API would. You fix it before shipping.</p>
+      </div>
     </div>
-    <div class="code-side">
-      <p>The second refund is the whole idea. A recorded fixture replays the first
-      response twice and your test goes green.</p>
+
+    <p class="demo-foot">Those four requests are a real recorded run, committed at
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/traces/example_double_refund.json">traces/example_double_refund.json</a>
+    and asserted by the test suite.</p>
+
+    <div class="cta">
       <a class="btn" href="https://github.com/RithikSatarla/agentcage#quickstart">Install it</a>
     </div>
+  </div>
+</section>
+
+<!-- Waiting list -->
+<section class="waitlist" id="waitlist">
+  <div class="wrap">
+    <h2 class="section">Get it when it ships</h2>
+    <p class="wl-sub">One email when AgentCage is usable outside this repository.
+    Nothing else.</p>
+
+    <form class="wl-form" id="wl-form" novalidate>
+      <div class="wl-row">
+        <label class="sr-only" for="wl-email">Email address</label>
+        <input id="wl-email" name="email" type="email" inputmode="email"
+               autocomplete="email" placeholder="you@company.com" required
+               aria-describedby="wl-msg">
+        <button class="btn btn-primary" type="submit" id="wl-submit">Join the list</button>
+      </div>
+      <!-- Honeypot. Off-screen rather than display:none, which some autofillers skip. -->
+      <div class="wl-hp" aria-hidden="true">
+        <label for="wl-company">Company</label>
+        <input id="wl-company" name="company" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="wl-msg" id="wl-msg" role="status" aria-live="polite"></p>
+    </form>
   </div>
 </section>
 
@@ -199,20 +266,79 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
 (function () {
   "use strict";
 
-  /* Copy button. */
-  var copy = document.getElementById("copy");
-  if (copy) {
-    copy.addEventListener("click", function () {
-      var text = document.getElementById("snippet").innerText;
-      var done = function () {
-        copy.textContent = "Copied";
-        window.setTimeout(function () { copy.textContent = "Copy"; }, 1400);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, done);
-      } else {
-        done();
+  /* Demo toggle. Both panes are in the markup and one is hidden, so the content is
+     there for search engines and for anyone without scripting. */
+  var bMock = document.getElementById("t-mock");
+  var bCage = document.getElementById("t-cage");
+  var pMock = document.getElementById("pane-mock");
+  var pCage = document.getElementById("pane-cage");
+
+  if (bMock && bCage) {
+    var choose = function (mock) {
+      bMock.setAttribute("aria-pressed", String(mock));
+      bCage.setAttribute("aria-pressed", String(!mock));
+      pMock.hidden = !mock;
+      pCage.hidden = mock;
+    };
+    bMock.addEventListener("click", function () { choose(true); });
+    bCage.addEventListener("click", function () { choose(false); });
+  }
+
+  /* Waiting list. Four states, and the failure state is the one that matters: if the
+     endpoint is not connected to a destination it answers 503, and the visitor is told
+     to email instead. Nothing here ever shows a tick for a signup that went nowhere. */
+  var form = document.getElementById("wl-form");
+  if (form) {
+    var input = document.getElementById("wl-email");
+    var submit = document.getElementById("wl-submit");
+    var msg = document.getElementById("wl-msg");
+    var MAILTO = "mailto:rithiksatarla@gmail.com?subject=AgentCage%20waiting%20list";
+
+    var say = function (state, text) {
+      msg.className = "wl-msg " + state;
+      msg.innerHTML = text;
+    };
+
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var email = input.value.trim();
+
+      if (!email || email.indexOf("@") < 1 || email.lastIndexOf(".") < email.indexOf("@")) {
+        say("err", "Enter a valid email address.");
+        input.focus();
+        return;
       }
+
+      submit.disabled = true;
+      submit.textContent = "Joining";
+      say("", "");
+
+      fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          company: document.getElementById("wl-company").value,
+          source: "landing"
+        })
+      }).then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      }).then(function (result) {
+        if (result.ok && result.data.ok) {
+          form.innerHTML = '<p class="wl-msg ok">You are on the list. ' +
+            'You will hear from us once, when it ships.</p>';
+          return;
+        }
+        var reason = (result.data && result.data.error) || "something went wrong";
+        say("err", "Could not add you: " + reason + ". " +
+            '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
+      }).catch(function () {
+        say("err", 'Could not reach the server. ' +
+            '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
+      }).then(function () {
+        submit.disabled = false;
+        submit.textContent = "Join the list";
+      });
     });
   }
 

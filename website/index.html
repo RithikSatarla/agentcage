@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentCage — test AI agents without hitting real APIs</title>
-<meta name="description" content="Test AI agents without hitting real APIs. A stateful mock that remembers, so a double refund fails your test instead of your customer.">
+<title>AgentCage: test AI agents without hitting real APIs</title>
+<meta name="description" content="Their tests pass. Their writes are wrong. AgentCage runs agent code against a stateful API model, so a duplicate write fails your test instead of your customer.">
 <meta property="og:title" content="AgentCage">
-<meta property="og:description" content="Test AI agents without hitting real APIs.">
+<meta property="og:description" content="Their tests pass. Their writes are wrong.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://agentcage.vercel.app/">
 <meta name="twitter:card" content="summary">
@@ -15,73 +15,153 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="home.css">
+<script>
+/* Arm the scroll-reveal only when scripting is available and motion is welcome.
+   Runs in the head so content never flashes visible before being hidden. */
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.documentElement.className += " js";
+}
+</script>
 </head>
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
 
-<!-- Nav -->
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="/" aria-current="page">AgentCage</a>
-    <a class="link" href="/manifesto">Manifesto</a>
-    <a class="link" href="/models">Models</a>
-    <a class="link" href="/data">Data</a>
-    <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    <div class="nav-links">
+      <a class="link" href="/manifesto">Manifesto</a>
+      <a class="link" href="/models">Models</a>
+      <a class="link" href="/data">Data</a>
+      <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    </div>
   </div>
 </nav>
 
-<!-- Hero -->
+<!-- Hero: asymmetric split. Copy carries the claim, the panel carries the proof. -->
 <header class="hero" id="main">
-  <div class="wrap">
-    <h1>AgentCage</h1>
-    <h2>Test AI agents without hitting real APIs.</h2>
-    <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Part B results</p>
+      <h1>Their tests pass.<br>Their writes don&rsquo;t.</h1>
+      <p class="sub">AgentCage runs agent code against a stateful API model. A
+      duplicate write fails your test, not your customer.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#findings">See what broke</a>
+        <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      </div>
+    </div>
+
+    <!-- Real requests from part_b/traces/camel.json, scenario pull-request-repeat.
+         Not a mock-up of a terminal: this is the recorded run, committed in the repo. -->
+    <figure class="trace">
+      <figcaption class="trace-head">
+        <span class="trace-what">camel-ai/camel</span>
+        <span class="trace-when">second run</span>
+      </figcaption>
+      <ol class="trace-body">
+        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets</span><span class="code ok">200</span></li>
+        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets/branches/main</span><span class="code ok">200</span></li>
+        <li><span class="verb">POST</span><span class="path">/repos/acme/widgets/git/refs</span><span class="code warn">422</span></li>
+        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets/contents/README.md</span><span class="code ok">200</span></li>
+        <li class="fail"><span class="verb">PUT</span><span class="path">/repos/acme/widgets/contents/README.md</span><span class="code bad">409</span></li>
+      </ol>
+      <p class="trace-note">It read the file from one branch and wrote that version to
+      another. The 409 is never caught.</p>
+    </figure>
   </div>
 </header>
 
-<!-- DemoToggle -->
-<section>
-  <div class="wrap">
-    <div class="toggle" role="group" aria-label="Compare without and with AgentCage">
-      <button type="button" id="t-without" aria-pressed="true">WITHOUT</button>
-      <button type="button" id="t-with" aria-pressed="false">WITH</button>
+<!-- Metrics: hairline-separated data, no card boxes. -->
+<section class="metrics" aria-label="Key figures">
+  <div class="wrap metrics-grid">
+    <div class="metric">
+      <p class="figure">20.3%</p>
+      <p class="label">of write-capable agent tools have zero test coverage</p>
+      <p class="foot">32 of 158 tools across 13 open-source projects</p>
     </div>
-
-    <div class="compare">
-      <div class="side bad" id="side-without">
-        <h4>Without AgentCage</h4>
-        <p class="flow">Agent writes to Stripe
-          <span class="arrow">↓</span>
-          <span class="call">REAL API CALL</span>
-        </p>
-        <ul>
-          <li>Real money moves</li>
-          <li>Untestable paths</li>
-          <li>You ship it broken</li>
-        </ul>
-      </div>
-
-      <div class="side good" id="side-with">
-        <h4>With AgentCage</h4>
-        <p class="flow">Agent writes to Stripe
-          <span class="arrow">↓</span>
-          <span class="call">MOCK API CALL</span>
-        </p>
-        <ul>
-          <li>No money moves</li>
-          <li>All paths testable</li>
-          <li>You ship it working</li>
-        </ul>
-      </div>
+    <div class="metric">
+      <p class="figure">3 of 3</p>
+      <p class="label">agents we ran got a write wrong</p>
+      <p class="foot">every one of their own suites passes</p>
+    </div>
+    <div class="metric">
+      <p class="figure">40</p>
+      <p class="label">API requests graded against a pre-registered rubric</p>
+      <p class="foot">fixed before any data existed</p>
     </div>
   </div>
 </section>
 
-<!-- CodeSnippet -->
-<section>
+<!-- Findings: asymmetric bento, three items in three cells. -->
+<section id="findings">
   <div class="wrap">
-    <div class="code">
+    <h2 class="section">What happened when we ran it</h2>
+    <p class="lede">Three open-source agent tools, their own code unchanged, pointed at
+    a model that remembers what they already did.</p>
+
+    <div class="bento">
+      <article class="cell cell-lead reveal">
+        <p class="who"><span class="repo">camel-ai/camel</span><span class="what">GithubToolkit</span></p>
+        <p class="verdict">Stale read</p>
+        <p class="detail">It reads a file from the default branch, then writes that
+        version to a different branch. GitHub rejects the write. The tool never catches
+        the error.</p>
+        <p class="aside">Its 9 tests pass with the entire GitHub library swapped for a
+        mock that always says yes, so no version check ever runs.</p>
+      </article>
+
+      <article class="cell reveal">
+        <p class="who"><span class="repo">agno-agi/agno</span><span class="what">JiraTools</span></p>
+        <p class="verdict">Duplicate write</p>
+        <p class="detail">One call to create an issue. Two issues created. The tool
+        reports a single success.</p>
+      </article>
+
+      <article class="cell reveal">
+        <p class="who"><span class="repo">run-llama/llama_index</span><span class="what">JiraIssueToolSpec</span></p>
+        <p class="verdict">Duplicate write</p>
+        <p class="detail">Written independently of agno, and wrong the same way. The
+        retry happens inside the HTTP client, below the tool.</p>
+      </article>
+    </div>
+
+    <p class="caveat">Three agents is a small number, and the models were built against
+    these clients, so the clean parts of the result say more about fit than about
+    generality. Every limitation is written down, alongside every request each agent
+    made. <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Read the protocol</a>.</p>
+  </div>
+</section>
+
+<!-- How it works: three moves, vertical, no step numbers. -->
+<section class="how">
+  <div class="wrap">
+    <h2 class="section">How it works</h2>
+    <ol class="moves">
+      <li class="reveal">
+        <h3>Intercept</h3>
+        <p>Your agent keeps its own HTTP client. AgentCage catches the request on its
+        way out, without rewriting it.</p>
+      </li>
+      <li class="reveal">
+        <h3>Model</h3>
+        <p>A stateful stand-in answers. It remembers the charge you already refunded and
+        the file you already wrote.</p>
+      </li>
+      <li class="reveal">
+        <h3>Assert</h3>
+        <p>The second refund is refused, the stale write is rejected, and your test
+        fails where production would have.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- Code: full-width band. -->
+<section class="codeband">
+  <div class="wrap">
+    <div class="code-panel">
       <button type="button" id="copy">Copy</button>
 <pre id="snippet"><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
 
@@ -92,92 +172,23 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
 stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
 <span class="cmt"># StripeError: charge already refunded (400)</span></pre>
     </div>
-  </div>
-</section>
-
-<!-- WhatHappening -->
-<section>
-  <div class="wrap">
-    <h3 class="section">What&rsquo;s happening</h3>
-    <ol class="steps">
-      <li><span class="num">①</span>Agent writes to Stripe</li>
-      <li class="arrow">↓</li>
-      <li><span class="num">②</span>AgentCage intercepts</li>
-      <li class="arrow">↓</li>
-      <li><span class="num">③</span>Fake Stripe responds</li>
-      <li class="arrow">↓</li>
-      <li><span class="num">④</span>Agent continues</li>
-      <li class="arrow">↓</li>
-      <li><span class="num">⑤</span>Your code passes</li>
-      <li class="arrow">↓</li>
-      <li><span class="num">⑥</span>You ship safely</li>
-    </ol>
-  </div>
-</section>
-
-<!-- Findings -->
-<section>
-  <div class="wrap">
-    <h3 class="section">What happened when we ran it</h3>
-    <p class="lede">We pointed three real open-source agent tools at the model, with
-    their own code unchanged. Every one of their test suites passes. Every one of them
-    got a write wrong.</p>
-
-    <ol class="findings">
-      <li>
-        <p class="who"><span class="repo">camel-ai/camel</span><span class="what">GithubToolkit</span></p>
-        <p class="defect">Reads a file from the default branch, then writes that version
-        to a different branch. GitHub rejects it. The error is never caught.</p>
-        <p class="suite">Its 9 tests pass &mdash; with the entire GitHub library replaced
-        by a mock that always says yes.</p>
-      </li>
-      <li>
-        <p class="who"><span class="repo">agno-agi/agno</span><span class="what">JiraTools</span></p>
-        <p class="defect">One call to create an issue. Two issues created. The tool
-        reports a single success and never sees the duplicate.</p>
-        <p class="suite">The retry happens inside the HTTP client, below the tool.</p>
-      </li>
-      <li>
-        <p class="who"><span class="repo">run-llama/llama_index</span><span class="what">JiraIssueToolSpec</span></p>
-        <p class="defect">Same shape, different project. One call, two issues, one
-        reported success.</p>
-        <p class="suite">Written independently of agno, and wrong the same way.</p>
-      </li>
-    </ol>
-
-    <p class="caveat">Three agents is a small number, and the models were built against
-    these clients, so the clean parts of the result say more about fit than about
-    generality. The limitations are written down in full, alongside every request each
-    agent made.
-    <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Read the protocol</a>.</p>
-  </div>
-</section>
-
-<!-- StatBox -->
-<section>
-  <div class="wrap">
-    <div class="statbox">
-      <p class="stat"><span class="figure">20.3%</span> of write-capable agent tools have
-      zero test coverage.</p>
-      <p>That&rsquo;s 32 of 158 tools across 13 open-source projects with real API access
-      and no safety tests.</p>
-      <p>AgentCage fixes that.</p>
-      <div class="cta">
-        <a class="btn" href="agentcage-paper.pdf">Read the Research</a>
-        <a class="btn" href="https://github.com/RithikSatarla/agentcage">Start</a>
-      </div>
+    <div class="code-side">
+      <p>The second refund is the whole idea. A recorded fixture replays the first
+      response twice and your test goes green.</p>
+      <a class="btn" href="https://github.com/RithikSatarla/agentcage#quickstart">Install it</a>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
 <footer>
   <div class="wrap">
     <p class="links">
       <a href="https://github.com/RithikSatarla/agentcage">GitHub</a>
-      <span class="sep">|</span>
+      <span class="sep">/</span>
       <a href="agentcage-paper.pdf">Paper</a>
-      <span class="sep">|</span>
+      <span class="sep">/</span>
+      <a href="/data">Data</a>
+      <span class="sep">/</span>
       <a href="mailto:rithiksatarla@gmail.com">Email</a>
     </p>
     <p class="copy">&copy; 2026 AgentCage</p>
@@ -188,39 +199,44 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
 (function () {
   "use strict";
 
-  /* DemoToggle — fade out, switch emphasis, fade in. Both panels stay side by side on
-     desktop because the contrast is the point; on mobile the inactive one is hidden. */
-  var without = document.getElementById("side-without");
-  var wit = document.getElementById("side-with");
-  var bWithout = document.getElementById("t-without");
-  var bWith = document.getElementById("t-with");
-
-  function select(mode) {
-    var showWithout = mode === "without";
-    bWithout.setAttribute("aria-pressed", String(showWithout));
-    bWith.setAttribute("aria-pressed", String(!showWithout));
-    without.classList.toggle("dim", !showWithout);
-    wit.classList.toggle("dim", showWithout);
+  /* Copy button. */
+  var copy = document.getElementById("copy");
+  if (copy) {
+    copy.addEventListener("click", function () {
+      var text = document.getElementById("snippet").innerText;
+      var done = function () {
+        copy.textContent = "Copied";
+        window.setTimeout(function () { copy.textContent = "Copy"; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, done);
+      } else {
+        done();
+      }
+    });
   }
 
-  bWithout.addEventListener("click", function () { select("without"); });
-  bWith.addEventListener("click", function () { select("with"); });
-  select("without");
+  /* Scroll reveal. IntersectionObserver rather than a scroll listener: no work on
+     frames where nothing crossed the threshold. Motion is here to sequence the
+     findings so they read one at a time, not for decoration. */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var targets = document.querySelectorAll(".reveal");
 
-  /* CodeSnippet — copy button */
-  var copy = document.getElementById("copy");
-  copy.addEventListener("click", function () {
-    var text = document.getElementById("snippet").innerText;
-    var done = function () {
-      copy.textContent = "Copied!";
-      window.setTimeout(function () { copy.textContent = "Copy"; }, 1400);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, done);
-    } else {
-      done();
-    }
-  });
+  if (reduce.matches || !("IntersectionObserver" in window)) {
+    Array.prototype.forEach.call(targets, function (el) { el.classList.add("shown"); });
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry, i) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      window.setTimeout(function () { el.classList.add("shown"); }, i * 70);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
+
+  Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
 })();
 </script>
 </body>

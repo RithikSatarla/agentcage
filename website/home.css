@@ -1,27 +1,29 @@
-/* AgentCage landing page. Locked spec: exact palette, type scale and spacing.
-   Scoped to index.html so the reference pages keep their own stylesheet. */
+/* AgentCage landing page.
+
+   Dark-locked by brand: every section is the same navy family, none inverts.
+   One accent (cyan) carries every interactive and emphatic state. Red appears only
+   where an actual HTTP failure is being shown, never as decoration.
+   One radius: zero. Sharp edges everywhere, which suits a tool whose output is a
+   request log. */
 
 :root {
   --bg:      #0a0e27;
+  --bg-lift: #0d1233;   /* same family, one step up. Never a light section. */
   --text:    #ffffff;
-  --body:    #e0e0e0;
-  --subtle:  #999999;
-  /* Spec said #666, which measures 3.31:1 on this background - below the WCAG AA
-     minimum of 4.5:1 for text under 18pt. Raised to the nearest value that passes. */
-  --small:   #8a8a8a;
-  --success: #00d9ff;
-  --warning: #ff6b6b;
-  --border:  #333333;
+  --body:    #dfe3f0;
+  --subtle:  #9aa0b8;   /* 7.3:1 on --bg */
+  --small:   #8a8a8a;   /* 5.5:1 on --bg. The spec's #666 measured 3.3:1. */
+  --accent:  #00d9ff;   /* 11.2:1 on --bg */
+  --bad:     #ff6b6b;   /* 6.9:1 on --bg, semantic only */
+  --border:  #232a4d;   /* navy-tinted, not neutral grey, so it sits in the palette */
+  --hairline:#171d3d;
 
-  /* Space Grotesk over Inter: the audit flags Inter as the default AI choice, and a
-     geometric grotesque carries more character at display sizes. JetBrains Mono for
-     code because it was drawn for terminals. Both load with display=swap and fall back
-     to the system stack, so the page is readable before the webfont arrives — and stays
-     readable anywhere the font request is blocked. */
   --sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
           Helvetica, Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
           Monaco, monospace;
+
+  --ease: cubic-bezier(.16, 1, .3, 1);
 }
 
 * { box-sizing: border-box; }
@@ -34,230 +36,338 @@ body {
   color: var(--body);
   font-family: var(--sans);
   font-size: 16px;
-  font-weight: 400;
   line-height: 1.6;
-  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   position: relative;
+  overflow-x: hidden;
 }
 
-/* Grain. Flat vector surfaces read as sterile; this breaks the digital flatness
-   without adding a network request or shifting any colour. */
+/* Grain. Fixed and pointer-events-none so it never repaints on scroll. */
 body::before {
   content: "";
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035;
+  position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: .035;
   background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>\
 <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter>\
 <rect width='140' height='140' filter='url(%23n)'/></svg>");
 }
-body > * { position: relative; z-index: 2; }
 
-/* Keyboard users land here first. */
+/* Ambient field behind the hero. Two off-centre radial pools in the brand accent,
+   very low alpha. This is what gives the top of the page depth without a photograph
+   and without an external request. */
+body::after {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 900px;
+  z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(680px 420px at 78% 6%,  rgba(0, 217, 255, .13), transparent 68%),
+    radial-gradient(520px 380px at 8%  32%, rgba(0, 217, 255, .07), transparent 70%);
+}
+body > * { position: relative; z-index: 1; }
+
 .skip {
-  position: absolute; left: -9999px; top: 0; z-index: 10;
-  background: var(--success); color: var(--bg); padding: 12px 20px; font-size: 14px;
+  position: absolute; left: -9999px; top: 0; z-index: 20;
+  background: var(--accent); color: var(--bg); padding: 12px 20px; font-size: 14px;
 }
 .skip:focus { left: 0; text-decoration: none; }
 
-.wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
 
-a { color: var(--success); text-decoration: none; }
+/* Grid children default to min-width:auto, so anything holding a <pre> or a nowrap
+   path pushes its own track wider than the container instead of scrolling inside it.
+   That is what made the page overflow horizontally at 390px. */
+.hero-grid > *, .metrics-grid > *, .bento > *, .moves > *, .codeband .wrap > * {
+  min-width: 0;
+}
+
+a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
-a:visited { color: #00b4d4; }
-a:focus-visible, button:focus-visible { outline: 1px solid var(--success); outline-offset: 3px; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 3px;
+}
 
 /* ---------- nav ---------- */
-.nav { border-bottom: 1px solid var(--border); }
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  border-bottom: 1px solid var(--hairline);
+  background: rgba(10, 14, 39, .72);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .nav { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
 .nav-inner {
-  max-width: 960px; margin: 0 auto; padding: 20px 24px;
-  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  max-width: 1120px; margin: 0 auto; padding: 0 28px;
+  height: 64px; display: flex; align-items: center; gap: 28px;
 }
 .nav .brand {
-  font-size: 16px; font-weight: 600; color: var(--text); margin-right: auto;
+  font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -.02em;
+  margin-right: auto;
 }
-.nav .brand:hover { text-decoration: none; }
-.nav a.link { font-size: 14px; color: var(--subtle); }
-.nav a.link:hover { color: var(--text); text-decoration: underline; }
+.nav .brand:hover { text-decoration: none; color: var(--accent); }
+.nav-links { display: flex; gap: 26px; align-items: center; }
+.nav a.link { font-size: 14px; color: var(--subtle); transition: color .15s var(--ease); }
+.nav a.link:hover { color: var(--text); text-decoration: none; }
 
-/* ---------- hero ----------
-   Left-aligned, not centred: a fully centred hero is the single most templated
-   layout there is. Bottom padding runs heavier than top so the section sits
-   optically centred rather than mathematically. */
-.hero { padding: 128px 0 148px; }
+/* ---------- hero ---------- */
+.hero { padding: 96px 0 108px; }
+.hero-grid {
+  display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; align-items: center;
+}
+
+.eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent);
+  margin: 0 0 22px;
+}
+
 .hero h1 {
-  font-size: 64px; font-weight: 700; color: var(--text);
-  margin: 0 0 20px; line-height: 1.04; letter-spacing: -0.035em;
-  text-wrap: balance;
+  /* Capped so the second line stays on one line in the copy column. A headline that
+     wraps to three lines is a font-size error, not a copy-length error. */
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 700; color: var(--text);
+  margin: 0 0 22px; line-height: 1.04; letter-spacing: -.04em;
 }
-.hero h2 {
-  font-size: 20px; font-weight: 400; color: var(--subtle);
-  margin: 0 0 40px; line-height: 1.55; max-width: 34ch;
-  text-wrap: pretty;
+
+.sub {
+  font-size: 19px; color: var(--subtle); margin: 0 0 36px;
+  line-height: 1.55; max-width: 46ch; text-wrap: pretty;
 }
+
+.cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
 /* ---------- buttons ---------- */
 .btn {
-  display: inline-block; font-family: var(--sans); font-size: 16px; font-weight: 400;
-  padding: 12px 28px; border: 1px solid var(--border); background: transparent;
-  color: var(--text); cursor: pointer; transition: color .15s ease, border-color .15s ease;
+  display: inline-block; font-family: var(--sans); font-size: 15px; font-weight: 500;
+  padding: 13px 26px; border: 1px solid var(--border); background: transparent;
+  color: var(--text); cursor: pointer; white-space: nowrap;
+  transition: color .15s var(--ease), border-color .15s var(--ease),
+              background .15s var(--ease), transform .1s var(--ease);
 }
-.btn:hover { color: var(--success); border-color: var(--success); text-decoration: underline; }
-/* Pressed feedback: a physical click needs a physical response. */
-.btn:active { color: #00b4d4; transform: translateY(1px); }
+.btn:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+  font-weight: 700;
+}
+.btn-primary:hover { background: #5ce6ff; border-color: #5ce6ff; color: var(--bg); }
+
+/* ---------- hero trace ----------
+   Real recorded requests, so it is typeset as a log, not dressed as a window.
+   No title bar, no traffic lights, no fake build stamp. */
+.trace {
+  margin: 0; border: 1px solid var(--border); background: var(--bg-lift);
+  box-shadow: 0 24px 60px rgba(4, 7, 22, .55);   /* tinted to the background, not black */
+}
+.trace-head {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 14px 20px; border-bottom: 1px solid var(--hairline);
+}
+.trace-what { font-family: var(--mono); font-size: 12px; color: var(--text); }
+.trace-when { font-family: var(--mono); font-size: 11px; color: var(--small); }
+
+.trace-body { list-style: none; margin: 0; padding: 12px 0; }
+.trace-body li {
+  display: grid; grid-template-columns: 46px 1fr auto; gap: 12px; align-items: baseline;
+  padding: 7px 20px;
+  font-family: var(--mono); font-size: 12.5px;
+  border-left: 2px solid transparent;
+}
+.trace-body .verb { color: var(--small); }
+.trace-body .path {
+  color: var(--body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0;   /* let it ellipsis instead of widening the row */
+}
+.trace-body .code { font-variant-numeric: tabular-nums; }
+.trace-body .code.ok   { color: var(--small); }
+.trace-body .code.warn { color: var(--subtle); }
+.trace-body .code.bad  { color: var(--bad); font-weight: 500; }
+.trace-body li.fail { background: rgba(255, 107, 107, .07); border-left-color: var(--bad); }
+.trace-body li.fail .path { color: var(--text); }
+
+.trace-note {
+  margin: 0; padding: 14px 20px; border-top: 1px solid var(--hairline);
+  font-size: 13.5px; color: var(--subtle); line-height: 1.5;
+}
+
+/* ---------- metrics ----------
+   Hairlines, not cards. The numbers are the hierarchy. */
+.metrics { padding: 0 0 96px; }
+.metrics-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+}
+.metric { padding: 34px 32px 0 0; }
+.metric + .metric { border-left: 1px solid var(--border); padding-left: 32px; }
+.metric .figure {
+  font-size: 40px; font-weight: 700; color: var(--text); margin: 0 0 12px;
+  letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.metric .label { font-size: 15px; color: var(--body); margin: 0 0 8px; max-width: 30ch; }
+.metric .foot {
+  font-family: var(--mono); font-size: 11.5px; color: var(--small); margin: 0;
+  line-height: 1.5;
+}
 
 /* ---------- sections ---------- */
-section { padding: 80px 0; }
-h3.section {
-  font-size: 24px; font-weight: 600; color: var(--text);
-  margin: 0 0 40px; line-height: 1.25; letter-spacing: -0.02em;
-  text-wrap: balance;
+section { padding: 96px 0; }
+h2.section {
+  font-size: clamp(26px, 3.4vw, 38px); font-weight: 700; color: var(--text);
+  margin: 0 0 18px; line-height: 1.12; letter-spacing: -.03em;
 }
-
-/* ---------- demo ---------- */
-.toggle { display: inline-flex; border: 1px solid var(--border); margin-bottom: 40px; }
-.toggle button {
-  font-family: var(--sans); font-size: 14px; padding: 10px 24px;
-  background: transparent; border: 0; color: var(--subtle); cursor: pointer;
-  transition: color .15s ease, background .15s ease;
-}
-.toggle button:hover { color: var(--text); }
-.toggle button[aria-pressed="true"] { color: var(--bg); background: var(--text); }
-
-.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.side {
-  border: 1px solid var(--border); padding: 40px;
-  transition: opacity .15s ease, border-color .15s ease;
-}
-.side h4 {
-  font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 1px;
-  margin: 0 0 20px; text-transform: uppercase;
-}
-.side.bad h4 { color: var(--warning); }
-.side.good h4 { color: var(--success); }
-.side .flow { font-family: var(--mono); font-size: 14px; color: var(--body); margin: 0 0 20px; }
-.side .flow .arrow { color: var(--small); display: block; margin: 4px 0; }
-.side .call { font-weight: 600; }
-.side.bad .call { color: var(--warning); }
-.side.good .call { color: var(--success); }
-.side ul { list-style: none; margin: 0; padding: 0; }
-.side li { font-size: 16px; color: var(--body); padding: 6px 0; }
-.side.dim { opacity: .45; }
-
-/* ---------- code ---------- */
-.code { position: relative; border: 1px solid var(--border); }
-.code pre {
-  margin: 0; padding: 40px; overflow-x: auto;
-  font-family: var(--mono); font-size: 14px; line-height: 1.6; color: var(--text);
-}
-.code .str { color: var(--subtle); }
-.code .cmt { color: var(--warning); }
-.code .kw { color: var(--success); }
-.code button {
-  position: absolute; top: 12px; right: 12px;
-  font-family: var(--mono); font-size: 12px; padding: 6px 12px;
-  background: var(--bg); border: 1px solid var(--border); color: var(--subtle);
-  cursor: pointer; transition: color .15s ease, border-color .15s ease;
-}
-.code button:hover { color: var(--success); border-color: var(--success); }
-
-/* ---------- what's happening ---------- */
-.steps { list-style: none; margin: 0; padding: 0; }
-.steps li {
-  font-size: 16px; color: var(--subtle); line-height: 1.6;
-  opacity: 0; transform: translateY(6px);
-  animation: rise .5s cubic-bezier(.2,.7,.3,1) forwards;
-}
-/* Staggered entry: mounting everything at once reads as a template. */
-.steps li:nth-child(1)  { animation-delay: .05s }
-.steps li:nth-child(3)  { animation-delay: .11s }
-.steps li:nth-child(5)  { animation-delay: .17s }
-.steps li:nth-child(7)  { animation-delay: .23s }
-.steps li:nth-child(9)  { animation-delay: .29s }
-.steps li:nth-child(11) { animation-delay: .35s }
-@keyframes rise { to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .steps li { opacity: 1; transform: none; animation: none; }
-}
-.steps li .num { font-family: var(--mono); color: var(--success); margin-right: 12px; }
-.steps .arrow { color: var(--small); font-family: var(--mono); margin: 8px 0 8px 4px; }
-
-/* ---------- findings ----------
-   A numbered list rather than three cards: the entries are read in sequence and are
-   not comparable options, which is the only thing a card row is good at. */
 .lede {
-  font-size: 18px; color: var(--body); margin: -16px 0 40px;
-  max-width: 62ch; text-wrap: pretty;
-}
-
-.findings { list-style: none; margin: 0; padding: 0; counter-reset: f; }
-.findings li {
-  counter-increment: f;
-  padding: 24px 0 24px 44px;
-  border-top: 1px solid var(--border);
-  position: relative;
-}
-.findings li:last-child { border-bottom: 1px solid var(--border); }
-.findings li::before {
-  content: counter(f, decimal-leading-zero);
-  position: absolute; left: 0; top: 26px;
-  font-family: var(--mono); font-size: 12px; color: var(--success);
-}
-
-.findings .who { margin: 0 0 8px; display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; }
-.findings .repo { font-size: 16px; font-weight: 600; color: var(--text); }
-.findings .what {
-  font-family: var(--mono); font-size: 12px; color: var(--small);
-}
-.findings .defect {
-  font-size: 16px; color: var(--body); margin: 0 0 8px; max-width: 68ch;
+  font-size: 18px; color: var(--subtle); margin: 0 0 48px; max-width: 60ch;
   text-wrap: pretty;
 }
-.findings .suite { font-size: 14px; color: var(--subtle); margin: 0; max-width: 68ch; }
+
+/* ---------- findings bento ----------
+   Three items, three cells: one lead cell spanning the top, two beneath it. */
+.bento { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.cell {
+  background: var(--bg); padding: 34px 32px;
+  transition: background .25s var(--ease);
+}
+.cell:hover { background: var(--bg-lift); }
+.cell-lead {
+  grid-column: 1 / -1;
+  background:
+    radial-gradient(560px 260px at 88% 0%, rgba(0, 217, 255, .09), transparent 70%),
+    var(--bg);
+}
+.cell-lead:hover {
+  background:
+    radial-gradient(560px 260px at 88% 0%, rgba(0, 217, 255, .13), transparent 70%),
+    var(--bg-lift);
+}
+
+.who { margin: 0 0 16px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.who .repo { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+.who .what { font-family: var(--mono); font-size: 11.5px; color: var(--small); }
+
+.verdict {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+}
+.cell .detail { font-size: 16px; color: var(--body); margin: 0; max-width: 58ch; text-wrap: pretty; }
+.cell-lead .detail { font-size: 18px; max-width: 62ch; }
+.cell .aside {
+  font-size: 14px; color: var(--subtle); margin: 16px 0 0; max-width: 62ch;
+  padding-left: 16px; border-left: 1px solid var(--border);
+}
 
 .caveat {
-  font-size: 14px; color: var(--subtle); margin: 32px 0 0; max-width: 68ch;
+  font-size: 14px; color: var(--subtle); margin: 40px 0 0; max-width: 72ch;
   text-wrap: pretty;
 }
 
-/* ---------- stat ---------- */
-/* Left rule rather than a full box: a bordered rectangle is the default card look,
-   and the number does not need to be caged to carry weight. */
-.statbox { border-left: 2px solid var(--success); padding: 8px 0 8px 40px; }
-.statbox .stat {
-  font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.35;
-  margin: 0 0 20px; letter-spacing: -0.02em; text-wrap: balance;
-  font-variant-numeric: tabular-nums;
+/* Reveal. Sequences the findings so they land one at a time rather than as a block.
+   The hidden state is scoped to .js, which the page sets only when it has both
+   scripting and permission to move. Without that class the content is simply visible:
+   an animation that fails must never be able to hide the thing it was animating. */
+.js .reveal { opacity: 0; transform: translateY(14px); }
+.js .reveal.shown {
+  opacity: 1; transform: none;
+  transition: opacity .55s var(--ease), transform .55s var(--ease);
 }
-.statbox .stat .figure { color: var(--success); }
-.statbox p { font-size: 16px; color: var(--subtle); margin: 0 0 20px; }
-.statbox .cta { display: flex; gap: 20px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal, .js .reveal.shown { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- how it works ---------- */
+.how { background: var(--bg-lift); border-top: 1px solid var(--hairline);
+       border-bottom: 1px solid var(--hairline); }
+/* A vertical sequence, not three columns. These three moves happen in order, and a
+   3-up row would both read as parallel and repeat the metrics band's layout. */
+.moves { list-style: none; margin: 0; padding: 0; max-width: 720px; }
+.moves li {
+  position: relative; padding: 0 0 34px 30px; border-left: 1px solid var(--border);
+}
+.moves li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.moves li::before {
+  content: ""; position: absolute; left: -4px; top: 9px;
+  width: 7px; height: 7px; background: var(--accent);
+}
+.moves h3 {
+  font-size: 20px; font-weight: 700; color: var(--text); margin: 0 0 8px;
+  letter-spacing: -.02em; line-height: 1.2;
+}
+.moves p { font-size: 16px; color: var(--subtle); margin: 0; max-width: 58ch; }
+
+/* ---------- code ---------- */
+.codeband .wrap { display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: center; }
+.code-panel { position: relative; border: 1px solid var(--border); background: var(--bg-lift); }
+.code-panel pre {
+  margin: 0; padding: 32px; overflow-x: auto;
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.7; color: var(--text);
+}
+.code-panel .str { color: var(--subtle); }
+.code-panel .cmt { color: var(--bad); }
+.code-panel .kw  { color: var(--accent); }
+.code-panel button {
+  position: absolute; top: 12px; right: 12px;
+  font-family: var(--mono); font-size: 11px; padding: 6px 12px;
+  background: var(--bg); border: 1px solid var(--border); color: var(--subtle);
+  cursor: pointer; transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+.code-panel button:hover { color: var(--accent); border-color: var(--accent); }
+.code-side p { font-size: 17px; color: var(--body); margin: 0 0 26px; text-wrap: pretty; }
 
 /* ---------- footer ---------- */
-footer { padding: 80px 0; text-align: center; border-top: 1px solid var(--border); }
-footer .links { font-family: var(--mono); font-size: 12px; color: var(--small); }
+footer { padding: 64px 0; text-align: center; border-top: 1px solid var(--hairline); }
+footer .links { font-family: var(--mono); font-size: 12px; color: var(--small); margin: 0; }
 footer .links a { color: var(--small); }
-footer .links a:hover { color: var(--success); text-decoration: underline; }
+footer .links a:hover { color: var(--accent); }
 footer .sep { color: var(--border); margin: 0 12px; }
-footer .copy { font-size: 12px; color: var(--small); margin: 20px 0 0; }
+footer .copy { font-size: 12px; color: var(--small); margin: 18px 0 0; }
 
-/* ---------- mobile ---------- */
+/* ---------- tablet ---------- */
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+  .sub { max-width: 54ch; }
+  .codeband .wrap { grid-template-columns: 1fr; gap: 32px; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(3) {
+    grid-column: 1 / -1; border-left: 0; padding-left: 0;
+    border-top: 1px solid var(--border); margin-top: 28px; padding-top: 28px;
+  }
+}
+
+/* ---------- mobile: every multi-column layout collapses to one ---------- */
 @media (max-width: 720px) {
-  .hero { padding: 40px 0; }
-  .hero h1 { font-size: 40px; }
-  .hero h2 { font-size: 18px; }
-  section { padding: 40px 0; }
-  .compare { grid-template-columns: 1fr; }
-  .side { padding: 24px; }
-  .side.dim { display: none; }
-  .code pre { padding: 24px; }
-  .btn { display: block; width: 100%; text-align: center; }
-  .statbox .cta { flex-direction: column; }
-  .lede { font-size: 16px; }
-  .findings li { padding-left: 0; }
-  .findings li::before { position: static; display: block; margin-bottom: 8px; }
+  .wrap { padding: 0 20px; }
+  .nav-inner { padding: 0 20px; gap: 18px; }
+  .nav-links { gap: 16px; }
+  .nav a.link { font-size: 13px; }
+
+  .hero { padding: 56px 0 64px; }
+  .sub { font-size: 17px; }
+  .cta { flex-direction: column; align-items: stretch; }
+  .btn { text-align: center; }
+
+  section { padding: 64px 0; }
+  .metrics { padding-bottom: 64px; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .metric { padding: 26px 0 0; }
+  .metric + .metric {
+    border-left: 0; padding-left: 0;
+    border-top: 1px solid var(--border); margin-top: 26px; padding-top: 26px;
+  }
+  .metric:nth-child(3) { margin-top: 26px; padding-top: 26px; }
+
+  .bento { grid-template-columns: 1fr; }
+  .cell { padding: 26px 22px; }
+  .cell-lead .detail { font-size: 16px; }
+
+  .moves li { padding-left: 22px; padding-bottom: 28px; }
+
+  .code-panel pre { padding: 22px; font-size: 12.5px; }
+  .trace-body li { grid-template-columns: 40px 1fr auto; gap: 8px; padding: 7px 14px; }
+  .trace-body { font-size: 11.5px; }
+  .trace-head, .trace-note { padding-left: 14px; padding-right: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+  * { transition: none !important; animation: none !important; }
 }

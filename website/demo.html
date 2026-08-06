@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: one refund, issued twice &mdash; AgentCage</title>
+<meta name="description" content="The same two refund calls against a recorded mock and against a stateful model. One suite stays green and ships the bug; the other fails.">
+<meta property="og:title" content="AgentCage demo">
+<meta property="og:description" content="One refund, issued twice, and a suite that stays green.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://agentcage.vercel.app/demo">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e27'/%3E%3Cpath d='M9 10v12M16 10v12M23 10v12' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M6 16h20' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="home.css">
+<script>
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.documentElement.className += " js";
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">AgentCage</a>
+    <div class="nav-links">
+      <a class="link" href="/demo" aria-current="page">Demo</a>
+      <a class="link" href="/explained">Explained</a>
+      <a class="link" href="/models">Models</a>
+      <a class="link" href="/data">Data</a>
+      <a class="link" href="/manifesto">Manifesto</a>
+      <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <a class="link book" href="/book">Book a session</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head" id="main">
+  <div class="wrap">
+    <p class="eyebrow">Demo</p>
+    <h1>One refund, issued twice, and a suite that stays green.</h1>
+    <p class="sub">An agent refunds a charge, loses the response, and retries. What your
+    test says about that depends entirely on what it is talking to.</p>
+  </div>
+</header>
+
+<!-- Same code, two backends. -->
+<section id="demo">
+  <div class="wrap">
+    <div class="toggle" role="group" aria-label="Choose what the agent is tested against">
+      <button type="button" id="t-mock" aria-pressed="true" aria-controls="pane">Recorded mock</button>
+      <button type="button" id="t-cage" aria-pressed="false" aria-controls="pane">AgentCage</button>
+    </div>
+
+    <div class="panes" id="pane">
+      <div class="pane" id="pane-mock">
+        <div class="pane-code">
+<pre><span class="cmt"># one response, recorded from the real API, replayed forever</span>
+stripe = ReplayMock(<span class="str">"responses.json"</span>)
+
+charge = stripe.post_charge(amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
+        </div>
+        <ol class="pane-out">
+          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
+          <li><span class="lbl">refund 2</span><span class="res ok">200 succeeded</span></li>
+          <li class="outcome pass"><span class="lbl">your test</span><span class="res">passes</span></li>
+        </ol>
+        <p class="pane-note">The fixture has no memory, so the retry looks exactly like
+        the original. The bug ships, and the customer is paid twice.</p>
+      </div>
+
+      <div class="pane" id="pane-cage" hidden>
+        <div class="pane-code">
+<pre><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
+
+stripe = StripeMock()
+charge = stripe.post_charge(amount=<span class="str">5000</span>)
+
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
+stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
+        </div>
+        <ol class="pane-out">
+          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
+          <li><span class="lbl">refund 2</span><span class="res bad">400 charge_already_refunded</span></li>
+          <li class="outcome fail"><span class="lbl">your test</span><span class="res">fails</span></li>
+        </ol>
+        <p class="pane-note">The model remembers the first refund, so the second is
+        refused exactly as the real API would. You fix it before shipping.</p>
+      </div>
+    </div>
+
+    <p class="demo-foot">Those four requests are a real recorded run, committed at
+    <a href="https://github.com/RithikSatarla/agentcage/blob/main/traces/example_double_refund.json">traces/example_double_refund.json</a>
+    and asserted by the test suite. Reproduce the comparison with
+    <code>python -m part_b.demo_fixture_vs_model</code>.</p>
+  </div>
+</section>
+
+<!-- What just happened -->
+<section class="how">
+  <div class="wrap">
+    <h2 class="section">What just happened</h2>
+    <ol class="moves">
+      <li class="reveal">
+        <h3>Intercept</h3>
+        <p>Your agent keeps its own HTTP client. AgentCage catches the request on its
+        way out, without rewriting it.</p>
+      </li>
+      <li class="reveal">
+        <h3>Model</h3>
+        <p>A stateful stand-in answers. It remembers the charge you already refunded and
+        the file you already wrote.</p>
+      </li>
+      <li class="reveal">
+        <h3>Assert</h3>
+        <p>The second refund is refused, the stale write is rejected, and your test
+        fails where production would have.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- Agent cards -->
+<section id="findings">
+  <div class="wrap">
+    <h2 class="section">All three showed bugs their own tests missed</h2>
+    <p class="lede">Three open-source agent tools, their own code unchanged, pointed at
+    a model that remembers what they already did.</p>
+
+    <div class="bento">
+      <article class="cell cell-lead reveal">
+        <p class="who"><span class="repo">camel-ai/camel</span><span class="what">GithubToolkit</span></p>
+        <p class="verdict">Stale read</p>
+        <p class="detail">It reads a file from the default branch, then writes that
+        version to a different branch. GitHub rejects the write. The tool never catches
+        the error.</p>
+        <p class="aside">Its 9 tests pass with the entire GitHub library swapped for a
+        mock that always says yes, so no version check ever runs.</p>
+      </article>
+
+      <article class="cell reveal">
+        <p class="who"><span class="repo">agno-agi/agno</span><span class="what">JiraTools</span></p>
+        <p class="verdict">Duplicate write</p>
+        <p class="detail">One call to create an issue. Two issues created. The tool
+        reports a single success.</p>
+      </article>
+
+      <article class="cell reveal">
+        <p class="who"><span class="repo">run-llama/llama_index</span><span class="what">JiraIssueToolSpec</span></p>
+        <p class="verdict">Duplicate write</p>
+        <p class="detail">Written independently of agno, and wrong the same way. The
+        retry happens inside the HTTP client, below the tool.</p>
+      </article>
+    </div>
+
+    <p class="caveat">Three agents is a small number, and the models were built against
+    these clients, so the clean parts of the result say more about fit than about
+    generality. Every limitation is written down, alongside every request each agent
+    made. <a href="/explained">Read the full result</a>.</p>
+  </div>
+</section>
+
+<!-- Closer -->
+<section class="closer">
+  <div class="wrap">
+    <h2 class="section">Run it against your agent.</h2>
+    <p class="lede">Thirty minutes, founder-led. Tell us what your agent writes to and
+    we&rsquo;ll point AgentCage at your suite on the call.</p>
+    <a class="btn btn-primary" href="/book">
+      Book a working session
+      <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M2 8h11M9 4l4 4-4 4"/>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="/">Overview</a>
+      <span class="sep">/</span>
+      <a href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <span class="sep">/</span>
+      <a href="/agentcage-paper.pdf">Paper</a>
+      <span class="sep">/</span>
+      <a href="mailto:rithiksatarla@gmail.com">Email</a>
+    </p>
+    <p class="copy">&copy; 2026 AgentCage</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var bMock = document.getElementById("t-mock");
+  var bCage = document.getElementById("t-cage");
+  var pMock = document.getElementById("pane-mock");
+  var pCage = document.getElementById("pane-cage");
+
+  if (bMock && bCage) {
+    var choose = function (mock) {
+      bMock.setAttribute("aria-pressed", String(mock));
+      bCage.setAttribute("aria-pressed", String(!mock));
+      pMock.hidden = !mock;
+      pCage.hidden = mock;
+    };
+    bMock.addEventListener("click", function () { choose(true); });
+    bCage.addEventListener("click", function () { choose(false); });
+  }
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var targets = document.querySelectorAll(".reveal");
+  if (reduce.matches || !("IntersectionObserver" in window)) {
+    Array.prototype.forEach.call(targets, function (el) { el.classList.add("shown"); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry, i) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      window.setTimeout(function () { el.classList.add("shown"); }, i * 70);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
+  Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>

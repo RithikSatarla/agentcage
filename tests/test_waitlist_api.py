@@ -184,11 +184,11 @@ def test_an_unexpected_error_never_reports_success(monkeypatch):
 
 # --- the page's own form ------------------------------------------------------
 #
-# The site posts straight to Formspree rather than through the function above, so
-# these test the page. The function is kept as the self-hosted alternative and its
+# The booking page posts straight to Formspree rather than through the function
+# above, so these test that page. The function is kept as the self-hosted alternative and its
 # behaviour is still covered by everything above.
 
-PAGE = (ROOT / "website" / "index.html").read_text(encoding="utf-8")
+PAGE = (ROOT / "website" / "book.html").read_text(encoding="utf-8")
 FORMSPREE = "https://formspree.io/f/mnpaqoaz"
 
 
@@ -208,7 +208,7 @@ def test_the_form_asks_formspree_for_json():
 def test_the_form_only_reports_success_on_an_accepted_response():
     """The tick is gated on result.ok, never shown unconditionally."""
     assert "if (result.ok) {" in PAGE
-    assert "You are on the list" in PAGE
+    assert "Request received" in PAGE
 
 
 def test_the_form_offers_a_fallback_when_signup_fails():
@@ -220,3 +220,8 @@ def test_the_form_offers_a_fallback_when_signup_fails():
 def test_the_honeypot_field_is_named_for_formspree():
     """_gotcha is dropped by Formspree as well as by our own check."""
     assert 'name="_gotcha"' in PAGE
+
+
+def test_the_booking_form_asks_what_the_agent_writes_to():
+    """The question that makes the session useful before it starts."""
+    assert "What does your agent write to?" in PAGE

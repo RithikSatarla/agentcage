@@ -13,11 +13,13 @@
   <div class="nav-inner">
     <a class="brand" href="/">AgentCage</a>
     <a class="link" href="/">Overview</a>
+    <a class="link" href="/demo">Demo</a>
     <a class="link" href="/explained">Explained</a>
     <a class="link" href="/manifesto" aria-current="page">Manifesto</a>
     <a class="link" href="/models">Models</a>
     <a class="link" href="/data">Data</a>
     <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    <a class="link book" href="/book">Book a session</a>
   </div>
 </nav>
 
@@ -144,17 +146,12 @@
         Deterministic identifiers and an injectable clock, so a failure is a failure every
         time. MIT licensed, so it keeps working if we disappear.</p>
         <div class="actions">
-          <a class="btn solid" href="/">See the demo</a>
+          <a class="btn solid" href="/demo">See the demo</a>
           <a class="btn" href="/models">What it models</a>
         </div>
       </div>
       <div>
-        <div class="note"><strong>What we have not shown.</strong> The follow-up study —
-        whether this catches defects in real agents that pass their own suites — is
-        pre-registered with a hypothesis, four defect classes, a 20% falsification
-        threshold and a 50% kill criterion. It <strong>has not been run</strong>. We claim
-        no number for it, and this page will not carry one until there is a result to
-        report, including if that result kills the idea.</div>
+        <div class="note"><strong>What we found.</strong> The follow-up study was pre-registered with a hypothesis, four defect classes, a 20% falsification threshold and a 50% kill criterion, then run. Three agents, all three showing a write-path defect while their own suites pass. The pre-registration also caught two errors in its own scope, both reported. The kill criterion had no denominator and was <strong>not tested</strong>, which is not the same as passed. <a href="/explained">The full result, with its caveats</a>.</div>
         <div class="note"><strong>And the honest limit of the study.</strong> 32 of 45
         candidates screened out because our detectors only find framework-idiomatic tool
         definitions. Agents with bespoke architectures write to disk constantly and are
@@ -185,7 +182,7 @@
     <p>MIT licensed ·
     <a href="https://github.com/RithikSatarla/agentcage">github.com/RithikSatarla/agentcage</a>
     · <a href="/data">Data</a> · <a href="/agentcage-paper.pdf">Paper</a> · <a href="/models">Models</a><br>
-    Part A is exploratory; Part B is pre-registered and has not been run.</p>
+    Part A is exploratory; Part B is pre-registered and has been run.</p>
   </div>
 </footer>
 

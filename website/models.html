@@ -13,11 +13,13 @@
   <div class="nav-inner">
     <a class="brand" href="/">AgentCage</a>
     <a class="link" href="/">Overview</a>
+    <a class="link" href="/demo">Demo</a>
     <a class="link" href="/explained">Explained</a>
     <a class="link" href="/manifesto">Manifesto</a>
     <a class="link" href="/models" aria-current="page">Models</a>
     <a class="link" href="/data">Data</a>
     <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+    <a class="link book" href="/book">Book a session</a>
   </div>
 </nav>
 
@@ -28,6 +30,42 @@
     <p class="lede">A recorded mock answers the same way forever. This one remembers.</p>
   </div>
 </header>
+
+<!-- The boundary leads the page. What a model refuses is the reason to trust what it
+     accepts, so it belongs above the code rather than in a caption underneath it. -->
+<section class="boundary">
+  <div class="wrap">
+    <h2>What these models claim, and what they don&rsquo;t.</h2>
+    <div class="bcols">
+      <div class="bcol yes">
+        <h3>Modelled</h3>
+        <ul>
+          <li>A refund moves <code>amount_refunded</code>, and the next read observes it</li>
+          <li>A second refund on a fully refunded charge is refused</li>
+          <li>A refund larger than the unrefunded remainder is refused</li>
+          <li>An uncaptured charge cannot be refunded at all</li>
+          <li>Idempotency keys replay the first answer instead of acting twice</li>
+          <li>File contents are keyed by branch, so a sha read on one is stale on another</li>
+          <li>Issue creation has no idempotency key, so a retry really does make two</li>
+        </ul>
+      </div>
+      <div class="bcol no">
+        <h3>Not modelled</h3>
+        <ul>
+          <li>Disputes, payouts, webhooks, 3-D Secure, connected accounts</li>
+          <li>Pagination and rate limits</li>
+          <li>Anything requiring a real account&rsquo;s pre-existing state</li>
+          <li>Forks complete synchronously here; the real endpoint is asynchronous</li>
+          <li>JQL beyond equality on project and status</li>
+        </ul>
+      </div>
+    </div>
+    <p class="bnote">The models were built against the three agents in the study, adding
+    endpoints as runs reached them. That is why the miss rate in Part B is zero and why
+    that number says more about fit than about coverage of an agent we have not seen.
+    <a href="/explained">The full caveat is on the explainer</a>.</p>
+  </div>
+</section>
 
 <section class="flush">
   <div class="wrap">
@@ -150,8 +188,12 @@
         <tbody>
           <tr><td class="name">Stripe</td><td><span class="pill live">working</span></td>
               <td>Charges, refunds, customers, idempotency</td></tr>
-          <tr><td class="name">GitHub</td><td><span class="pill none">not built</span></td>
-              <td>Destructive, widely used — the natural second one</td></tr>
+          <tr><td class="name">GitHub</td><td><span class="pill live">working</span></td>
+              <td>Issues, branch-keyed contents, refs, pulls</td></tr>
+          <tr><td class="name">Jira</td><td><span class="pill live">working</span></td>
+              <td>Issues, comments, worklogs, transitions</td></tr>
+          <tr><td class="name">Shell execution</td><td><span class="pill none">not built</span></td>
+              <td>The largest untested surface by count, and not an HTTP API</td></tr>
           <tr><td class="name">S3</td><td><span class="pill none">not built</span></td>
               <td>Deletes and overwrites</td></tr>
           <tr><td class="name">Postgres</td><td><span class="pill none">not built</span></td>
@@ -159,11 +201,8 @@
         </tbody>
       </table>
     </div>
-    <p class="caption"><strong style="color:var(--ink)">Not modelled:</strong> disputes,
-    payouts, webhooks, 3-D Secure, connected accounts, pagination, rate limits. The model
-    does double-refund, over-refund and read-after-write, and claims nothing else.
-    <a href="mailto:rithiksatarla@gmail.com?subject=AgentCage%20design%20partner">Tell us
-    which one you need →</a></p>
+    <p class="caption">The boundary for each of these is at the top of the page.
+    <a href="/book">Tell us which one you need &rarr;</a></p>
   </div>
 </section>
 

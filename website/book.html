@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a working session &mdash; AgentCage</title>
+<meta name="description" content="Thirty minutes, founder-led. We look at your agent's write paths, run one against the state model, and you leave with the trace.">
+<meta property="og:title" content="Book a working session">
+<meta property="og:description" content="Technical, founder-led. Your agents, your repo, a concrete path.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://agentcage.vercel.app/book">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e27'/%3E%3Cpath d='M9 10v12M16 10v12M23 10v12' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M6 16h20' stroke='%2300d9ff' stroke-width='2.5' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">AgentCage</a>
+    <div class="nav-links">
+      <a class="link" href="/demo">Demo</a>
+      <a class="link" href="/explained">Explained</a>
+      <a class="link" href="/models">Models</a>
+      <a class="link" href="/data">Data</a>
+      <a class="link" href="/manifesto">Manifesto</a>
+      <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <a class="link book" href="/book" aria-current="page">Book a session</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head" id="main">
+  <div class="wrap">
+    <h1>Book a working session.</h1>
+    <p class="sub">Technical, founder-led. Your agents, your repo, a concrete path,
+    not a deck.</p>
+  </div>
+</header>
+
+<section class="booking">
+  <div class="wrap booking-grid">
+
+    <form class="bform" id="bform" novalidate>
+      <div class="frow">
+        <label for="f-name">Name</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div class="frow">
+        <label for="f-email">Work email</label>
+        <input id="f-email" name="email" type="email" inputmode="email"
+               autocomplete="email" required aria-describedby="f-msg">
+      </div>
+      <div class="frow">
+        <label for="f-company">Company</label>
+        <input id="f-company" name="company" type="text" autocomplete="organization">
+      </div>
+      <div class="frow">
+        <label for="f-writes">What does your agent write to?</label>
+        <textarea id="f-writes" name="writes" rows="4"
+                  placeholder="Stripe, an internal API, a repo, a database"></textarea>
+      </div>
+
+      <!-- Off-screen rather than display:none, which some autofillers skip. Named
+           _gotcha so Formspree drops it on its side too. -->
+      <div class="wl-hp" aria-hidden="true">
+        <label for="f-hp">Website</label>
+        <input id="f-hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="btn btn-primary" type="submit" id="f-submit">
+        Request a working session
+        <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M2 8h11M9 4l4 4-4 4"/>
+        </svg>
+      </button>
+      <p class="wl-msg" id="f-msg" role="status" aria-live="polite"></p>
+      <p class="fnote">No automated calendar is promised. A founder replies with next
+      steps.</p>
+    </form>
+
+    <aside class="session">
+      <h2>What the session is</h2>
+      <ol class="moves">
+        <li>
+          <h3>Your write paths</h3>
+          <p>We look at what your agent writes to, and which of those paths a test
+          currently names.</p>
+        </li>
+        <li>
+          <h3>One of them, run</h3>
+          <p>We point the state model at a single path and see whether it survives a
+          retry.</p>
+        </li>
+        <li>
+          <h3>The trace</h3>
+          <p>You leave with it, whatever it showed. If nothing broke, that is the
+          result and we will say so.</p>
+        </li>
+      </ol>
+      <p class="fnote">30 minutes &middot; no NDA required</p>
+    </aside>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="/">Overview</a>
+      <span class="sep">/</span>
+      <a href="/demo">Demo</a>
+      <span class="sep">/</span>
+      <a href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <span class="sep">/</span>
+      <a href="/agentcage-paper.pdf">Paper</a>
+    </p>
+    <p class="copy">&copy; 2026 AgentCage</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Posts straight to Formspree. The Accept header is required: without it Formspree
+     answers with a redirect to its own thank-you page and this could not tell success
+     from failure, which would make the failure handling below decorative.
+
+     A confirmation appears only when Formspree has accepted the submission. Anything
+     else says so and offers the mailto, so no request is ever lost silently. */
+  var ENDPOINT = "https://formspree.io/f/mnpaqoaz";
+  var MAILTO = "mailto:rithiksatarla@gmail.com?subject=AgentCage%20working%20session";
+
+  var form = document.getElementById("bform");
+  if (!form) return;
+  var submit = document.getElementById("f-submit");
+  var msg = document.getElementById("f-msg");
+  var email = document.getElementById("f-email");
+  var name = document.getElementById("f-name");
+
+  var say = function (state, html) {
+    msg.className = "wl-msg " + state;
+    msg.innerHTML = html;
+  };
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var address = email.value.trim();
+
+    if (!name.value.trim()) {
+      say("err", "Enter your name.");
+      name.focus();
+      return;
+    }
+    if (!address || address.indexOf("@") < 1 ||
+        address.lastIndexOf(".") < address.indexOf("@")) {
+      say("err", "Enter a valid work email.");
+      email.focus();
+      return;
+    }
+
+    submit.disabled = true;
+    submit.textContent = "Sending";
+    say("", "");
+
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        name: name.value.trim(),
+        email: address,
+        company: document.getElementById("f-company").value.trim(),
+        writes: document.getElementById("f-writes").value.trim(),
+        _gotcha: document.getElementById("f-hp").value,
+        source: "booking page"
+      })
+    }).then(function (res) {
+      return res.json()
+        .catch(function () { return {}; })
+        .then(function (data) { return { ok: res.ok, data: data }; });
+    }).then(function (result) {
+      if (result.ok) {
+        form.innerHTML = '<p class="wl-msg ok">Request received. A founder will reply ' +
+          'with next steps, usually within a day.</p>';
+        return;
+      }
+      var errors = (result.data && result.data.errors) || [];
+      var reason = (errors[0] && errors[0].message) || "something went wrong";
+      say("err", "Could not send that: " + reason + ". " +
+          '<a href="' + MAILTO + '">Email it to me instead</a>.');
+    }).catch(function () {
+      say("err", 'Could not reach the form service. ' +
+          '<a href="' + MAILTO + '">Email it to me instead</a>.');
+    }).then(function () {
+      submit.disabled = false;
+      submit.textContent = "Request a working session";
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -299,9 +299,10 @@ def test_website_figures_exist_in_both_themes():
 
 #: Every page must exist and be reachable from every other page's nav. The paper has no
 #: page of its own: the PDF ships and is linked, but the site does not host a reader.
-SITE_PAGES = {"index.html", "explained.html", "manifesto.html", "models.html",
-              "data.html"}
-NAV_TARGETS = ("/", "/explained", "/manifesto", "/models", "/data")
+SITE_PAGES = {"index.html", "demo.html", "explained.html", "manifesto.html",
+              "models.html", "data.html", "book.html"}
+NAV_TARGETS = ("/", "/demo", "/explained", "/manifesto", "/models", "/data",
+               "/book")
 
 
 def test_site_has_exactly_the_expected_pages():
@@ -373,6 +374,8 @@ def test_every_asset_reference_exists():
 #: The reference pages share styles.css.
 PAGE_STYLESHEET = {
     "index.html": "home.css",
+    "demo.html": "home.css",
+    "book.html": "home.css",
     "explained.html": "explained.css",
     "manifesto.html": "styles.css",
     "models.html": "styles.css",

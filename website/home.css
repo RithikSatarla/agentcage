@@ -534,3 +534,70 @@ footer .copy { font-size: 12px; color: var(--small); margin: 18px 0 0; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---------- shared page header (demo, book) ---------- */
+.page-head { padding: 72px 0 40px; }
+.page-head h1 {
+  font-size: clamp(30px, 4.4vw, 46px); font-weight: 700; color: var(--text);
+  margin: 0 0 18px; line-height: 1.1; letter-spacing: -.035em; text-wrap: balance;
+  max-width: 22ch;
+}
+.page-head .sub { margin-bottom: 0; }
+
+/* The booking link is the one action in the nav, so it reads as one. */
+.nav a.link.book {
+  color: var(--accent); border: 1px solid var(--border); padding: 6px 12px;
+}
+.nav a.link.book:hover { border-color: var(--accent); }
+
+/* ---------- closer ---------- */
+.closer { border-top: 1px solid var(--hairline); }
+.closer .lede { margin-bottom: 32px; }
+
+/* ---------- booking ---------- */
+.booking-grid {
+  display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: start;
+}
+.booking-grid > * { min-width: 0; }
+
+.bform { max-width: 520px; }
+.frow { margin: 0 0 20px; }
+.frow label {
+  display: block; margin: 0 0 7px; font-size: 14px; color: var(--body);
+}
+.frow input, .frow textarea {
+  width: 100%; font-family: var(--sans); font-size: 15px; color: var(--text);
+  padding: 12px 14px; background: var(--bg-lift);
+  border: 1px solid var(--border); border-radius: 0;
+  transition: border-color .15s var(--ease);
+}
+.frow textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+/* 5.5:1 on the field background, so the example is legible rather than a ghost. */
+.frow input::placeholder, .frow textarea::placeholder { color: var(--small); opacity: 1; }
+.frow input:focus, .frow textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 217, 255, .18);
+}
+.bform .btn { margin-top: 4px; }
+.bform .btn:disabled { opacity: .6; cursor: progress; }
+.fnote { font-size: 13px; color: var(--small); margin: 14px 0 0; line-height: 1.55; }
+
+.session {
+  border-left: 1px solid var(--border); padding-left: 32px;
+}
+.session h2 {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--small); margin: 0 0 24px; font-weight: 400;
+}
+.session .moves { max-width: none; }
+.session .moves h3 { font-size: 16px; }
+.session .moves p { font-size: 15px; }
+
+@media (max-width: 960px) {
+  .booking-grid { grid-template-columns: 1fr; gap: 44px; }
+  .session { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 32px; }
+}
+@media (max-width: 720px) {
+  .page-head { padding: 44px 0 28px; }
+  .bform { max-width: none; }
+}

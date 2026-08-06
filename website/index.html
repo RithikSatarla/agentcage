@@ -31,11 +31,13 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   <div class="nav-inner">
     <a class="brand" href="/" aria-current="page">AgentCage</a>
     <div class="nav-links">
+      <a class="link" href="/demo">Demo</a>
       <a class="link" href="/explained">Explained</a>
-      <a class="link" href="/manifesto">Manifesto</a>
       <a class="link" href="/models">Models</a>
       <a class="link" href="/data">Data</a>
+      <a class="link" href="/manifesto">Manifesto</a>
       <a class="link" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+      <a class="link book" href="/book">Book a session</a>
     </div>
   </div>
 </nav>
@@ -95,13 +97,13 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       </ul>
 
       <div class="cta">
-        <a class="btn btn-primary" href="#waitlist">
+        <a class="btn btn-primary" href="/book">
           Book a working session
           <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <path d="M2 8h11M9 4l4 4-4 4"/>
           </svg>
         </a>
-        <a class="btn" href="#demo">
+        <a class="btn" href="/demo">
           <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <path d="M4 3l9 5-9 5z"/>
           </svg>
@@ -142,157 +144,18 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </div>
 </header>
 
-<!-- Findings: asymmetric bento, three items in three cells. -->
-<section id="findings">
+<!-- Closer. One action, no form: the form lives on /book. -->
+<section class="closer">
   <div class="wrap">
-    <h2 class="section">What happened when we ran it</h2>
-    <p class="lede">Three open-source agent tools, their own code unchanged, pointed at
-    a model that remembers what they already did.</p>
-
-    <div class="bento">
-      <article class="cell cell-lead reveal">
-        <p class="who"><span class="repo">camel-ai/camel</span><span class="what">GithubToolkit</span></p>
-        <p class="verdict">Stale read</p>
-        <p class="detail">It reads a file from the default branch, then writes that
-        version to a different branch. GitHub rejects the write. The tool never catches
-        the error.</p>
-        <p class="aside">Its 9 tests pass with the entire GitHub library swapped for a
-        mock that always says yes, so no version check ever runs.</p>
-      </article>
-
-      <article class="cell reveal">
-        <p class="who"><span class="repo">agno-agi/agno</span><span class="what">JiraTools</span></p>
-        <p class="verdict">Duplicate write</p>
-        <p class="detail">One call to create an issue. Two issues created. The tool
-        reports a single success.</p>
-      </article>
-
-      <article class="cell reveal">
-        <p class="who"><span class="repo">run-llama/llama_index</span><span class="what">JiraIssueToolSpec</span></p>
-        <p class="verdict">Duplicate write</p>
-        <p class="detail">Written independently of agno, and wrong the same way. The
-        retry happens inside the HTTP client, below the tool.</p>
-      </article>
-    </div>
-
-    <p class="caveat">Three agents is a small number, and the models were built against
-    these clients, so the clean parts of the result say more about fit than about
-    generality. Every limitation is written down, alongside every request each agent
-    made. <a href="https://github.com/RithikSatarla/agentcage/blob/main/PROTOCOL.md">Read the protocol</a>.</p>
-  </div>
-</section>
-
-<!-- How it works: three moves, vertical, no step numbers. -->
-<section class="how">
-  <div class="wrap">
-    <h2 class="section">How it works</h2>
-    <ol class="moves">
-      <li class="reveal">
-        <h3>Intercept</h3>
-        <p>Your agent keeps its own HTTP client. AgentCage catches the request on its
-        way out, without rewriting it.</p>
-      </li>
-      <li class="reveal">
-        <h3>Model</h3>
-        <p>A stateful stand-in answers. It remembers the charge you already refunded and
-        the file you already wrote.</p>
-      </li>
-      <li class="reveal">
-        <h3>Assert</h3>
-        <p>The second refund is refused, the stale write is rejected, and your test
-        fails where production would have.</p>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- Demo: same agent, same two calls, two different verdicts. -->
-<section class="demo" id="demo">
-  <div class="wrap">
-    <h2 class="section">Same code. Two verdicts.</h2>
-    <p class="lede">An agent refunds a charge, then retries the refund. What your test
-    says about that depends entirely on what it is talking to.</p>
-
-    <div class="toggle" role="group" aria-label="Choose what the agent is tested against">
-      <button type="button" id="t-mock" aria-pressed="true" aria-controls="pane">Recorded mock</button>
-      <button type="button" id="t-cage" aria-pressed="false" aria-controls="pane">AgentCage</button>
-    </div>
-
-    <div class="panes" id="pane">
-      <!-- Recorded mock -->
-      <div class="pane" id="pane-mock">
-        <div class="pane-code">
-<pre><span class="cmt"># one response, recorded from the real API, replayed forever</span>
-stripe = ReplayMock(<span class="str">"responses.json"</span>)
-
-charge = stripe.post_charge(amount=<span class="str">5000</span>)
-stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
-stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
-        </div>
-        <ol class="pane-out">
-          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
-          <li><span class="lbl">refund 2</span><span class="res ok">200 succeeded</span></li>
-          <li class="outcome pass"><span class="lbl">your test</span><span class="res">passes</span></li>
-        </ol>
-        <p class="pane-note bad">The fixture has no memory, so the retry looks exactly
-        like the original. The bug ships, and the customer is paid twice.</p>
-      </div>
-
-      <!-- AgentCage -->
-      <div class="pane" id="pane-cage" hidden>
-        <div class="pane-code">
-<pre><span class="kw">from</span> part_b.stripe_mock <span class="kw">import</span> StripeMock
-
-stripe = StripeMock()
-charge = stripe.post_charge(amount=<span class="str">5000</span>)
-
-stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)
-stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
-        </div>
-        <ol class="pane-out">
-          <li><span class="lbl">refund 1</span><span class="res ok">200 succeeded</span></li>
-          <li><span class="lbl">refund 2</span><span class="res bad">400 charge_already_refunded</span></li>
-          <li class="outcome fail"><span class="lbl">your test</span><span class="res">fails</span></li>
-        </ol>
-        <p class="pane-note good">The model remembers the first refund, so the second is
-        refused exactly as the real API would. You fix it before shipping.</p>
-      </div>
-    </div>
-
-    <p class="demo-foot">Those four requests are a real recorded run, committed at
-    <a href="https://github.com/RithikSatarla/agentcage/blob/main/traces/example_double_refund.json">traces/example_double_refund.json</a>
-    and asserted by the test suite.</p>
-
-    <div class="cta">
-      <a class="btn" href="https://github.com/RithikSatarla/agentcage#quickstart">Install it</a>
-    </div>
-  </div>
-</section>
-
-<!-- Waiting list -->
-<section class="waitlist" id="waitlist">
-  <div class="wrap">
-    <h2 class="section">Get it when it ships</h2>
-    <p class="wl-sub">One email when AgentCage is usable outside this repository.
-    Nothing else.</p>
-
-    <form class="wl-form" id="wl-form" novalidate>
-      <div class="wl-row">
-        <label class="sr-only" for="wl-email">Email address</label>
-        <input id="wl-email" name="email" type="email" inputmode="email"
-               autocomplete="email" placeholder="you@company.com" required
-               aria-describedby="wl-msg">
-        <button class="btn btn-primary" type="submit" id="wl-submit">Join the list</button>
-      </div>
-      <!-- Honeypot. Off-screen rather than display:none, which some autofillers skip.
-           Named _gotcha because that is the field Formspree drops on its side too, so
-           a bot has to beat both. -->
-      <div class="wl-hp" aria-hidden="true">
-        <label for="wl-company">Company</label>
-        <input id="wl-company" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
-      </div>
-      <p class="wl-msg" id="wl-msg" role="status" aria-live="polite"></p>
-    </form>
+    <h2 class="section">See what your suite is missing.</h2>
+    <p class="lede">Thirty minutes, founder-led. Tell us what your agent writes to and
+    we&rsquo;ll point AgentCage at your suite on the call.</p>
+    <a class="btn btn-primary" href="/book">
+      Book a working session
+      <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M2 8h11M9 4l4 4-4 4"/>
+      </svg>
+    </a>
   </div>
 </section>
 
@@ -413,115 +276,7 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
     }
   }
 
-  /* Demo toggle. Both panes are in the markup and one is hidden, so the content is
-     there for search engines and for anyone without scripting. */
-  var bMock = document.getElementById("t-mock");
-  var bCage = document.getElementById("t-cage");
-  var pMock = document.getElementById("pane-mock");
-  var pCage = document.getElementById("pane-cage");
 
-  if (bMock && bCage) {
-    var choose = function (mock) {
-      bMock.setAttribute("aria-pressed", String(mock));
-      bCage.setAttribute("aria-pressed", String(!mock));
-      pMock.hidden = !mock;
-      pCage.hidden = mock;
-    };
-    bMock.addEventListener("click", function () { choose(true); });
-    bCage.addEventListener("click", function () { choose(false); });
-  }
-
-  /* Waiting list. Four states, and the failure state is the one that matters: a tick
-     is shown only when Formspree has actually accepted the address. Anything else says
-     so and offers the mailto, so no signup is ever lost silently.
-
-     Formspree needs the Accept header to answer with JSON; without it, it replies with
-     a redirect to its own thank-you page and this would never see the outcome. */
-  var ENDPOINT = "https://formspree.io/f/mnpaqoaz";
-  var form = document.getElementById("wl-form");
-  if (form) {
-    var input = document.getElementById("wl-email");
-    var submit = document.getElementById("wl-submit");
-    var msg = document.getElementById("wl-msg");
-    var MAILTO = "mailto:rithiksatarla@gmail.com?subject=AgentCage%20waiting%20list";
-
-    var say = function (state, text) {
-      msg.className = "wl-msg " + state;
-      msg.innerHTML = text;
-    };
-
-    form.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      var email = input.value.trim();
-
-      if (!email || email.indexOf("@") < 1 || email.lastIndexOf(".") < email.indexOf("@")) {
-        say("err", "Enter a valid email address.");
-        input.focus();
-        return;
-      }
-
-      submit.disabled = true;
-      submit.textContent = "Joining";
-      say("", "");
-
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          email: email,
-          _gotcha: document.getElementById("wl-company").value,
-          source: "landing page"
-        })
-      }).then(function (res) {
-        return res.json()
-          .catch(function () { return {}; })
-          .then(function (data) { return { ok: res.ok, data: data }; });
-      }).then(function (result) {
-        if (result.ok) {
-          form.innerHTML = '<p class="wl-msg ok">You are on the list. ' +
-            'You will hear from us once, when it ships.</p>';
-          return;
-        }
-        /* Formspree reports problems as {errors: [{message, field}]}. Show the first
-           one rather than a generic string, since "email is invalid" is actionable. */
-        var errors = (result.data && result.data.errors) || [];
-        var reason = (errors[0] && errors[0].message) || "something went wrong";
-        say("err", "Could not add you: " + reason + ". " +
-            '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
-      }).catch(function () {
-        say("err", 'Could not reach the signup service. ' +
-            '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
-      }).then(function () {
-        submit.disabled = false;
-        submit.textContent = "Join the list";
-      });
-    });
-  }
-
-  /* Scroll reveal. IntersectionObserver rather than a scroll listener: no work on
-     frames where nothing crossed the threshold. Motion is here to sequence the
-     findings so they read one at a time, not for decoration. */
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var targets = document.querySelectorAll(".reveal");
-
-  if (reduce.matches || !("IntersectionObserver" in window)) {
-    Array.prototype.forEach.call(targets, function (el) { el.classList.add("shown"); });
-    return;
-  }
-
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry, i) {
-      if (!entry.isIntersecting) return;
-      var el = entry.target;
-      window.setTimeout(function () { el.classList.add("shown"); }, i * 70);
-      io.unobserve(el);
-    });
-  }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
-
-  Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
 })();
 </script>
 </body>

@@ -76,7 +76,7 @@ body > * { position: relative; z-index: 1; }
 /* Grid children default to min-width:auto, so anything holding a <pre> or a nowrap
    path pushes its own track wider than the container instead of scrolling inside it.
    That is what made the page overflow horizontally at 390px. */
-.hero-grid > *, .metrics-grid > *, .bento > *, .moves > *, .pane > * {
+.hero-grid > *, .bento > *, .moves > *, .pane > * {
   min-width: 0;
 }
 
@@ -111,9 +111,56 @@ a:focus-visible, button:focus-visible {
 .nav a.link:hover { color: var(--text); text-decoration: none; }
 
 /* ---------- hero ---------- */
-.hero { padding: 96px 0 108px; }
+.hero { padding: 88px 0 72px; position: relative; overflow: hidden; }
 .hero-grid {
-  display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; align-items: center;
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: center;
+}
+
+/* ---------- ambient field ----------
+   Two strips of real traffic in the margins outside the 1120px content column, so
+   nothing ever drifts behind the text. Below 1280px there is no margin to put them
+   in and the whole field is dropped rather than squeezed. */
+.field { display: none; }
+@media (min-width: 1280px) {
+  .field {
+    display: block; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    /* No band across the top or bottom: a full-bleed frame would enclose the
+       content instead of sitting beside it. */
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  }
+}
+.gutter {
+  position: absolute; top: 0; bottom: 0; width: calc((100% - 1120px) / 2);
+  overflow: hidden;
+}
+.gutter-l { left: 0; }
+.gutter-r { right: 0; }
+
+/* The list is written twice in the markup, so translating the strip by exactly half
+   its height loops seamlessly: no bounce at the ends, no fade in or out. */
+.strip {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; flex-direction: column;
+  animation: drift 96s linear infinite;
+}
+.gutter-r .strip { animation-duration: 124s; animation-delay: -37s; }
+@keyframes drift { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
+.strip .ln {
+  font-family: var(--mono); font-size: 11px; line-height: 1.4; white-space: nowrap;
+  color: var(--accent); opacity: .04;
+}
+/* Irregular spacing and offset so the two strips do not read as aligned columns. */
+.strip .o1 { margin: 34px 0 0 12px; }
+.strip .o2 { margin: 61px 0 0 46px; font-size: 12px; }
+.strip .o3 { margin: 22px 0 0 78px; opacity: .03; }
+.strip .o4 { margin: 78px 0 0 28px; font-size: 10px; }
+.strip .o5 { margin: 44px 0 0 62px; color: var(--bad); opacity: .05; }
+.strip .o6 { margin: 96px 0 0 8px; opacity: .035; }
+
+@media (prefers-reduced-motion: reduce) {
+  .strip { animation: none; }
 }
 
 .eyebrow {
@@ -154,61 +201,97 @@ a:focus-visible, button:focus-visible {
 }
 .btn-primary:hover { background: #5ce6ff; border-color: #5ce6ff; color: var(--bg); }
 
-/* ---------- hero trace ----------
-   Real recorded requests, so it is typeset as a log, not dressed as a window.
-   No title bar, no traffic lights, no fake build stamp. */
-.trace {
-  margin: 0; border: 1px solid var(--border); background: var(--bg-lift);
+/* ---------- chips ---------- */
+.chips {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 0 0 32px; padding: 0;
+}
+.chips li {
+  font-family: var(--mono); font-size: 11.5px; color: var(--subtle);
+  padding: 6px 12px; border: 1px solid var(--border); background: var(--bg-lift);
+}
+
+/* ---------- CTA icons ---------- */
+.cta .btn { display: inline-flex; align-items: center; gap: 9px; }
+.ico {
+  width: 15px; height: 15px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+/* The play triangle is a filled shape, not a stroked path. */
+.cta .btn:last-child .ico { fill: currentColor; stroke: none; }
+
+/* ---------- state model panel ---------- */
+.panel {
+  border: 1px solid var(--border); background: var(--bg-lift);
   box-shadow: 0 24px 60px rgba(4, 7, 22, .55);   /* tinted to the background, not black */
 }
-.trace-head {
-  display: flex; align-items: baseline; gap: 10px;
-  padding: 14px 20px; border-bottom: 1px solid var(--hairline);
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; border-bottom: 1px solid var(--hairline);
 }
-.trace-what { font-family: var(--mono); font-size: 12px; color: var(--text); }
-.trace-when { font-family: var(--mono); font-size: 11px; color: var(--small); }
+.panel-title {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--small);
+}
+.replay {
+  font-size: 14px; line-height: 1; padding: 4px 8px; cursor: pointer;
+  background: transparent; border: 1px solid var(--border); color: var(--subtle);
+  transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+.replay:hover { color: var(--accent); border-color: var(--accent); }
 
-.trace-body { list-style: none; margin: 0; padding: 12px 0; }
-.trace-body li {
-  display: grid; grid-template-columns: 46px 1fr auto; gap: 12px; align-items: baseline;
-  padding: 7px 20px;
-  font-family: var(--mono); font-size: 12.5px;
-  border-left: 2px solid transparent;
+.panel-state { margin: 0; padding: 14px 18px; }
+.panel-state > div {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  padding: 5px 0; font-family: var(--mono); font-size: 12px;
 }
-.trace-body .verb { color: var(--small); }
-.trace-body .path {
-  color: var(--body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  min-width: 0;   /* let it ellipsis instead of widening the row */
+.panel-state dt { color: var(--small); }
+.panel-state dd {
+  margin: 0; color: var(--body); text-align: right;
+  font-variant-numeric: tabular-nums;
 }
-.trace-body .code { font-variant-numeric: tabular-nums; }
-.trace-body .code.ok   { color: var(--small); }
-.trace-body .code.warn { color: var(--subtle); }
-.trace-body .code.bad  { color: var(--bad); font-weight: 500; }
-.trace-body li.fail { background: rgba(255, 107, 107, .07); border-left-color: var(--bad); }
-.trace-body li.fail .path { color: var(--text); }
-
-.trace-note {
-  margin: 0; padding: 14px 20px; border-top: 1px solid var(--hairline);
-  font-size: 13.5px; color: var(--subtle); line-height: 1.5;
+/* A value that just changed. Brief, and only on the call that changed it. */
+.panel-state dd.hit { color: var(--accent); }
+/* A value the retry did not move. This is the entire argument. */
+.panel-state dd .tag {
+  margin-left: 8px; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--small);
 }
 
-/* ---------- metrics ----------
-   Hairlines, not cards. The numbers are the hierarchy. */
-.metrics { padding: 0 0 96px; }
-.metrics-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--border);
+.panel-call {
+  padding: 14px 18px; border-top: 1px solid var(--hairline);
+  min-height: 82px;
 }
-.metric { padding: 34px 32px 0 0; }
-.metric + .metric { border-left: 1px solid var(--border); padding-left: 32px; }
-.metric .figure {
-  font-size: 40px; font-weight: 700; color: var(--text); margin: 0 0 12px;
-  letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums;
+.panel-call .req {
+  margin: 0 0 8px; font-family: var(--mono); font-size: 11.5px; color: var(--subtle);
+  word-break: break-word;
 }
-.metric .label { font-size: 15px; color: var(--body); margin: 0 0 8px; max-width: 30ch; }
-.metric .foot {
-  font-family: var(--mono); font-size: 11.5px; color: var(--small); margin: 0;
-  line-height: 1.5;
+.panel-call .req .lbl {
+  display: inline-block; margin-right: 8px; padding: 2px 6px;
+  font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  border: 1px solid var(--border); color: var(--small);
+}
+.panel-call .req .lbl.retry { color: var(--bad); border-color: rgba(255, 107, 107, .45); }
+.panel-call .res {
+  margin: 0; font-family: var(--mono); font-size: 12.5px; color: var(--subtle);
+  min-height: 1.2em;
+}
+.panel-call .res.ok  { color: var(--accent); }
+.panel-call .res.bad { color: var(--bad); }
+
+/* ---------- hero stats ---------- */
+.hero-stats {
+  display: flex; gap: 48px; flex-wrap: wrap;
+  margin-top: 64px; padding-top: 26px; border-top: 1px solid var(--border);
+}
+.hstat {
+  margin: 0; font-size: 14px; color: var(--subtle); max-width: 34ch;
+}
+.hstat strong {
+  display: block; font-size: 30px; font-weight: 700; color: var(--text);
+  letter-spacing: -.03em; line-height: 1.1; margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- sections ---------- */
@@ -404,11 +487,7 @@ footer .copy { font-size: 12px; color: var(--small); margin: 18px 0 0; }
   .sub { max-width: 54ch; }
   .pane { grid-template-columns: 1fr; }
   .pane-code { border-right: 0; border-bottom: 1px solid var(--border); }
-  .metrics-grid { grid-template-columns: 1fr 1fr; }
-  .metric:nth-child(3) {
-    grid-column: 1 / -1; border-left: 0; padding-left: 0;
-    border-top: 1px solid var(--border); margin-top: 28px; padding-top: 28px;
-  }
+  .hero-stats { gap: 32px; }
 }
 
 /* ---------- mobile: every multi-column layout collapses to one ---------- */
@@ -431,14 +510,11 @@ footer .copy { font-size: 12px; color: var(--small); margin: 18px 0 0; }
   .btn { text-align: center; }
 
   section { padding: 64px 0; }
-  .metrics { padding-bottom: 64px; }
-  .metrics-grid { grid-template-columns: 1fr; }
-  .metric { padding: 26px 0 0; }
-  .metric + .metric {
-    border-left: 0; padding-left: 0;
-    border-top: 1px solid var(--border); margin-top: 26px; padding-top: 26px;
-  }
-  .metric:nth-child(3) { margin-top: 26px; padding-top: 26px; }
+  .hero-stats { flex-direction: column; gap: 24px; margin-top: 44px; }
+  .chips { gap: 6px; margin-bottom: 26px; }
+  .chips li { font-size: 11px; padding: 5px 10px; }
+  .panel-state > div { font-size: 11.5px; }
+  .panel-call .req { font-size: 11px; }
 
   .bento { grid-template-columns: 1fr; }
   .cell { padding: 26px 22px; }
@@ -453,9 +529,6 @@ footer .copy { font-size: 12px; color: var(--small); margin: 18px 0 0; }
   .pane-code pre { padding: 20px; font-size: 12px; }
   .pane-out { padding: 20px; }
   .pane-note { padding: 16px 20px; }
-  .trace-body li { grid-template-columns: 40px 1fr auto; gap: 8px; padding: 7px 14px; }
-  .trace-body { font-size: 11.5px; }
-  .trace-head, .trace-note { padding-left: 14px; padding-right: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

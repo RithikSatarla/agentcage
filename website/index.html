@@ -40,60 +40,107 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   </div>
 </nav>
 
-<!-- Hero: asymmetric split. Copy carries the claim, the panel carries the proof. -->
+<!-- Hero. Copy left, a live state model right, real traffic drifting in the outer
+     margins. The field is decoration and sits outside the content column entirely;
+     below 1280px there is no margin to put it in, so it is not rendered. -->
 <header class="hero" id="main">
+
+  <!-- Every line is a real request from a committed trace in part_b/traces/. The
+       repeated pairs are the point: the same call, the same 200, twice. -->
+  <div class="field" aria-hidden="true">
+    <div class="gutter gutter-l">
+      <div class="strip">
+        <span class="ln o1">POST /v1/refunds &rarr; 200</span>
+        <span class="ln o4">POST /v1/refunds &rarr; 200</span>
+        <span class="ln o2">GET /v1/charges/ch_00000001 &rarr; 200</span>
+        <span class="ln o5">PUT contents/README.md &rarr; 409</span>
+        <span class="ln o3">POST /repos/acme/widgets/pulls &rarr; 201</span>
+        <span class="ln o6">GET /repos/acme/widgets &rarr; 200</span>
+        <span class="ln o2">POST /rest/api/2/issue &rarr; 201</span>
+        <span class="ln o5">POST /rest/api/2/issue &rarr; 201</span>
+        <span class="ln o1">GET /rest/api/2/search/jql &rarr; 200</span>
+        <span class="ln o4">DELETE /rest/api/2/issue/10001 &rarr; 204</span>
+      </div>
+    </div>
+    <div class="gutter gutter-r">
+      <div class="strip">
+        <span class="ln o3">POST /rest/api/2/issue &rarr; 201</span>
+        <span class="ln o6">POST /rest/api/2/issue &rarr; 201</span>
+        <span class="ln o1">GET /rest/api/2/issue/KAN-1 &rarr; 404</span>
+        <span class="ln o4">POST /v1/charges &rarr; 200</span>
+        <span class="ln o2">GET /repos/acme/widgets/branches/main &rarr; 200</span>
+        <span class="ln o5">POST /v1/refunds &rarr; 200</span>
+        <span class="ln o3">POST /v1/refunds &rarr; 200</span>
+        <span class="ln o6">POST /repos/acme/widgets/git/refs &rarr; 422</span>
+        <span class="ln o2">GET /rest/api/2/serverInfo &rarr; 200</span>
+        <span class="ln o4">POST /repos/acme/widgets/issues &rarr; 201</span>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <p class="eyebrow">Part B results</p>
       <h1>Their tests pass.<br>Their writes don&rsquo;t.</h1>
       <p class="sub">AgentCage runs agent code against a stateful API model. A
       duplicate write fails your test, not your customer.</p>
+
+      <ul class="chips">
+        <li>Stripe</li>
+        <li>GitHub</li>
+        <li>Jira</li>
+        <li>LangChain</li>
+        <li>CrewAI</li>
+        <li>pytest</li>
+      </ul>
+
       <div class="cta">
-        <a class="btn btn-primary" href="#findings">See what broke</a>
-        <a class="btn" href="https://github.com/RithikSatarla/agentcage">GitHub</a>
+        <a class="btn btn-primary" href="#waitlist">
+          Book a working session
+          <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
+          </svg>
+        </a>
+        <a class="btn" href="#demo">
+          <svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M4 3l9 5-9 5z"/>
+          </svg>
+          See it fail live
+        </a>
       </div>
     </div>
 
-    <!-- Real requests from part_b/traces/camel.json, scenario pull-request-repeat.
-         Not a mock-up of a terminal: this is the recorded run, committed in the repo. -->
-    <figure class="trace">
-      <figcaption class="trace-head">
-        <span class="trace-what">camel-ai/camel</span>
-        <span class="trace-when">second run</span>
-      </figcaption>
-      <ol class="trace-body">
-        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets</span><span class="code ok">200</span></li>
-        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets/branches/main</span><span class="code ok">200</span></li>
-        <li><span class="verb">POST</span><span class="path">/repos/acme/widgets/git/refs</span><span class="code warn">422</span></li>
-        <li><span class="verb">GET</span><span class="path">/repos/acme/widgets/contents/README.md</span><span class="code ok">200</span></li>
-        <li class="fail"><span class="verb">PUT</span><span class="path">/repos/acme/widgets/contents/README.md</span><span class="code bad">409</span></li>
-      </ol>
-      <p class="trace-note">It read the file from one branch and wrote that version to
-      another. The 409 is never caught.</p>
-    </figure>
+    <!-- The state model, running. Values come from part_b/stripe_mock.py: a refund
+         moves amount_refunded once and the second attempt is refused, so the numbers
+         do not move a second time. -->
+    <div class="panel" id="panel">
+      <div class="panel-head">
+        <span class="panel-title">State model</span>
+        <button type="button" class="replay" id="replay" aria-label="Replay the sequence">
+          <span aria-hidden="true">&#8635;</span>
+        </button>
+      </div>
+
+      <dl class="panel-state">
+        <div><dt>charge</dt><dd id="v-charge">&mdash;</dd></div>
+        <div><dt>amount_captured</dt><dd id="v-captured">&mdash;</dd></div>
+        <div><dt>amount_refunded</dt><dd id="v-refunded">&mdash;</dd></div>
+        <div><dt>refunded</dt><dd id="v-flag">&mdash;</dd></div>
+        <div><dt>refunds accepted</dt><dd id="v-count">&mdash;</dd></div>
+      </dl>
+
+      <div class="panel-call" id="panel-call">
+        <p class="req" id="c-req">waiting for the first call</p>
+        <p class="res" id="c-res"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap hero-stats">
+    <p class="hstat"><strong>3 / 3</strong> real agents showed a write-path defect</p>
+    <p class="hstat"><strong>20.3%</strong> of write-capable tools never tested</p>
   </div>
 </header>
-
-<!-- Metrics: hairline-separated data, no card boxes. -->
-<section class="metrics" aria-label="Key figures">
-  <div class="wrap metrics-grid">
-    <div class="metric">
-      <p class="figure">20.3%</p>
-      <p class="label">of write-capable agent tools have zero test coverage</p>
-      <p class="foot">32 of 158 tools across 13 open-source projects</p>
-    </div>
-    <div class="metric">
-      <p class="figure">3 of 3</p>
-      <p class="label">agents we ran got a write wrong</p>
-      <p class="foot">every one of their own suites passes</p>
-    </div>
-    <div class="metric">
-      <p class="figure">40</p>
-      <p class="label">API requests graded against a pre-registered rubric</p>
-      <p class="foot">fixed before any data existed</p>
-    </div>
-  </div>
-</section>
 
 <!-- Findings: asymmetric bento, three items in three cells. -->
 <section id="findings">
@@ -267,6 +314,104 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
 <script>
 (function () {
   "use strict";
+
+  /* State model panel.
+
+     The sequence is the one from part_b/stripe_mock.py: a refund moves
+     amount_refunded once, and the identical retry is refused, so nothing moves the
+     second time. The retry frame is the whole argument, which is why it holds longest
+     before the loop restarts. Pauses on hover so it can be read. */
+  var panel = document.getElementById("panel");
+  if (panel) {
+    var el = function (id) { return document.getElementById(id); };
+    var fields = {
+      charge: el("v-charge"), captured: el("v-captured"), refunded: el("v-refunded"),
+      flag: el("v-flag"), count: el("v-count")
+    };
+    var req = el("c-req"), res = el("c-res");
+
+    var EMPTY = { charge: "—", captured: "—", refunded: "—",
+                  flag: "—", count: "—" };
+    var AFTER = { charge: "ch_00000001", captured: "$50.00", refunded: "$50.00",
+                  flag: "true", count: "1" };
+
+    var paint = function (values, hits, tags) {
+      Object.keys(fields).forEach(function (k) {
+        var node = fields[k];
+        node.textContent = values[k];
+        node.classList.toggle("hit", (hits || []).indexOf(k) !== -1);
+        if (tags && tags[k]) {
+          var tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = tags[k];
+          node.appendChild(tag);
+        }
+      });
+    };
+
+    var CALL = "POST /v1/refunds {charge: ch_00000001, amount: 5000}";
+    var frames = [
+      { at: 0, run: function () {
+          paint(EMPTY);
+          req.innerHTML = "waiting for the first call";
+          res.textContent = ""; res.className = "res";
+        } },
+      { at: 900, run: function () {
+          req.innerHTML = '<span class="lbl">first call</span>' + CALL;
+          res.textContent = ""; res.className = "res";
+        } },
+      { at: 1600, run: function () {
+          paint(AFTER, ["refunded", "count"]);
+          res.textContent = "200  refund accepted";
+          res.className = "res ok";
+        } },
+      { at: 3300, run: function () {
+          req.innerHTML = '<span class="lbl retry">retry</span>' + CALL;
+          res.textContent = ""; res.className = "res";
+        } },
+      { at: 4000, run: function () {
+          /* Same values, no highlight, labelled. Nothing moved. */
+          paint(AFTER, [], { refunded: "unchanged", count: "still 1" });
+          res.textContent = "400  charge_already_refunded";
+          res.className = "res bad";
+        } }
+    ];
+    var CYCLE = 6400;
+
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) {
+      /* No loop. Show the outcome, which is the informative frame. */
+      frames[4].run();
+    } else {
+      var t0 = 0, next = 0, paused = false, raf = null;
+
+      var tick = function (now) {
+        if (!t0) t0 = now;
+        if (!paused) {
+          var elapsed = now - t0;
+          while (next < frames.length && elapsed >= frames[next].at) {
+            frames[next].run();
+            next += 1;
+          }
+          if (elapsed >= CYCLE) { t0 = now; next = 0; }
+        } else {
+          t0 = now - (frames[Math.max(next - 1, 0)].at);   /* hold where we are */
+        }
+        raf = window.requestAnimationFrame(tick);
+      };
+      raf = window.requestAnimationFrame(tick);
+
+      panel.addEventListener("mouseenter", function () { paused = true; });
+      panel.addEventListener("mouseleave", function () { paused = false; });
+
+      var replay = document.getElementById("replay");
+      if (replay) {
+        replay.addEventListener("click", function () {
+          t0 = 0; next = 0; paused = false; frames[0].run();
+        });
+      }
+    }
+  }
 
   /* Demo toggle. Both panes are in the markup and one is hidden, so the content is
      there for search engines and for anyone without scripting. */

@@ -237,10 +237,12 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
                aria-describedby="wl-msg">
         <button class="btn btn-primary" type="submit" id="wl-submit">Join the list</button>
       </div>
-      <!-- Honeypot. Off-screen rather than display:none, which some autofillers skip. -->
+      <!-- Honeypot. Off-screen rather than display:none, which some autofillers skip.
+           Named _gotcha because that is the field Formspree drops on its side too, so
+           a bot has to beat both. -->
       <div class="wl-hp" aria-hidden="true">
         <label for="wl-company">Company</label>
-        <input id="wl-company" name="company" type="text" tabindex="-1" autocomplete="off">
+        <input id="wl-company" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
       </div>
       <p class="wl-msg" id="wl-msg" role="status" aria-live="polite"></p>
     </form>
@@ -252,7 +254,7 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
     <p class="links">
       <a href="https://github.com/RithikSatarla/agentcage">GitHub</a>
       <span class="sep">/</span>
-      <a href="agentcage-paper.pdf">Paper</a>
+      <a href="/agentcage-paper.pdf">Paper</a>
       <span class="sep">/</span>
       <a href="/data">Data</a>
       <span class="sep">/</span>
@@ -284,9 +286,13 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
     bCage.addEventListener("click", function () { choose(false); });
   }
 
-  /* Waiting list. Four states, and the failure state is the one that matters: if the
-     endpoint is not connected to a destination it answers 503, and the visitor is told
-     to email instead. Nothing here ever shows a tick for a signup that went nowhere. */
+  /* Waiting list. Four states, and the failure state is the one that matters: a tick
+     is shown only when Formspree has actually accepted the address. Anything else says
+     so and offers the mailto, so no signup is ever lost silently.
+
+     Formspree needs the Accept header to answer with JSON; without it, it replies with
+     a redirect to its own thank-you page and this would never see the outcome. */
+  var ENDPOINT = "https://formspree.io/f/mnpaqoaz";
   var form = document.getElementById("wl-form");
   if (form) {
     var input = document.getElementById("wl-email");
@@ -313,27 +319,35 @@ stripe.post_refund(charge=charge.id, amount=<span class="str">5000</span>)</pre>
       submit.textContent = "Joining";
       say("", "");
 
-      fetch("/api/waitlist", {
+      fetch(ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({
           email: email,
-          company: document.getElementById("wl-company").value,
-          source: "landing"
+          _gotcha: document.getElementById("wl-company").value,
+          source: "landing page"
         })
       }).then(function (res) {
-        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        return res.json()
+          .catch(function () { return {}; })
+          .then(function (data) { return { ok: res.ok, data: data }; });
       }).then(function (result) {
-        if (result.ok && result.data.ok) {
+        if (result.ok) {
           form.innerHTML = '<p class="wl-msg ok">You are on the list. ' +
             'You will hear from us once, when it ships.</p>';
           return;
         }
-        var reason = (result.data && result.data.error) || "something went wrong";
+        /* Formspree reports problems as {errors: [{message, field}]}. Show the first
+           one rather than a generic string, since "email is invalid" is actionable. */
+        var errors = (result.data && result.data.errors) || [];
+        var reason = (errors[0] && errors[0].message) || "something went wrong";
         say("err", "Could not add you: " + reason + ". " +
             '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
       }).catch(function () {
-        say("err", 'Could not reach the server. ' +
+        say("err", 'Could not reach the signup service. ' +
             '<a href="' + MAILTO + '">Email it to me instead</a> and I will add you by hand.');
       }).then(function () {
         submit.disabled = false;

@@ -182,16 +182,41 @@ def test_an_unexpected_error_never_reports_success(monkeypatch):
     assert fake.payload["ok"] is False
 
 
-# --- the page agrees with the endpoint ---------------------------------------
+# --- the page's own form ------------------------------------------------------
+#
+# The site posts straight to Formspree rather than through the function above, so
+# these test the page. The function is kept as the self-hosted alternative and its
+# behaviour is still covered by everything above.
 
-def test_the_form_posts_where_the_function_is_deployed():
-    page = (ROOT / "website" / "index.html").read_text(encoding="utf-8")
-    assert '"/api/waitlist"' in page
-    assert (ROOT / "api" / "waitlist.py").exists()
+PAGE = (ROOT / "website" / "index.html").read_text(encoding="utf-8")
+FORMSPREE = "https://formspree.io/f/mnpaqoaz"
+
+
+def test_the_form_posts_to_the_configured_endpoint():
+    assert FORMSPREE in PAGE
+
+
+def test_the_form_asks_formspree_for_json():
+    """Without the Accept header Formspree answers with a redirect to its own page.
+
+    The submit handler would then be unable to tell success from failure, and the
+    honest-failure behaviour below would be decorative.
+    """
+    assert '"Accept": "application/json"' in PAGE
+
+
+def test_the_form_only_reports_success_on_an_accepted_response():
+    """The tick is gated on result.ok, never shown unconditionally."""
+    assert "if (result.ok) {" in PAGE
+    assert "You are on the list" in PAGE
 
 
 def test_the_form_offers_a_fallback_when_signup_fails():
-    """If the endpoint is down or unconfigured, the visitor still has a way through."""
-    page = (ROOT / "website" / "index.html").read_text(encoding="utf-8")
-    assert "mailto:rithiksatarla@gmail.com" in page
-    assert "Email it to me instead" in page
+    """If the service is down or refuses, the visitor still has a way through."""
+    assert "mailto:rithiksatarla@gmail.com" in PAGE
+    assert "Email it to me instead" in PAGE
+
+
+def test_the_honeypot_field_is_named_for_formspree():
+    """_gotcha is dropped by Formspree as well as by our own check."""
+    assert 'name="_gotcha"' in PAGE

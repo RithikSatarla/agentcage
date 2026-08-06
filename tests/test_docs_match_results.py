@@ -320,11 +320,18 @@ def _site_links():
 
 
 def _route_to_file(route: str) -> str:
-    """Map a cleanUrls route to the file Vercel serves for it."""
+    """Map a cleanUrls route to the file Vercel serves for it.
+
+    A route that already names a file keeps its name. Only extensionless routes get
+    ``.html`` appended, which is what cleanUrls does. Without that distinction
+    ``/agentcage-paper.pdf`` would be looked up as ``agentcage-paper.pdf.html``.
+    """
     route = route.split("#")[0]
     if route in ("", "/"):
         return "index.html"
-    return route.lstrip("/") + ("" if route.endswith(".html") else ".html")
+    name = route.lstrip("/")
+    has_extension = "." in name.rsplit("/", 1)[-1]
+    return name if has_extension else name + ".html"
 
 
 def test_no_internal_link_is_dead():

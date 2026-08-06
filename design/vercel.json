@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": null,
+  "installCommand": null,
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/demo", "destination": "/demo.html" },
+    { "source": "/how-it-works", "destination": "/how-it-works.html" },
+    { "source": "/install", "destination": "/install.html" },
+    { "source": "/book", "destination": "/book.html" }
+  ]
+}

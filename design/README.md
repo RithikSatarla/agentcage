@@ -29,3 +29,19 @@ Two things in these files that did **not** come across, deliberately: they link 
 `/paper/agentcage.pdf`, which has never existed in this repository (the compiled paper
 is `website/agentcage-paper.pdf`), and their booking form posts to Formspree, which
 `website/book.html` now does directly.
+
+## vercel.json
+
+This folder is also deployed on its own, as a separate Vercel project whose Root
+Directory is `design/`. The repository-root `vercel.json` belongs to the other project
+and does not apply here, which is why there is a second one in this folder.
+
+It exists because the bundles and the host disagreed about URL shape. Every internal
+link in these pages is file-relative with the extension (`href="demo.html"`), but the
+deployment was serving the extensionless form only: `/demo` returned 200 and
+`/demo.html` returned 404, so the homepage worked and every nav click failed.
+
+`cleanUrls` is therefore off, so the `.html` paths the pages actually link to resolve.
+The rewrites keep the extensionless paths working as well, so any URL already shared
+stays alive. Fixing it here rather than in the markup keeps the bundles byte-identical
+to what was exported.

@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from part_b.jira_mock import JiraMock  # noqa: E402
 from part_b.server import ModelServer  # noqa: E402
+from part_b.fixture_arm import backend_for, fault_for, save_recording  # noqa: E402
 
 AGENT = "agno-agi/agno"
 TOOL = "JiraTools"
@@ -42,8 +43,9 @@ def main() -> int:
             return "drop"
         return None
 
-    with ModelServer(model, fault=fault) as srv:
-        model.base_url = srv.base_url
+    backend = backend_for(model, "agno")
+    with ModelServer(backend, fault=fault_for(fault)) as srv:
+        backend.base_url = srv.base_url
         tools = JiraTools(server_url=srv.base_url, username="bot@example.invalid",
                           token="not-a-real-token")
 
@@ -97,6 +99,8 @@ def main() -> int:
             "deleted": list(model.deleted),
         }
         requests = [r.to_dict() for r in srv.requests]
+
+    save_recording("agno")
 
     payload = {
         "agent": AGENT, "tool": TOOL, "tool_path": TOOL_PATH, "api": "jira",

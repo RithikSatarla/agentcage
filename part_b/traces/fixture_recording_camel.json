@@ -1,0 +1,256 @@
+[
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": 9746958,
+      "name": "widgets",
+      "full_name": "acme/widgets",
+      "owner": {
+        "login": "acme",
+        "type": "Organization",
+        "url": "https://api.github.com/users/acme"
+      },
+      "private": false,
+      "default_branch": "main",
+      "fork": false,
+      "archived": false,
+      "url": "https://api.github.com/repos/acme/widgets",
+      "html_url": "https://github.com/acme/widgets"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets/branches/main",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "name": "main",
+      "commit": {
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0",
+        "url": "https://api.github.com/repos/acme/widgets/commits/b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/repos/acme/widgets/git/refs",
+    "request_body": {
+      "ref": "refs/heads/agent-patch",
+      "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+    },
+    "status": 201,
+    "response_body": {
+      "ref": "refs/heads/agent-patch",
+      "url": "https://api.github.com/repos/acme/widgets/git/refs/heads/agent-patch",
+      "object": {
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0",
+        "type": "commit",
+        "url": "https://api.github.com/repos/acme/widgets/git/commits/b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets/contents/README.md",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "type": "file",
+      "name": "README.md",
+      "path": "README.md",
+      "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+      "size": 3,
+      "encoding": "base64",
+      "content": "djAK",
+      "url": "https://api.github.com/repos/acme/widgets/contents/README.md",
+      "git_url": "https://api.github.com/repos/acme/widgets/git/blobs/a84a34b1c6762529695802a5d2f72a090072e701",
+      "html_url": "https://github.com/acme/widgets/blob/main/README.md",
+      "download_url": "https://raw.githubusercontent.com/acme/widgets/main/README.md"
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/repos/acme/widgets/contents/README.md",
+    "request_body": {
+      "message": "please review",
+      "content": "djEK",
+      "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+      "branch": "agent-patch"
+    },
+    "status": 201,
+    "response_body": {
+      "content": {
+        "type": "file",
+        "name": "README.md",
+        "path": "README.md",
+        "sha": "328332ab319e53fc0b108c3379f52d065e69991a",
+        "size": 3,
+        "encoding": "base64",
+        "content": "djEK",
+        "url": "https://api.github.com/repos/acme/widgets/contents/README.md",
+        "git_url": "https://api.github.com/repos/acme/widgets/git/blobs/328332ab319e53fc0b108c3379f52d065e69991a",
+        "html_url": "https://github.com/acme/widgets/blob/main/README.md",
+        "download_url": "https://raw.githubusercontent.com/acme/widgets/main/README.md"
+      },
+      "commit": {
+        "sha": "328332ab319e53fc0b108c3379f52d065e69991a",
+        "message": "please review",
+        "url": "https://api.github.com/repos/acme/widgets/git/commits/328332ab319e53fc0b108c3379f52d065e69991a",
+        "html_url": "https://github.com/acme/widgets/commit/328332ab319e53fc0b108c3379f52d065e69991a",
+        "author": {
+          "name": "agent-bot",
+          "email": "agent-bot@example.invalid",
+          "date": "2023-11-14T22:13:20Z"
+        },
+        "committer": {
+          "name": "agent-bot",
+          "email": "agent-bot@example.invalid",
+          "date": "2023-11-14T22:13:20Z"
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/repos/acme/widgets/pulls",
+    "request_body": {
+      "base": "main",
+      "head": "agent-patch",
+      "title": "Update readme",
+      "body": "please review"
+    },
+    "status": 201,
+    "response_body": {
+      "id": 1,
+      "number": 1,
+      "title": "Update readme",
+      "state": "open",
+      "merged": false,
+      "merge_commit_sha": null,
+      "head": {
+        "ref": "agent-patch",
+        "sha": "311b445881dc734831eabb729f55d64d578b0950"
+      },
+      "base": {
+        "ref": "main",
+        "sha": "267c1c2b02078a0b44d4b350f0b96cb835b5b618"
+      },
+      "created_at": "2023-11-14T22:13:20Z",
+      "url": "https://api.github.com/repos/acme/widgets/pulls/1",
+      "issue_url": "https://api.github.com/repos/acme/widgets/issues/1",
+      "html_url": "https://github.com/acme/widgets/pull/1"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": 9746958,
+      "name": "widgets",
+      "full_name": "acme/widgets",
+      "owner": {
+        "login": "acme",
+        "type": "Organization",
+        "url": "https://api.github.com/users/acme"
+      },
+      "private": false,
+      "default_branch": "main",
+      "fork": false,
+      "archived": false,
+      "url": "https://api.github.com/repos/acme/widgets",
+      "html_url": "https://github.com/acme/widgets"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets/branches/main",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "name": "main",
+      "commit": {
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0",
+        "url": "https://api.github.com/repos/acme/widgets/commits/b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/repos/acme/widgets/git/refs",
+    "request_body": {
+      "ref": "refs/heads/agent-patch",
+      "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+    },
+    "status": 422,
+    "response_body": {
+      "message": "Reference already exists"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets/contents/README.md",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "type": "file",
+      "name": "README.md",
+      "path": "README.md",
+      "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+      "size": 3,
+      "encoding": "base64",
+      "content": "djAK",
+      "url": "https://api.github.com/repos/acme/widgets/contents/README.md",
+      "git_url": "https://api.github.com/repos/acme/widgets/git/blobs/a84a34b1c6762529695802a5d2f72a090072e701",
+      "html_url": "https://github.com/acme/widgets/blob/main/README.md",
+      "download_url": "https://raw.githubusercontent.com/acme/widgets/main/README.md"
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/repos/acme/widgets/contents/README.md",
+    "request_body": {
+      "message": "please review",
+      "content": "djIK",
+      "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+      "branch": "agent-patch"
+    },
+    "status": 409,
+    "response_body": {
+      "message": "README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": 9746958,
+      "name": "widgets",
+      "full_name": "acme/widgets",
+      "owner": {
+        "login": "acme",
+        "type": "Organization",
+        "url": "https://api.github.com/users/acme"
+      },
+      "private": false,
+      "default_branch": "main",
+      "fork": false,
+      "archived": false,
+      "url": "https://api.github.com/repos/acme/widgets",
+      "html_url": "https://github.com/acme/widgets"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/repos/acme/widgets/issues?state=all",
+    "request_body": null,
+    "status": 200,
+    "response_body": []
+  }
+]

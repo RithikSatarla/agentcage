@@ -1,0 +1,329 @@
+{
+  "agent": "camel-ai/camel",
+  "tool": "GithubToolkit",
+  "tool_path": "camel/toolkits/github_toolkit.py",
+  "api": "github",
+  "seam": "none (client constructed inline; traffic redirected below the tool)",
+  "redirect": {
+    "rewritten": 13,
+    "passed_through": []
+  },
+  "scenarios": [
+    {
+      "name": "pull-request-first",
+      "description": "open a pull request that edits one file on a new branch",
+      "reported": "Title: Update readme\nBody: None\n",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 2,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 3,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "query": "",
+          "body": {
+            "ref": "refs/heads/agent-patch",
+            "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 4,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 5,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": {
+            "message": "please review",
+            "content": "djEK",
+            "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+            "branch": "agent-patch"
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 6,
+          "method": "POST",
+          "path": "/repos/acme/widgets/pulls",
+          "query": "",
+          "body": {
+            "base": "main",
+            "head": "agent-patch",
+            "title": "Update readme",
+            "body": "please review"
+          },
+          "status": 201,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "pull-request-repeat",
+      "description": "run the identical call again, as an agent re-attempting the task would; the branch now exists and holds the first edit",
+      "reported": "None",
+      "raised": "GithubException: README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a: 409 {\"message\": \"README.md does not match 328332ab319e53fc0b108c3379f52d065e69991a\"}",
+      "requests": [
+        {
+          "seq": 7,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 8,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 9,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "query": "",
+          "body": {
+            "ref": "refs/heads/agent-patch",
+            "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+          },
+          "status": 422,
+          "dropped": false
+        },
+        {
+          "seq": 10,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 11,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": {
+            "message": "please review",
+            "content": "djIK",
+            "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+            "branch": "agent-patch"
+          },
+          "status": 409,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "issue-list-after",
+      "description": "read back the issue list to confirm the toolkit's read path works against the model",
+      "reported": "[]",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 12,
+          "method": "GET",
+          "path": "/repos/acme/widgets",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 13,
+          "method": "GET",
+          "path": "/repos/acme/widgets/issues",
+          "query": "state=all",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "seq": 1,
+      "method": "GET",
+      "path": "/repos/acme/widgets",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 2,
+      "method": "GET",
+      "path": "/repos/acme/widgets/branches/main",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 3,
+      "method": "POST",
+      "path": "/repos/acme/widgets/git/refs",
+      "query": "",
+      "body": {
+        "ref": "refs/heads/agent-patch",
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 4,
+      "method": "GET",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 5,
+      "method": "PUT",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": {
+        "message": "please review",
+        "content": "djEK",
+        "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+        "branch": "agent-patch"
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 6,
+      "method": "POST",
+      "path": "/repos/acme/widgets/pulls",
+      "query": "",
+      "body": {
+        "base": "main",
+        "head": "agent-patch",
+        "title": "Update readme",
+        "body": "please review"
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 7,
+      "method": "GET",
+      "path": "/repos/acme/widgets",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 8,
+      "method": "GET",
+      "path": "/repos/acme/widgets/branches/main",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 9,
+      "method": "POST",
+      "path": "/repos/acme/widgets/git/refs",
+      "query": "",
+      "body": {
+        "ref": "refs/heads/agent-patch",
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      },
+      "status": 422,
+      "dropped": false
+    },
+    {
+      "seq": 10,
+      "method": "GET",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 11,
+      "method": "PUT",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": {
+        "message": "please review",
+        "content": "djIK",
+        "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+        "branch": "agent-patch"
+      },
+      "status": 409,
+      "dropped": false
+    },
+    {
+      "seq": 12,
+      "method": "GET",
+      "path": "/repos/acme/widgets",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 13,
+      "method": "GET",
+      "path": "/repos/acme/widgets/issues",
+      "query": "state=all",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    }
+  ],
+  "final_state": {
+    "branches": {
+      "main": [
+        "README.md"
+      ]
+    },
+    "branch_contents": {
+      "main": {
+        "README.md": "v0\n"
+      }
+    },
+    "pull_requests": [],
+    "issue_count": 0
+  }
+}

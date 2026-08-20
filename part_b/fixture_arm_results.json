@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "what_this_is": "The same scenarios, interceptor, server and pre-registered detectors, with only the backend swapped: a stateful model versus a replay fixture recorded from a clean run against it.",
+  "fixture": "matches on method and path, walks recorded order then holds on the last recording, raises on an unrecorded route",
+  "agents": [
+    {
+      "agent": "camel-ai/camel",
+      "key": "camel",
+      "model_arm": {
+        "defect_classes": [
+          3
+        ],
+        "defects": 1,
+        "requests_graded": 13,
+        "tiers": {
+          "T1": 6,
+          "T2": 7,
+          "T3": 0,
+          "MISS": 0
+        }
+      },
+      "fixture_arm": {
+        "defect_classes": [
+          3
+        ],
+        "defects": 1,
+        "requests_graded": 13,
+        "tiers": {
+          "T1": 6,
+          "T2": 7,
+          "T3": 0,
+          "MISS": 0
+        },
+        "unanswerable_requests": 0
+      },
+      "missed_by_fixture": [],
+      "found_by_both": [
+        3
+      ],
+      "fixture_defect_detail": [
+        {
+          "class": 3,
+          "name": "stale read",
+          "scenario": "pull-request-repeat",
+          "evidence": "GET /repos/acme/widgets/contents/README.md (seq 10) supplied the version token used by PUT /repos/acme/widgets/contents/README.md (seq 11), which the API rejected 409 as out of date"
+        }
+      ]
+    },
+    {
+      "agent": "agno-agi/agno",
+      "key": "agno",
+      "model_arm": {
+        "defect_classes": [
+          1
+        ],
+        "defects": 1,
+        "requests_graded": 10,
+        "tiers": {
+          "T1": 5,
+          "T2": 5,
+          "T3": 0,
+          "MISS": 0
+        }
+      },
+      "fixture_arm": {
+        "defect_classes": [
+          1
+        ],
+        "defects": 1,
+        "requests_graded": 10,
+        "tiers": {
+          "T1": 5,
+          "T2": 5,
+          "T3": 0,
+          "MISS": 0
+        },
+        "unanswerable_requests": 0
+      },
+      "missed_by_fixture": [],
+      "found_by_both": [
+        1
+      ],
+      "fixture_defect_detail": [
+        {
+          "class": 1,
+          "name": "duplicate write",
+          "scenario": "create-interrupted",
+          "evidence": "2 identical successful POSTs to /rest/api/2/issue within one tool call; the tool reported a single success"
+        }
+      ]
+    },
+    {
+      "agent": "run-llama/llama_index",
+      "key": "llamaindex",
+      "model_arm": {
+        "defect_classes": [
+          1
+        ],
+        "defects": 1,
+        "requests_graded": 17,
+        "tiers": {
+          "T1": 7,
+          "T2": 10,
+          "T3": 0,
+          "MISS": 0
+        }
+      },
+      "fixture_arm": {
+        "defect_classes": [
+          1
+        ],
+        "defects": 1,
+        "requests_graded": 18,
+        "tiers": {
+          "T1": 8,
+          "T2": 10,
+          "T3": 0,
+          "MISS": 0
+        },
+        "unanswerable_requests": 0
+      },
+      "missed_by_fixture": [],
+      "found_by_both": [
+        1
+      ],
+      "fixture_defect_detail": [
+        {
+          "class": 1,
+          "name": "duplicate write",
+          "scenario": "create-interrupted",
+          "evidence": "2 identical successful POSTs to /rest/api/2/issue within one tool call; the tool reported a single success"
+        }
+      ]
+    }
+  ],
+  "by_defect_class": {
+    "3": {
+      "model": 1,
+      "fixture": 1
+    },
+    "1": {
+      "model": 2,
+      "fixture": 2
+    }
+  },
+  "limitations": [
+    "The recording is made against the stateful model, not the real service, so the fixture holds responses that are correct about what the API says and wrong only about when.",
+    "The record pass suppresses the injected fault, because a cassette recorded through the failure would bake it in. Recording through the fault would make the fixture arm look better than a real cassette would.",
+    "Two arms over three agents. This compares backends, not populations."
+  ]
+}

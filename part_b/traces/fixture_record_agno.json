@@ -1,0 +1,274 @@
+{
+  "agent": "agno-agi/agno",
+  "tool": "JiraTools",
+  "tool_path": "libs/agno/agno/tools/jira.py",
+  "api": "jira",
+  "seam": "configuration (server_url)",
+  "scenarios": [
+    {
+      "name": "create-interrupted",
+      "description": "create_issue whose response is dropped after the model applied it",
+      "reported": "{\"key\": \"KAN-1\", \"url\": \"http://model.invalid/browse/KAN-1\"}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "key": "KAN"
+              },
+              "summary": "Login returns 500",
+              "description": "on submit",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 3,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "create-retry",
+      "description": "the identical create_issue call again, as a caller that saw a failure would retry it",
+      "reported": "{\"key\": \"KAN-2\", \"url\": \"http://model.invalid/browse/KAN-2\"}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 4,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "key": "KAN"
+              },
+              "summary": "Login returns 500",
+              "description": "on submit",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 5,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-2",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "search-after-retry",
+      "description": "search the project to count what actually exists after the retry",
+      "reported": "[{\"key\": \"KAN-1\", \"summary\": \"Login returns 500\", \"status\": \"To Do\", \"assignee\": \"Unassigned\"}, {\"key\": \"KAN-2\", \"summary\": \"Login returns 500\", \"status\": \"To Do\", \"assignee\": \"Unassigned\"}]",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 6,
+          "method": "GET",
+          "path": "/rest/api/2/field",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 7,
+          "method": "GET",
+          "path": "/rest/api/2/search/jql",
+          "query": "jql=project+%3D+KAN&fields=%2Aall&maxResults=50",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "comment-on-missing-issue",
+      "description": "add_comment to an issue key that does not exist",
+      "reported": "{\"error\": \"JiraError HTTP 404 url: http://model.invalid/rest/api/2/issue/KAN-999/comment\\n\\ttext: Issue does not exist or you do not have permission to see it.\\n\\t\\n\\tresponse headers = {'Server': 'BaseHTTP/0.6 Python/3.14.3', 'Date': 'Thu, 20 Aug 2026 03:55:55 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '98', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Remaining': '4999', 'X-RateLimit-Reset': '0'}\\n\\tresponse text = {\\\"errorMessages\\\": [\\\"Issue does not exist or you do not have permission to see it.\\\"], \\\"errors\\\": {}}\"}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 8,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-999/comment",
+          "query": "",
+          "body": {
+            "body": "any progress?"
+          },
+          "status": 404,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "worklog-invalid-duration",
+      "description": "add_worklog with a duration Jira rejects",
+      "reported": "{\"error\": \"JiraError HTTP 400 url: http://model.invalid/rest/api/2/issue/KAN-1/worklog\\n\\ttext: Invalid time duration entered.\\n\\t\\n\\tresponse headers = {'Server': 'BaseHTTP/0.6 Python/3.14.3', 'Date': 'Thu, 20 Aug 2026 03:55:55 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '80', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Remaining': '4999', 'X-RateLimit-Reset': '0'}\\n\\tresponse text = {\\\"errorMessages\\\": [], \\\"errors\\\": {\\\"timeSpent\\\": \\\"Invalid time duration entered.\\\"}}\"}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 9,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/worklog",
+          "query": "",
+          "body": {
+            "timeSpent": "quite a while",
+            "comment": "investigating"
+          },
+          "status": 400,
+          "dropped": false
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "seq": 1,
+      "method": "GET",
+      "path": "/rest/api/2/serverInfo",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 2,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "key": "KAN"
+          },
+          "summary": "Login returns 500",
+          "description": "on submit",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 3,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 4,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "key": "KAN"
+          },
+          "summary": "Login returns 500",
+          "description": "on submit",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 5,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-2",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 6,
+      "method": "GET",
+      "path": "/rest/api/2/field",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 7,
+      "method": "GET",
+      "path": "/rest/api/2/search/jql",
+      "query": "jql=project+%3D+KAN&fields=%2Aall&maxResults=50",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 8,
+      "method": "POST",
+      "path": "/rest/api/2/issue/KAN-999/comment",
+      "query": "",
+      "body": {
+        "body": "any progress?"
+      },
+      "status": 404,
+      "dropped": false
+    },
+    {
+      "seq": 9,
+      "method": "POST",
+      "path": "/rest/api/2/issue/KAN-1/worklog",
+      "query": "",
+      "body": {
+        "timeSpent": "quite a while",
+        "comment": "investigating"
+      },
+      "status": 400,
+      "dropped": false
+    }
+  ],
+  "final_state": {
+    "issues": [
+      {
+        "key": "KAN-1",
+        "summary": "Login returns 500",
+        "status": "To Do"
+      },
+      {
+        "key": "KAN-2",
+        "summary": "Login returns 500",
+        "status": "To Do"
+      }
+    ],
+    "issue_count": 2,
+    "deleted": []
+  }
+}

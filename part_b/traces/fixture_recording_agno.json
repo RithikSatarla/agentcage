@@ -1,0 +1,379 @@
+[
+  {
+    "method": "GET",
+    "path": "/rest/api/2/serverInfo",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "baseUrl": "http://127.0.0.1:53110",
+      "version": "9.4.0",
+      "versionNumbers": [
+        9,
+        4,
+        0
+      ],
+      "deploymentType": "Cloud",
+      "buildNumber": 940000,
+      "serverTitle": "AgentCage Jira model"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue",
+    "request_body": {
+      "fields": {
+        "project": {
+          "key": "KAN"
+        },
+        "summary": "Login returns 500",
+        "description": "on submit",
+        "issuetype": {
+          "name": "Bug"
+        }
+      }
+    },
+    "status": 201,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53110/rest/api/2/issue/10001"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53110/rest/api/2/issue/10001",
+      "fields": {
+        "summary": "Login returns 500",
+        "description": "on submit",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "305",
+          "name": "To Do",
+          "statusCategory": {
+            "key": "new",
+            "id": 2
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53110/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue",
+    "request_body": {
+      "fields": {
+        "project": {
+          "key": "KAN"
+        },
+        "summary": "Login returns 500",
+        "description": "on submit",
+        "issuetype": {
+          "name": "Bug"
+        }
+      }
+    },
+    "status": 201,
+    "response_body": {
+      "id": "10002",
+      "key": "KAN-2",
+      "self": "http://127.0.0.1:53110/rest/api/2/issue/10002"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-2",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10002",
+      "key": "KAN-2",
+      "self": "http://127.0.0.1:53110/rest/api/2/issue/10002",
+      "fields": {
+        "summary": "Login returns 500",
+        "description": "on submit",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "305",
+          "name": "To Do",
+          "statusCategory": {
+            "key": "new",
+            "id": 2
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53110/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/field",
+    "request_body": null,
+    "status": 200,
+    "response_body": [
+      {
+        "id": "summary",
+        "name": "Summary",
+        "custom": false,
+        "navigable": true,
+        "searchable": true,
+        "clauseNames": [
+          "summary"
+        ],
+        "schema": {
+          "type": "string",
+          "system": "summary"
+        }
+      },
+      {
+        "id": "description",
+        "name": "Description",
+        "custom": false,
+        "navigable": true,
+        "searchable": true,
+        "clauseNames": [
+          "description"
+        ],
+        "schema": {
+          "type": "string",
+          "system": "description"
+        }
+      },
+      {
+        "id": "duedate",
+        "name": "Due Date",
+        "custom": false,
+        "navigable": true,
+        "searchable": true,
+        "clauseNames": [
+          "duedate"
+        ],
+        "schema": {
+          "type": "date",
+          "system": "duedate"
+        }
+      },
+      {
+        "id": "assignee",
+        "name": "Assignee",
+        "custom": false,
+        "navigable": true,
+        "searchable": true,
+        "clauseNames": [
+          "assignee"
+        ],
+        "schema": {
+          "type": "user",
+          "system": "assignee"
+        }
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/search/jql?jql=project+%3D+KAN&fields=%2Aall&maxResults=50",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "startAt": 0,
+      "maxResults": 50,
+      "total": 2,
+      "issues": [
+        {
+          "id": "10001",
+          "key": "KAN-1",
+          "self": "http://127.0.0.1:53110/rest/api/2/issue/10001",
+          "fields": {
+            "summary": "Login returns 500",
+            "description": "on submit",
+            "project": {
+              "id": "10000",
+              "key": "KAN",
+              "name": "KAN project"
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Bug",
+              "subtask": false
+            },
+            "status": {
+              "id": "305",
+              "name": "To Do",
+              "statusCategory": {
+                "key": "new",
+                "id": 2
+              }
+            },
+            "assignee": null,
+            "reporter": {
+              "accountId": "agent-bot",
+              "displayName": "Agent Bot",
+              "emailAddress": "agent-bot@example.invalid",
+              "active": true,
+              "self": "http://127.0.0.1:53110/rest/api/2/user?accountId=agent-bot"
+            },
+            "duedate": null,
+            "created": "2023-11-14T22:13:20.000+0000",
+            "updated": "2023-11-14T22:13:20.000+0000",
+            "labels": [],
+            "comment": {
+              "comments": [],
+              "total": 0,
+              "startAt": 0,
+              "maxResults": 0
+            },
+            "worklog": {
+              "worklogs": [],
+              "total": 0
+            }
+          }
+        },
+        {
+          "id": "10002",
+          "key": "KAN-2",
+          "self": "http://127.0.0.1:53110/rest/api/2/issue/10002",
+          "fields": {
+            "summary": "Login returns 500",
+            "description": "on submit",
+            "project": {
+              "id": "10000",
+              "key": "KAN",
+              "name": "KAN project"
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Bug",
+              "subtask": false
+            },
+            "status": {
+              "id": "305",
+              "name": "To Do",
+              "statusCategory": {
+                "key": "new",
+                "id": 2
+              }
+            },
+            "assignee": null,
+            "reporter": {
+              "accountId": "agent-bot",
+              "displayName": "Agent Bot",
+              "emailAddress": "agent-bot@example.invalid",
+              "active": true,
+              "self": "http://127.0.0.1:53110/rest/api/2/user?accountId=agent-bot"
+            },
+            "duedate": null,
+            "created": "2023-11-14T22:13:20.000+0000",
+            "updated": "2023-11-14T22:13:20.000+0000",
+            "labels": [],
+            "comment": {
+              "comments": [],
+              "total": 0,
+              "startAt": 0,
+              "maxResults": 0
+            },
+            "worklog": {
+              "worklogs": [],
+              "total": 0
+            }
+          }
+        }
+      ],
+      "expand": "schema,names"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue/KAN-999/comment",
+    "request_body": {
+      "body": "any progress?"
+    },
+    "status": 404,
+    "response_body": {
+      "errorMessages": [
+        "Issue does not exist or you do not have permission to see it."
+      ],
+      "errors": {}
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue/KAN-1/worklog",
+    "request_body": {
+      "timeSpent": "quite a while",
+      "comment": "investigating"
+    },
+    "status": 400,
+    "response_body": {
+      "errorMessages": [],
+      "errors": {
+        "timeSpent": "Invalid time duration entered."
+      }
+    }
+  }
+]

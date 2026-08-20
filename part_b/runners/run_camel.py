@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / "part_b" / ".agents" / "camel"))
 from part_b.github_mock import GitHubMock  # noqa: E402
 from part_b.redirect import redirect  # noqa: E402
 from part_b.server import ModelServer  # noqa: E402
+from part_b.fixture_arm import backend_for, save_recording  # noqa: E402
 
 AGENT = "camel-ai/camel"
 TOOL = "GithubToolkit"
@@ -42,7 +43,8 @@ def main() -> int:
 
     # The model keeps advertising the real origin because PyGithub asserts that the
     # URLs in payloads match the host it was configured with.
-    with ModelServer(model, advertise=REAL) as srv:
+    backend = backend_for(model, "camel")
+    with ModelServer(backend, advertise=REAL) as srv:
         with redirect({REAL: srv.base_url}) as red:
             from camel.toolkits.github_toolkit import GithubToolkit
             tk = GithubToolkit(access_token="ghp_" + "x" * 36)
@@ -101,6 +103,8 @@ def main() -> int:
             "issue_count": len(model.issues[REPO]),
         }
         requests = [r.to_dict() for r in srv.requests]
+
+    save_recording("camel")
 
     payload = {
         "agent": AGENT, "tool": TOOL, "tool_path": TOOL_PATH, "api": "github",

@@ -1,0 +1,462 @@
+[
+  {
+    "method": "GET",
+    "path": "/rest/api/2/serverInfo",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "baseUrl": "http://127.0.0.1:53149",
+      "version": "9.4.0",
+      "versionNumbers": [
+        9,
+        4,
+        0
+      ],
+      "deploymentType": "Cloud",
+      "buildNumber": 940000,
+      "serverTitle": "AgentCage Jira model"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/project/KAN",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10000",
+      "key": "KAN",
+      "name": "KAN project"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue",
+    "request_body": {
+      "fields": {
+        "project": {
+          "id": "10000"
+        },
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "issuetype": {
+          "name": "Bug"
+        }
+      }
+    },
+    "status": 201,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10001"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10001",
+      "fields": {
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "357",
+          "name": "To Do",
+          "statusCategory": {
+            "key": "new",
+            "id": 2
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53149/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/project/KAN",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10000",
+      "key": "KAN",
+      "name": "KAN project"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue",
+    "request_body": {
+      "fields": {
+        "project": {
+          "id": "10000"
+        },
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "issuetype": {
+          "name": "Bug"
+        }
+      }
+    },
+    "status": 201,
+    "response_body": {
+      "id": "10002",
+      "key": "KAN-2",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10002"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-2",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10002",
+      "key": "KAN-2",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10002",
+      "fields": {
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "357",
+          "name": "To Do",
+          "statusCategory": {
+            "key": "new",
+            "id": 2
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53149/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10001",
+      "fields": {
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "357",
+          "name": "To Do",
+          "statusCategory": {
+            "key": "new",
+            "id": 2
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53149/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1/transitions",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "expand": "transitions",
+      "transitions": [
+        {
+          "id": "11",
+          "name": "In Progress",
+          "to": {
+            "id": "779",
+            "name": "In Progress",
+            "statusCategory": {
+              "key": "indeterminate",
+              "id": 4
+            }
+          }
+        },
+        {
+          "id": "31",
+          "name": "Done",
+          "to": {
+            "id": "528",
+            "name": "Done",
+            "statusCategory": {
+              "key": "done",
+              "id": 3
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/rest/api/2/issue/KAN-1/transitions",
+    "request_body": {
+      "transition": {
+        "id": 31
+      },
+      "fields": {}
+    },
+    "status": 204,
+    "response_body": null
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10001",
+      "fields": {
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "528",
+          "name": "Done",
+          "statusCategory": {
+            "key": "done",
+            "id": 3
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53149/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1/transitions",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "expand": "transitions",
+      "transitions": [
+        {
+          "id": "21",
+          "name": "To Do",
+          "to": {
+            "id": "357",
+            "name": "To Do",
+            "statusCategory": {
+              "key": "new",
+              "id": 2
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "id": "10001",
+      "key": "KAN-1",
+      "self": "http://127.0.0.1:53149/rest/api/2/issue/10001",
+      "fields": {
+        "summary": "Checkout total is wrong",
+        "description": "off by the tax amount",
+        "project": {
+          "id": "10000",
+          "key": "KAN",
+          "name": "KAN project"
+        },
+        "issuetype": {
+          "id": "10000",
+          "name": "Bug",
+          "subtask": false
+        },
+        "status": {
+          "id": "528",
+          "name": "Done",
+          "statusCategory": {
+            "key": "done",
+            "id": 3
+          }
+        },
+        "assignee": null,
+        "reporter": {
+          "accountId": "agent-bot",
+          "displayName": "Agent Bot",
+          "emailAddress": "agent-bot@example.invalid",
+          "active": true,
+          "self": "http://127.0.0.1:53149/rest/api/2/user?accountId=agent-bot"
+        },
+        "duedate": null,
+        "created": "2023-11-14T22:13:20.000+0000",
+        "updated": "2023-11-14T22:13:20.000+0000",
+        "labels": [],
+        "comment": {
+          "comments": [],
+          "total": 0,
+          "startAt": 0,
+          "maxResults": 0
+        },
+        "worklog": {
+          "worklogs": [],
+          "total": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/rest/api/2/issue/10001?deleteSubtasks=False",
+    "request_body": null,
+    "status": 204,
+    "response_body": null
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 404,
+    "response_body": {
+      "errorMessages": [
+        "Issue does not exist or you do not have permission to see it."
+      ],
+      "errors": {}
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/rest/api/2/issue/KAN-1",
+    "request_body": null,
+    "status": 404,
+    "response_body": {
+      "errorMessages": [
+        "Issue does not exist or you do not have permission to see it."
+      ],
+      "errors": {}
+    }
+  }
+]

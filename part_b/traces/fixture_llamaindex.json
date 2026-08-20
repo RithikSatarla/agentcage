@@ -1,0 +1,470 @@
+{
+  "agent": "run-llama/llama_index",
+  "tool": "JiraIssueToolSpec",
+  "tool_path": "llama-index-integrations/tools/llama-index-tools-jira-issue/llama_index/tools/jira_issue/base.py",
+  "api": "jira",
+  "seam": "configuration (server_url)",
+  "scenarios": [
+    {
+      "name": "create-interrupted",
+      "description": "create_issue whose response is dropped after the model applied it",
+      "reported": "{'error': False, 'message': 'Issue KAN-2 created successfully.', 'issue_key': 'KAN-2'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 2,
+          "method": "GET",
+          "path": "/rest/api/2/project/KAN",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 3,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "id": "10000"
+              },
+              "summary": "Checkout total is wrong",
+              "description": "off by the tax amount",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": true
+        },
+        {
+          "seq": 4,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "id": "10000"
+              },
+              "summary": "Checkout total is wrong",
+              "description": "off by the tax amount",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 5,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-2",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "create-retry",
+      "description": "the identical create_issue call again, as a caller that saw a failure would retry it",
+      "reported": "{'error': False, 'message': 'Issue KAN-2 created successfully.', 'issue_key': 'KAN-2'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 6,
+          "method": "GET",
+          "path": "/rest/api/2/project/KAN",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 7,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "id": "10000"
+              },
+              "summary": "Checkout total is wrong",
+              "description": "off by the tax amount",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 8,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-2",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "status-allowed",
+      "description": "move an issue to a status the workflow offers from where it is",
+      "reported": "{'error': False, 'message': 'Issue KAN-1 status updated to Done.'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 9,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 10,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 11,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "query": "",
+          "body": {
+            "transition": {
+              "id": 31
+            },
+            "fields": {}
+          },
+          "status": 204,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "status-not-in-workflow",
+      "description": "move the same issue to a status not reachable from its new one; the available transitions changed as a result of the previous write, which is the part a recorded response cannot represent",
+      "reported": "{'error': True, 'message': \"Status 'In Progress' not available for issue KAN-1. Available transitions: ['To Do']\"}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 12,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 13,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1/transitions",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "delete",
+      "description": "delete an issue that exists",
+      "reported": "{'error': False, 'message': 'Issue KAN-1 deleted successfully.'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 14,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 15,
+          "method": "DELETE",
+          "path": "/rest/api/2/issue/10001",
+          "query": "deleteSubtasks=False",
+          "body": null,
+          "status": 204,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "delete-again",
+      "description": "delete the same issue a second time",
+      "reported": "{'error': False, 'message': 'Issue KAN-1 deleted successfully.'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 16,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 17,
+          "method": "DELETE",
+          "path": "/rest/api/2/issue/10001",
+          "query": "deleteSubtasks=False",
+          "body": null,
+          "status": 204,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "update-deleted-issue",
+      "description": "update the summary of an issue that was already deleted",
+      "reported": "{'error': True, 'message': 'Failed to update issue KAN-1: JiraError HTTP 404 url: http://model.invalid/rest/api/2/issue/KAN-1\\n\\ttext: Issue does not exist or you do not have permission to see it.\\n\\t\\n\\tresponse headers = {\\'Server\\': \\'BaseHTTP/0.6 Python/3.14.3\\', \\'Date\\': \\'Thu, 20 Aug 2026 03:56:26 GMT\\', \\'Content-Type\\': \\'application/json; charset=utf-8\\', \\'Content-Length\\': \\'98\\', \\'X-RateLimit-Limit\\': \\'5000\\', \\'X-RateLimit-Remaining\\': \\'4999\\', \\'X-RateLimit-Reset\\': \\'0\\'}\\n\\tresponse text = {\"errorMessages\": [\"Issue does not exist or you do not have permission to see it.\"], \"errors\": {}}'}",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 18,
+          "method": "GET",
+          "path": "/rest/api/2/issue/KAN-1",
+          "query": "",
+          "body": null,
+          "status": 404,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "due-date-invalid",
+      "description": "set a due date in a format Jira rejects",
+      "reported": "{'error': True, 'message': 'Invalid date format. Use YYYY-MM-DD.'}",
+      "raised": null,
+      "requests": []
+    }
+  ],
+  "requests": [
+    {
+      "seq": 1,
+      "method": "GET",
+      "path": "/rest/api/2/serverInfo",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 2,
+      "method": "GET",
+      "path": "/rest/api/2/project/KAN",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 3,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "id": "10000"
+          },
+          "summary": "Checkout total is wrong",
+          "description": "off by the tax amount",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": true
+    },
+    {
+      "seq": 4,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "id": "10000"
+          },
+          "summary": "Checkout total is wrong",
+          "description": "off by the tax amount",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 5,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-2",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 6,
+      "method": "GET",
+      "path": "/rest/api/2/project/KAN",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 7,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "id": "10000"
+          },
+          "summary": "Checkout total is wrong",
+          "description": "off by the tax amount",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 8,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-2",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 9,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 10,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1/transitions",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 11,
+      "method": "POST",
+      "path": "/rest/api/2/issue/KAN-1/transitions",
+      "query": "",
+      "body": {
+        "transition": {
+          "id": 31
+        },
+        "fields": {}
+      },
+      "status": 204,
+      "dropped": false
+    },
+    {
+      "seq": 12,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 13,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1/transitions",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 14,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 15,
+      "method": "DELETE",
+      "path": "/rest/api/2/issue/10001",
+      "query": "deleteSubtasks=False",
+      "body": null,
+      "status": 204,
+      "dropped": false
+    },
+    {
+      "seq": 16,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 17,
+      "method": "DELETE",
+      "path": "/rest/api/2/issue/10001",
+      "query": "deleteSubtasks=False",
+      "body": null,
+      "status": 204,
+      "dropped": false
+    },
+    {
+      "seq": 18,
+      "method": "GET",
+      "path": "/rest/api/2/issue/KAN-1",
+      "query": "",
+      "body": null,
+      "status": 404,
+      "dropped": false
+    }
+  ],
+  "final_state": {
+    "issues": [],
+    "issue_count": 0,
+    "deleted": []
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "protocol": "PROTOCOL.md 3A.4-3A.6, applied to a control rather than a sample member",
+  "what_this_is": "A client written to handle the write path correctly, driven through the same models, the same server and the same injected fault as the sampled agents, and graded by the same imported functions. It is not part of the 3A.7 denominator.",
+  "arms": [
+    {
+      "arm": "jira",
+      "requests_graded": 6,
+      "tiers": {
+        "T1": 3,
+        "T2": 3,
+        "T3": 0,
+        "MISS": 0
+      },
+      "defects": [],
+      "defect_count": 0,
+      "scenarios": [
+        {
+          "name": "create-interrupted-then-reconcile",
+          "hazard": "class 1 (duplicate write)",
+          "raised": null
+        },
+        {
+          "name": "create-again-preflighted",
+          "hazard": "class 1 (duplicate write)",
+          "raised": null
+        },
+        {
+          "name": "comment-on-missing-issue",
+          "hazard": "class 2 (unchecked error)",
+          "raised": "Unexpected: POST /rest/api/2/issue/KAN-999/comment -> 404, expected (201,): {\"errorMessages\": [\"Issue does not exist or you do not have permission to see it.\"], \"errors\": {}}"
+        },
+        {
+          "name": "worklog-invalid-duration",
+          "hazard": "class 2 (unchecked error)",
+          "raised": "Unexpected: POST /rest/api/2/issue/KAN-1/worklog -> 400, expected (201,): {\"errorMessages\": [], \"errors\": {\"timeSpent\": \"Invalid time duration entered.\"}}"
+        }
+      ],
+      "graded_requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issues matching the JQL query)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/"
+        },
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "status": 201,
+          "dropped": true,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (issue created; the endpoint has no idempotency key)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post"
+        },
+        {
+          "seq": 3,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issues matching the JQL query)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/"
+        },
+        {
+          "seq": 4,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (issues matching the JQL query)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/"
+        },
+        {
+          "seq": 5,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-999/comment",
+          "status": 404,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 404 is documented for this endpoint (no such issue)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/"
+        },
+        {
+          "seq": 6,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/worklog",
+          "status": 400,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 400 is documented for this endpoint (invalid duration)",
+          "reference": "https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-worklogs/"
+        }
+      ]
+    },
+    {
+      "arm": "github",
+      "requests_graded": 5,
+      "tiers": {
+        "T1": 4,
+        "T2": 1,
+        "T3": 0,
+        "MISS": 0
+      },
+      "defects": [],
+      "defect_count": 0,
+      "scenarios": [
+        {
+          "name": "branch-then-update-with-correct-ref",
+          "hazard": "class 3 (stale read)",
+          "raised": null
+        },
+        {
+          "name": "update-existing-without-sha",
+          "hazard": "class 2 (unchecked error)",
+          "raised": "Unexpected: PUT /repos/acme/widgets/contents/README.md -> 422, expected (200, 201): {\"message\": \"\\\"README.md\\\" already exists; you must supply its sha to update it\"}"
+        }
+      ],
+      "graded_requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "status": 200,
+          "dropped": false,
+          "tier": "T2",
+          "rule": "status 200 is documented for this endpoint (branch returned, including its head commit sha)",
+          "reference": "https://docs.github.com/en/rest/branches/branches#get-a-branch"
+        },
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (reference created)",
+          "reference": "https://docs.github.com/en/rest/git/refs#create-a-reference"
+        },
+        {
+          "seq": 3,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 200,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 200 is documented for this endpoint (file returned, base64 encoded, with its blob sha)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#get-repository-content"
+        },
+        {
+          "seq": 4,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 201,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 201 is documented for this endpoint (file created)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents"
+        },
+        {
+          "seq": 5,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "status": 422,
+          "dropped": false,
+          "tier": "T1",
+          "rule": "status 422 is documented for this endpoint (file exists and no sha was supplied, or validation failed)",
+          "reference": "https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "requests_graded": 11,
+    "tiers": {
+      "T1": 7,
+      "T2": 4,
+      "T3": 0,
+      "MISS": 0
+    },
+    "defects": 0
+  },
+  "expected": "zero class-1-4 defects",
+  "passed": true,
+  "limitations": [
+    "The control client was written by the same author as the models and the grader, and written knowing which defects the sampled agents exhibited. It shows the detectors are not unconditional; it does not show they are correct.",
+    "It exercises the same scenarios as the sampled agents and no others. A clean result here says nothing about false positives on write paths this study never drove."
+  ]
+}

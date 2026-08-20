@@ -1,0 +1,144 @@
+{
+  "agent": "negative-control (github)",
+  "tool": "reference client written for this study",
+  "tool_path": "part_b/negative_control.py",
+  "api": "github",
+  "seam": "configuration (base_url)",
+  "scenarios": [
+    {
+      "name": "branch-then-update-with-correct-ref",
+      "hazard": "class 3 (stale read)",
+      "description": "read the file on the branch being written, then write it there; the version token is current, so no 409 arises",
+      "reported": "updated:328332ab319e53fc0b108c3379f52d065e69991a",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/repos/acme/widgets/branches/main",
+          "query": "",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/repos/acme/widgets/git/refs",
+          "query": "",
+          "body": {
+            "ref": "refs/heads/feature",
+            "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+          },
+          "status": 201,
+          "dropped": false
+        },
+        {
+          "seq": 3,
+          "method": "GET",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "ref=feature",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 4,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": {
+            "message": "update readme on feature",
+            "content": "djEK",
+            "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+            "branch": "feature"
+          },
+          "status": 201,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "update-existing-without-sha",
+      "hazard": "class 2 (unchecked error)",
+      "description": "update an existing file with no sha; the 422 is checked and surfaced rather than reported as success",
+      "reported": "None",
+      "raised": "Unexpected: PUT /repos/acme/widgets/contents/README.md -> 422, expected (200, 201): {\"message\": \"\\\"README.md\\\" already exists; you must supply its sha to update it\"}",
+      "requests": [
+        {
+          "seq": 5,
+          "method": "PUT",
+          "path": "/repos/acme/widgets/contents/README.md",
+          "query": "",
+          "body": {
+            "message": "clobber",
+            "content": "djIK"
+          },
+          "status": 422,
+          "dropped": false
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "seq": 1,
+      "method": "GET",
+      "path": "/repos/acme/widgets/branches/main",
+      "query": "",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 2,
+      "method": "POST",
+      "path": "/repos/acme/widgets/git/refs",
+      "query": "",
+      "body": {
+        "ref": "refs/heads/feature",
+        "sha": "b236749e54feca9c72ea3042112cd942e7f8f1f0"
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 3,
+      "method": "GET",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "ref=feature",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 4,
+      "method": "PUT",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": {
+        "message": "update readme on feature",
+        "content": "djEK",
+        "sha": "a84a34b1c6762529695802a5d2f72a090072e701",
+        "branch": "feature"
+      },
+      "status": 201,
+      "dropped": false
+    },
+    {
+      "seq": 5,
+      "method": "PUT",
+      "path": "/repos/acme/widgets/contents/README.md",
+      "query": "",
+      "body": {
+        "message": "clobber",
+        "content": "djIK"
+      },
+      "status": 422,
+      "dropped": false
+    }
+  ],
+  "final_state": {
+    "note": "model state is exercised, not asserted, in this arm"
+  }
+}

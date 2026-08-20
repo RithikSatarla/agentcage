@@ -496,6 +496,31 @@ class-1 observations share one root cause and are not independent. Three agents 
 denominator and the proportion is descriptive only. The full list is under `limitations`
 in `part_b/partb_results.json`.
 
+**2026-08-19 - a negative control was added, after results were known.**
+
+Sections 3A.1-3A.9 specify no control arm. All three sampled agents exhibited a defect,
+and three positives with no negative do not show that the detectors in 3A.6 can return
+zero. A control was therefore written after the fact: `part_b/negative_control.py`, a
+client written here to handle the write path correctly, driven through the same models,
+the same server and the same injected fault as the sampled agents, and graded by the
+same `grade` and `find_defects` imported from `part_b/experiment.py`.
+
+Result: 11 requests graded across two arms, T1=7, T2=4, T3=0, MISS=0, and **0 defects**
+of classes 1-4. Every hazard was reached rather than avoided:
+
+| Hazard | How the control met it | Outcome |
+|---|---|---|
+| class 1 | first `POST /rest/api/2/issue` had its response dropped after the model applied it, the same fault as agno and llama_index | client reconciled by reading; run ended with **one** issue, not two |
+| class 3 | read-then-write on the file camel writes, with `?ref=` supplied | `PUT /contents` returned 201, not 409 |
+| class 2 | three 4xx responses reached the client (404, 400, 422) | each surfaced as a failure, none reported as success |
+
+This is a control, not a sample member. It is deliberately absent from
+`experiment.AGENTS` and does not enter the 3A.7 denominator. It was written after the
+positives were known, by the author of the models and the grader. It establishes that
+the detectors are not unconditional. It does not establish that they are correct, and it
+says nothing about false positives on write paths this study never drove.
+
+
 ---
 
 ## 4. Reproduction

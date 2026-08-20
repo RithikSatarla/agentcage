@@ -1,0 +1,198 @@
+{
+  "agent": "negative-control (jira)",
+  "tool": "reference client written for this study",
+  "tool_path": "part_b/negative_control.py",
+  "api": "jira",
+  "seam": "configuration (base_url)",
+  "scenarios": [
+    {
+      "name": "create-interrupted-then-reconcile",
+      "hazard": "class 1 (duplicate write)",
+      "description": "create whose response is dropped after the model applied it; the client reconciles by reading instead of retrying the write",
+      "reported": "reconciled:KAN-1",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 1,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "query": "jql=project+%3D+KAN&maxResults=50",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        },
+        {
+          "seq": 2,
+          "method": "POST",
+          "path": "/rest/api/2/issue",
+          "query": "",
+          "body": {
+            "fields": {
+              "project": {
+                "key": "KAN"
+              },
+              "summary": "Login returns 500",
+              "description": "on submit",
+              "issuetype": {
+                "name": "Bug"
+              }
+            }
+          },
+          "status": 201,
+          "dropped": true
+        },
+        {
+          "seq": 3,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "query": "jql=project+%3D+KAN&maxResults=50",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "create-again-preflighted",
+      "hazard": "class 1 (duplicate write)",
+      "description": "the identical create request again; the pre-flight read finds the issue and no second write is issued",
+      "reported": "exists:KAN-1",
+      "raised": null,
+      "requests": [
+        {
+          "seq": 4,
+          "method": "GET",
+          "path": "/rest/api/2/search",
+          "query": "jql=project+%3D+KAN&maxResults=50",
+          "body": null,
+          "status": 200,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "comment-on-missing-issue",
+      "hazard": "class 2 (unchecked error)",
+      "description": "comment on an issue key that does not exist; the 404 is checked and surfaced rather than reported as success",
+      "reported": "None",
+      "raised": "Unexpected: POST /rest/api/2/issue/KAN-999/comment -> 404, expected (201,): {\"errorMessages\": [\"Issue does not exist or you do not have permission to see it.\"], \"errors\": {}}",
+      "requests": [
+        {
+          "seq": 5,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-999/comment",
+          "query": "",
+          "body": {
+            "body": "any progress?"
+          },
+          "status": 404,
+          "dropped": false
+        }
+      ]
+    },
+    {
+      "name": "worklog-invalid-duration",
+      "hazard": "class 2 (unchecked error)",
+      "description": "worklog with a duration Jira rejects; the 400 is checked and surfaced",
+      "reported": "None",
+      "raised": "Unexpected: POST /rest/api/2/issue/KAN-1/worklog -> 400, expected (201,): {\"errorMessages\": [], \"errors\": {\"timeSpent\": \"Invalid time duration entered.\"}}",
+      "requests": [
+        {
+          "seq": 6,
+          "method": "POST",
+          "path": "/rest/api/2/issue/KAN-1/worklog",
+          "query": "",
+          "body": {
+            "timeSpent": "quite a while",
+            "comment": "investigating"
+          },
+          "status": 400,
+          "dropped": false
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "seq": 1,
+      "method": "GET",
+      "path": "/rest/api/2/search",
+      "query": "jql=project+%3D+KAN&maxResults=50",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 2,
+      "method": "POST",
+      "path": "/rest/api/2/issue",
+      "query": "",
+      "body": {
+        "fields": {
+          "project": {
+            "key": "KAN"
+          },
+          "summary": "Login returns 500",
+          "description": "on submit",
+          "issuetype": {
+            "name": "Bug"
+          }
+        }
+      },
+      "status": 201,
+      "dropped": true
+    },
+    {
+      "seq": 3,
+      "method": "GET",
+      "path": "/rest/api/2/search",
+      "query": "jql=project+%3D+KAN&maxResults=50",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 4,
+      "method": "GET",
+      "path": "/rest/api/2/search",
+      "query": "jql=project+%3D+KAN&maxResults=50",
+      "body": null,
+      "status": 200,
+      "dropped": false
+    },
+    {
+      "seq": 5,
+      "method": "POST",
+      "path": "/rest/api/2/issue/KAN-999/comment",
+      "query": "",
+      "body": {
+        "body": "any progress?"
+      },
+      "status": 404,
+      "dropped": false
+    },
+    {
+      "seq": 6,
+      "method": "POST",
+      "path": "/rest/api/2/issue/KAN-1/worklog",
+      "query": "",
+      "body": {
+        "timeSpent": "quite a while",
+        "comment": "investigating"
+      },
+      "status": 400,
+      "dropped": false
+    }
+  ],
+  "final_state": {
+    "issues": [
+      {
+        "key": "KAN-1",
+        "summary": "Login returns 500",
+        "status": "To Do"
+      }
+    ],
+    "issue_count": 1,
+    "deleted": []
+  }
+}
